@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String    @unique
+  password String
+  posts    Post[]
+  photo    String    @default("https://cdn-icons-png.flaticon.com/512/149/149071.png")
+  comments Comment[]
+}
+
+model Post {
+  id         Int       @id @default(autoincrement())
+  title      String
+  content    String
+  author     User      @relation(fields: [authorId], references: [id])
+  authorId   Int
+  createdAt  DateTime  @default(now())
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  comments   Comment[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  posts Post[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  createdAt DateTime @default(now())
+}
+
+//npx prisma init
+//npx prisma generate (read database url in .env file)
+//npx prisma db push (add database to mongo db cluster)
+//npx prisma studio
+// npx prisma migrate dev --name init
+
+//to add new column in database
+// npx prisma migrate dev --name add_user_photo
+// npx prisma generate
+//npx prisma db push
