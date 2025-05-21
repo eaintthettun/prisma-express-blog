@@ -18,9 +18,10 @@ model User {
   name     String
   email    String    @unique
   password String
-  posts    Post[]
+  posts    Post[] //user can write many posts
   photo    String    @default("https://cdn-icons-png.flaticon.com/512/149/149071.png")
   comments Comment[]
+  likes    Like[] //Likes given by this user
 }
 
 model Post {
@@ -33,6 +34,17 @@ model Post {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId Int?
   comments   Comment[]
+  likes      Like[] // Likes received by this post
+}
+
+model Like {
+  id       Int  @id @default(autoincrement())
+  author   User @relation(fields: [authorId], references: [id]) //who like this
+  authorId Int
+  post     Post @relation(fields: [postId], references: [id]) //under which post
+  postId   Int
+
+  @@unique([authorId, postId]) // Prevent duplicate likes
 }
 
 model Category {

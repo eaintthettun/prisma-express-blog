@@ -2,6 +2,42 @@ const {PrismaClient}=require('@prisma/client');
 const { name } = require('ejs');
 const prisma=new PrismaClient();
 
+
+//toggle like method
+exports.likePost=async(req,res)=>{
+    const authorId = req.session.userId; //who like the post
+    const postId = parseInt(req.params.id);  //which post he likes
+    
+    // Check if like already exists
+    const existingLike = await prisma.like.findUnique({
+        where: {
+          authorId_postId: {
+            authorId,
+            postId,
+          },
+        },
+    });
+    if(existingLike){
+        // User already liked → unlike (delete)
+        await prisma.like.delete({
+            where: {
+            authorId_postId: {
+                authorId,
+                postId,
+            },
+            },
+        });
+    }else{
+        // User hasn't liked → create like
+        const like=await prisma.like.create({
+            data: { 
+                authorId,
+                postId },
+          });
+    }
+    res.redirect('/');      
+}
+
 //search posts with pagination
 let ITEMS_PER_PAGE=5;
 exports.searchPosts=async(req,res)=>{

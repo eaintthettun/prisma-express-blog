@@ -37,7 +37,7 @@ app.use('/comments',commentRoutes);
 
   
 let ITEMS_PER_PAGE=5;
-app.get('/',auth,async(req,res)=>{
+app.get('/',async(req,res)=>{
     //for pagination
     const page = parseInt(req.query.page) || 1;  // default to page 1
     console.log('index page',page);
@@ -60,6 +60,7 @@ app.get('/',auth,async(req,res)=>{
         const posts=await prisma.post.findMany({
             where:filter,
             include:{
+                likes:true,// includes list of users who liked this post
                 author:{
                     select:{
                         email:true,
@@ -88,15 +89,20 @@ app.get('/',auth,async(req,res)=>{
         });
         //console.log('all posts show:',posts);
         
-        const totalItems=await prisma.post.count();
+        const totalItems=await prisma.post.count({
+            where:filter
+        }
+        );
         const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
+        
         res.render("index",{posts,
             currentPage:page,
             totalPages,
             hasNextPage:page<totalPages,
             hasPreviousPage:page>1,
             nextPage:page+1,
-            previousPage:page-1
+            previousPage:page-1,
+            currentUserId:req.session.userId
         });
     
     }catch(error){
