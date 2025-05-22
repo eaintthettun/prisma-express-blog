@@ -5,5 +5,6 @@ const auth=require('../middleware/authMiddleware');
 
 //prefix: /comments
 router.post('/',auth,commentController.processComment);
+router.post('/:id/toggle-like',auth,commentController.likeComment); //comment id
 
 module.exports=router;

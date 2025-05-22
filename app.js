@@ -69,6 +69,7 @@ app.get('/',async(req,res)=>{
                 },
                 comments: {
                     include: {
+                      commentLikes:true, //include userId and commentId
                       author: true
                     },
                     orderBy: {

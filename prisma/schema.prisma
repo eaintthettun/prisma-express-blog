@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  name     String
-  email    String    @unique
-  password String
-  posts    Post[] //user can write many posts
-  photo    String    @default("https://cdn-icons-png.flaticon.com/512/149/149071.png")
-  comments Comment[]
-  likes    Like[] //Likes given by this user
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  posts        Post[] //user can write many posts
+  photo        String        @default("https://cdn-icons-png.flaticon.com/512/149/149071.png")
+  comments     Comment[]
+  likes        Like[] //Likes given by this user
+  commentLikes CommentLike[]
 }
 
 model Post {
@@ -35,6 +36,16 @@ model Post {
   categoryId Int?
   comments   Comment[]
   likes      Like[] // Likes received by this post
+}
+
+model CommentLike {
+  id        Int     @id @default(autoincrement())
+  author    User    @relation(fields: [authorId], references: [id]) //which user like this comment
+  authorId  Int
+  comment   Comment @relation(fields: [commentId], references: [id]) //which comment is liked
+  commentId Int
+
+  @@unique([authorId, commentId]) // Prevent double-likes
 }
 
 model Like {
@@ -54,13 +65,14 @@ model Category {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    Int
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  createdAt DateTime @default(now())
+  id           Int           @id @default(autoincrement())
+  content      String
+  post         Post          @relation(fields: [postId], references: [id])
+  postId       Int
+  author       User          @relation(fields: [authorId], references: [id])
+  authorId     Int
+  createdAt    DateTime      @default(now())
+  commentLikes CommentLike[]
 }
 
 //npx prisma init

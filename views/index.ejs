@@ -17,6 +17,9 @@
             background-color: #f8d7da;
             color: #dc3545;
         }
+        .like-button:hover i.bi-heart {
+            color: #dc3545 !important; /* Bootstrap red */
+        }
     </style>
 </head>
 
@@ -42,9 +45,12 @@
                     </a> at <%= post.createdAt.toLocaleString() %></small><br><br>
                     
                     <!-- Action icons: Like, Unlike, Comment -->
-                    <% const liked = post.likes.some(like => like.authorId === currentUserId); %>
+                    <!--post like-->
+                    <% const postLiked = post.likes.some(like => like.authorId === currentUserId); %>
                     <% const likeCount = post.likes.length; %>
-                    <% if (liked) { %>
+
+
+                    <% if (postLiked) { %>
                         <% if (likeCount > 1) { %>
                             <small class="text-muted" style="display: block;">
                                 <i class="bi bi-heart-fill"></i> You and <%= likeCount - 1 %> others
@@ -59,22 +65,11 @@
                     <div class="d-flex gap-2 align-items-center">
                             <!-- Like Toggle Form -->
                             <form action="/posts/<%= post.id %>/toggle-like" method="POST">
-                                <button type="submit" class="btn d-flex align-items-center gap-2 px-3 py-1 <%= liked ? 'btn-danger' : 'btn-outline-danger' %>">
-                                <i class="bi <%= liked ? 'bi-heart-fill' : 'bi-heart' %>"></i>
-                                <span><%= likeCount %></span>
+                                <button type="submit" class="btn d-flex align-items-center gap-2 px-3 py-1 <%= postLiked ? 'btn-danger' : 'btn-outline-danger' %>">
+                                    <i class="bi <%= postLiked ? 'bi-heart-fill' : 'bi-heart' %>"></i>
+                                    <span><%= likeCount %></span>
                                 </button>
                             </form>
-
-                            
-                            <!-- Unlike Button -->
-                            <form action="/posts/<%= post.id %>/unlike" method="POST">
-                                <button type="submit" class="btn btn-outline-secondary d-flex align-items-center gap-1">
-                                <i class="bi bi-heartbreak"></i> Unlike
-                                </button>
-                            </form>
-                            <a href="#comment-input-<%= post.id %>" class="text-decoration-none text-primary">
-                                <i class="bi bi-chat-dots"></i> Comment
-                            </a>
                     </div>
 
                     <!--show all comments under each post-->
@@ -83,9 +78,22 @@
                             <strong>Comments:</strong>
                             <ul class="list-group list-group-flush">
                             <% post.comments.forEach(function(comment) { %>
+                                <% commentLikes = comment.commentLikes || []; %>
+                                <% const commentLiked = commentLikes.some(like => like.authorId === currentUserId); %>
+                                <% const commentLikeCount = commentLikes.length; %>
+                                
+                                <!--comment like-->
                                 <li class="list-group-item">
-                                <%= comment.content %> 
-                                <small class="text-muted"> — <%= comment.author.name %> at <%= comment.createdAt.toLocaleString() %></small>
+                                    <%= comment.author.name %>-<small class="text-muted"> <%= comment.createdAt.toLocaleString() %></small><br>
+                                    <%= comment.content %> 
+                                    <form action="/comments/<%= comment.id %>/toggle-like" method="POST">
+                                        <button type="submit" class="btn btn-sm like-button d-flex align-items-center gap-1 px-2 py-1 btn-light border-0">
+                                            <i class="bi <%= commentLiked ? 'bi-heart-fill text-danger' : 'bi-heart text-muted' %>" style="font-size: 0.9rem;"></i>
+                                            <span class="text-muted" style="font-size: 0.85rem;"><%= commentLikeCount %></span>
+                                        </button>
+                                    </form>
+
+
                                 </li>
                             <% }) %>
                             </ul>
