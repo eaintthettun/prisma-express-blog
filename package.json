@@ -11,11 +11,11 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@prisma/client": "^6.8.2",
     "prisma": "^6.7.0"
   },
   "dependencies": {
     "@faker-js/faker": "^9.7.0",
-    "@prisma/client": "^6.8.2",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",

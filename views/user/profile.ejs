@@ -1,68 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= user.name %>'s Profile</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <style>
-      body {
-        background-color: #f5f5f5;
-      }
-
-      .profile-container {
-        max-width: 800px;
-        margin: 50px auto;
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      }
-
-      .profile-photo {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 50%;
-        margin-bottom: 20px;
-        border: 4px solid #28a745;
-      }
-
-      .card {
-        background-color: #ffffff;
-      }
-    </style>
-  </head>
-  <body>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
     <%- include('../partials/header') %>
 
-    <div class="container profile-container text-center">
-      <img
-        src="<%= user.photo %>"
-        alt="user photo"
-        class="profile-photo"
-      />
-      <h1 class="mt-2"><%= user.name %>'s Profile</h1>
+<div class="container my-5 profile-page-container">
+    <div class="row">
+        <div class="col-12">
+            <div class="profile-header-card">
+                <div class="d-flex align-items-center">
+                    <img src="<%= profileUser.profilePictureUrl || '/images/default-avatar.png' %>" alt="<%= profileUser.name %>'s Profile Picture" class="profile-avatar me-4">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-2">
+                            <h2 class="profile-name mb-0 me-3"><%= profileUser.name %></h2>
 
-      <% if (user.posts.length === 0) { %>
-        <p class="text-muted mt-4">No posts to show.</p>
-      <% } else { %>
-        <h3 class="text-start mt-5 mb-4">Posts by <%= user.name %>:</h3>
-        <% user.posts.forEach(function(post) { %>
-          <div class="card mb-4 text-start">
-            <div class="card-body">
-              <h5 class="card-title"><%= post.title %></h5>
-              <p class="card-text"><%= post.content %></p>
-              <p class="text-muted">
-                Posted on <%= post.createdAt.toLocaleDateString() %>
-              </p>
+                            <% /* --- Conditional Button Logic --- */ %>
+                            <% if (currentUser) { %>
+                                <% if (currentUser.id === profileUser.id) { %>
+                                    <% /* Case 1: Viewing OWN profile */ %>
+                                    <a href="/profile/edit/<%= profileUser.id %>" class="btn btn-edit-profile">Edit Profile</a>
+                                <% } else { %>
+                                    <% /* Case 2: Viewing SOMEONE ELSE'S profile */ %>
+                                    <% if (isFollowing) { %>
+                                        <form action="/profile/<%= profileUser.id %>/unfollow" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-unfollow">Unfollow</button>
+                                        </form>
+                                    <% } else { %>
+                                        <form action="/profile/<%= profileUser.id %>/follow" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-dark-blue-follow">Follow</button>
+                                        </form>
+                                    <% } %>
+                                <% } %>
+                            <% } %>
+                            <% /* --- End Conditional Button Logic --- */ %>
+
+                        </div>
+                        <% if (profileUser.title) { %>
+                            <p class="profile-title"><%= profileUser.title %></p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="profile-bio-section mt-3">
+                    <% if (profileUser.bio) { %>
+                        <p class="profile-bio-text"><%= profileUser.bio %></p>
+                    <% } %>
+                </div>
+
+                <div class="profile-stats mt-4 d-flex">
+                    <div class="stat-item me-4">
+                        <span class="stat-number">
+                            <%= profileUser._count.posts %>
+                        </span>
+                        <span class="stat-label">Posts</span>
+                    </div>
+                    <div class="stat-item me-4">
+                        <span class="stat-number">
+                            <%= profileUser._count.followers >= 1000000 ? (profileUser._count.followers / 1000000).toFixed(1) + 'M' :
+                                profileUser._count.followers >= 1000 ? (profileUser._count.followers / 1000).toFixed(1) + 'K' :
+                                profileUser._count.followers %>
+                        </span>
+                        <span class="stat-label">Followers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">
+                            <%= profileUser.totalViews >= 1000000 ? (profileUser.totalViews / 1000000).toFixed(1) + 'M' :
+                                profileUser.totalViews >= 1000 ? (profileUser.totalViews / 1000).toFixed(1) + 'K' :
+                                profileUser.totalViews || '0' %>
+                        </span>
+                        <span class="stat-label">Views</span>
+                    </div>
+                </div>
+
+                <div class="profile-social-links mt-4">
+                    <% if (profileUser.githubUrl) { %>
+                        <a href="<%= profileUser.githubUrl %>" target="_blank" class="social-icon me-3" title="GitHub">
+                            <i class="bi bi-github"></i>
+                        </a>
+                    <% } %>
+                    <% if (profileUser.twitterUrl) { %>
+                        <a href="<%= profileUser.twitterUrl %>" target="_blank" class="social-icon me-3" title="Twitter">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                    <% } %>
+                    <% if (profileUser.linkedinUrl) { %>
+                        <a href="<%= profileUser.linkedinUrl %>" target="_blank" class="social-icon me-3" title="LinkedIn">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                    <% } %>
+                </div>
+
             </div>
-          </div>
-        <% }); %>
-      <% } %>
+        </div>
     </div>
-  </body>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>Posts by <%= profileUser.name %></h3>
+            <% if (profileUser.posts && profileUser.posts.length > 0) { %>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <% profileUser.posts.forEach(post => { %>
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <% if (post.imageUrl) { %>
+                                    <img src="<%= post.imageUrl %>" class="card-img-top" alt="<%= post.title %>">
+                                <% } %>
+                                <div class="card-body">
+                                    <h5 class="card-title"><a href="/posts/<%= post.id %>" class="text-decoration-none"><%= post.title %></a></h5>
+                                    <p class="card-text text-muted small"><%= post.subtitle %></p>
+                                    <a href="/posts/<%= post.id %>" class="btn btn-sm btn-outline-primary">Read More</a>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between align-items-center small text-muted">
+                                    <span><%= new Date(post.createdAt).toLocaleDateString() %></span>
+                                    <span><%= post._count.comments %> <i class="bi bi-chat-dots"></i> | <%= post._count.likes %> <i class="bi bi-heart"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <p class="text-muted">No posts found for this user yet.</p>
+            <% } %>
+        </div>
+    </div>
+
+</div>
+
+<%- include('../partials/footer') %>
+</body>
 </html>

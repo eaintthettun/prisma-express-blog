@@ -14,21 +14,49 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  name         String
-  email        String        @unique
-  password     String
+  id                Int     @id @default(autoincrement())
+  name              String
+  email             String  @unique
+  password          String
+  profilePictureUrl String? // Optional profile picture URL
+  title             String? // New: Senior Tech Writer & Developer
+  bio               String? // New: About Alex Chen
+  githubUrl         String? // New: Social links
+  twitterUrl        String? // New: Social links
+  linkedinUrl       String? // New: Social links
+
   posts        Post[] //user can write many posts
-  photo        String        @default("https://cdn-icons-png.flaticon.com/512/149/149071.png")
   comments     Comment[]
   likes        Like[] //Likes given by this user
   commentLikes CommentLike[]
+
+  //follows relation(many-many relationship join table)
+  userFollowers UserFollow[] @relation("FollowerFollowing")
+  userFollowing UserFollow[] @relation("FollowingFollower")
+}
+
+//m-m relationship with self-referencing
+//join table
+model UserFollow {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  // Relations: Connecting back to the User model
+  follower    User     @relation("FollowingFollower", fields: [followerId], references: [id])
+  followerId  Int
+  following   User     @relation("FollowerFollowing", fields: [followingId], references: [id])
+  followingId Int
+
+  @@unique([followerId, followingId])
 }
 
 model Post {
   id         Int       @id @default(autoincrement())
   title      String
+  subtitle   String?
+  imageUrl   String?
   content    String
+  readTime   String?
+  featured   Boolean   @default(false)
   author     User      @relation(fields: [authorId], references: [id])
   authorId   Int
   createdAt  DateTime  @default(now())

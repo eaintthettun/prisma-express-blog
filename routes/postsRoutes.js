@@ -4,7 +4,8 @@ const postController=require('../controllers/postController.js');
 const auth=require('../middleware/authMiddleware');
 
 //prefix: /posts
-router.get('/',auth,postController.listPosts); //db
+router.get('/',postController.listAllPosts); //list all posts including me and other users
+router.get('/myPosts',auth,postController.listMyPosts); //list my posts
 router.get('/new',auth,postController.showCreateForm); //ui (html links)
 router.post('/',auth,postController.createPost);
 router.get('/edit/:id',auth,postController.showEditForm); //ui(html links)

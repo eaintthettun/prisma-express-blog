@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <section class="recent-posts-section">
+    <div class="section-header">
+        <h2>Recent Posts</h2>
+        <a href="/posts" class="view-all-link">View All Posts &rarr;</a>
+    </div>
+
+    <div class="recent-posts-grid">
+        <% if (recentPosts && recentPosts.length > 0) { %>
+            <% recentPosts.forEach(post => { %>
+                <div class="post-card">
+                    <div class="post-card-image-row">
+                        <% if (post.imageUrl) { %>
+                            <a href="/posts/<%= post.id %>">
+                                <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="post-card-image">
+                            </a>
+                        <% } else { %>
+                            <a href="/posts/<%= post.id %>">
+                                <img src="/images/default-post-image.jpg" alt="Default Post Image" class="post-card-image">
+                            </a>
+                        <% } %>
+                    </div> 
+                    <div class="post-card-content-row">
+                        <small class="post-category">
+                            <a href="/category/<%= post.categoryId %>" class="category-pill-link">
+                                <%= post.category.name %>
+                            </a>
+                        </small>
+                        <h3><a href="/posts/<%= post.id %>"><%= post.title %></a></h3>
+
+                        <% if (post.subtitle) { %> <p><%= post.subtitle %></p> <% } %>
+                        
+                        <%- include('../partials/likeAndCommentSection',{ post: post, req: req }) %>
+
+                    </div> <!--end post card content row-->
+                </div> <!--end post card-->
+             <% }) %>  <!--end recentPosts.forEach -->
+        <% } else { %>
+            <p class="no-posts-message">No recent posts to display yet. Check back soon!</p>
+        <% } %>
+    </div> <!--end recent post grid-->
+</section>
+</body>
+</html>

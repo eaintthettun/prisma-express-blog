@@ -3,15 +3,20 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 exports.showProfile=async (req,res)=>{
-    const user=await prisma.user.findUnique({
+    let currentUser = res.locals.currentUser; 
+    const profileUser=await prisma.user.findUnique({
         where:{id:parseInt(req.params.id)},
         include:{
-            posts:true
+            _count:{
+                select:{
+                    posts:true,
+                    userFollowers:true
+                }
+                
+            }
         }
     });
-    const categories=await prisma.category.findMany({
-    });
-    res.render('user/profile',{user,categories});
+    res.render('user/profile',{profileUser,currentUser});
 }
 exports.showRegister=async(_,res)=>{
     const categories=await prisma.category.findMany({
@@ -19,7 +24,7 @@ exports.showRegister=async(_,res)=>{
     res.render('auth/register',{title:'Register',categories}); //register.ejs(view)
 }
 exports.register=async (req,res)=>{
-    const {name,email,password}=req.body;
+    const {name,email,password,profilePictureUrl,title,bio,githubUrl,twitterUrl,linkedinUrl}=req.body;
     try{
         //check user by email
         const existingUser=await prisma.user.findUnique({
@@ -35,7 +40,9 @@ exports.register=async (req,res)=>{
         const hashedPassword=await bcrypt.hash(password,10);
         //create new user
         await prisma.user.create({
-            data:{name,email,password:hashedPassword} //key:value object
+            data:{name,email,password:hashedPassword,
+                profilePictureUrl,title,bio,githubUrl,twitterUrl,linkedinUrl
+            } //key:value object
         });
         res.redirect('/auth/login');    
     }catch(error){

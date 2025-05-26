@@ -9,6 +9,7 @@ const prisma = new PrismaClient();
 const authRoutes=require('./routes/authRoutes');
 const postRoutes=require('./routes/postsRoutes');
 const commentRoutes=require('./routes/commentRoutes');
+const topicRoutes=require('./routes/topicRoutes');
 const auth=require('./middleware/authMiddleware');
 const { fi } = require('@faker-js/faker');
 
@@ -27,6 +28,21 @@ app.use(async(req,res,next)=>{
     // Make selectedCategory and categories available to all views
     res.locals.selectedCategory = req.query.categoryId || "";
     res.locals.categories = await prisma.category.findMany();
+
+    if (req.session.userId) {
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: req.session.userId },
+                select: { id: true, name: true } // Select necessary user data
+            });
+            res.locals.currentUser = user;
+        } catch (error) {
+            console.error("Error fetching user for header:", error);
+            res.locals.currentUser = null; // Ensure it's null on error too
+        }
+    } else {
+        res.locals.currentUser = null; // No user logged in
+    }
     next();
 });
 
@@ -34,82 +50,84 @@ app.use(async(req,res,next)=>{
 app.use('/auth',authRoutes);
 app.use('/posts',postRoutes); //only write posts when only login
 app.use('/comments',commentRoutes);
+app.use('/topics',topicRoutes);
 
-  
-let ITEMS_PER_PAGE=5;
+
 app.get('/',async(req,res)=>{
-    //for pagination
-    const page = parseInt(req.query.page) || 1;  // default to page 1
-    console.log('index page',page);
-    const skip=(page-1)*ITEMS_PER_PAGE;
-    console.log('index skip',skip);
-    
-    const categoryId = parseInt(req.query.categoryId);
-    const search = req.query.search || "";
-    const filter = {
-        ...(categoryId ? { categoryId: categoryId } : {}), //if category is selected
-        ...(search ? { //if search is done
-            OR: [
-                { title: { contains: search, mode: "insensitive" } },
-                { content: { contains: search, mode: "insensitive" } }
-            ]
-        } : {})
-      };
-    //show all posts on index.ejs
-    try{
-        const posts=await prisma.post.findMany({
-            where:filter,
-            include:{
-                likes:true,// includes list of users who liked this post
-                author:{
-                    select:{
-                        email:true,
-                        name:true
-                    }
-                },
-                comments: {
-                    include: {
-                      commentLikes:true, //include userId and commentId
-                      author: true
+    const featuredPost = await prisma.post.findUnique(
+        { 
+            where: { id: 36 },
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profilePictureUrl: true, // Include author's profile picture if you show it
                     },
-                    orderBy: {
-                      createdAt: 'asc'
-                    }
                 },
-                category:{
-                    select:{
-                        name:true,
+                likes: {
+                    // Include likes to check if the current user has liked it
+                    select: {
+                        authorId: true, // Only need the authorId to check for a match
+                    },
+                },
+                _count: {
+                    select: {
+                        comments: true, // This will give you the count of comments
+                    },
+                },
+                // You might also need categories if displayed on the card
+                category: {
+                     select: {
+                        name: true
                     }
                 }
             },
-            orderBy: {
-                createdAt: 'desc'
-            },
-            skip,
-            take:ITEMS_PER_PAGE,
-        });
-        //console.log('all posts show:',posts);
-        
-        const totalItems=await prisma.post.count({
-            where:filter
         }
-        );
-        const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
-        
-        res.render("index",{posts,
-            currentPage:page,
-            totalPages,
-            hasNextPage:page<totalPages,
-            hasPreviousPage:page>1,
-            nextPage:page+1,
-            previousPage:page-1,
-            currentUserId:req.session.userId
-        });
-    
-    }catch(error){
-        console.error(error);
-        res.status(500).send('An error occurred while fetching posts');
-    }
+    ); 
+
+    const recentPosts = await prisma.post.findMany({
+        orderBy: 
+        { createdAt: 'desc' },
+        take: 2,
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                    profilePictureUrl: true, // Include author's profile picture if you show it
+                },
+            },
+            likes: {
+                // Include likes to check if the current user has liked it
+                select: {
+                    authorId: true, // Only need the authorId to check for a match
+                },
+            },
+            _count: {
+                select: {
+                    comments: true, // This will give you the count of comments
+                },
+            },
+            // You might also need categories if displayed on the card
+            category: {
+                 select: {
+                    name: true
+                }
+            }
+        },
+    });
+    // Now, when you pass 'posts' to your EJS template:
+    // res.render('your_template', { recentPosts: posts, currentUser: req.user });
+    // Each 'post' object in 'recentPosts' will have a '_count' property:
+    // post._count.comments will hold the number of comments for that post.
+    res.render('index',{featuredPost,recentPosts
+        ,req:req,
+    });
 });
+
+
+  
 const PORT=process.env.PORT || 5800;
 app.listen(PORT,()=>console.log(`Server running on port http://localhost:${PORT}`));
+
