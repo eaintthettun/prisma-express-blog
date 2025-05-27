@@ -31,8 +31,8 @@ model User {
   commentLikes CommentLike[]
 
   //follows relation(many-many relationship join table)
-  userFollowers UserFollow[] @relation("FollowerFollowing")
-  userFollowing UserFollow[] @relation("FollowingFollower")
+  followers UserFollow[] @relation("FollowerFollowing")
+  following UserFollow[] @relation("FollowingFollower")
 }
 
 //m-m relationship with self-referencing

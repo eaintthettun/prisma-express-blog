@@ -185,8 +185,6 @@ exports.listAllPosts=async (req,res)=>{
         );
         const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
         
-        
-        
         res.render("posts/allPosts",{posts,
             currentPage:page,
             totalPages,

@@ -22,33 +22,50 @@
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-center mb-2">
                             <h2 class="profile-name mb-0 me-3"><%= profileUser.name %></h2>
-
-                            <% /* --- Conditional Button Logic --- */ %>
-                            <% if (currentUser) { %>
-                                <% if (currentUser.id === profileUser.id) { %>
-                                    <% /* Case 1: Viewing OWN profile */ %>
-                                    <a href="/profile/edit/<%= profileUser.id %>" class="btn btn-edit-profile">Edit Profile</a>
-                                <% } else { %>
-                                    <% /* Case 2: Viewing SOMEONE ELSE'S profile */ %>
-                                    <% if (isFollowing) { %>
-                                        <form action="/profile/<%= profileUser.id %>/unfollow" method="POST" class="d-inline">
-                                            <button type="submit" class="btn btn-unfollow">Unfollow</button>
-                                        </form>
-                                    <% } else { %>
-                                        <form action="/profile/<%= profileUser.id %>/follow" method="POST" class="d-inline">
-                                            <button type="submit" class="btn btn-dark-blue-follow">Follow</button>
-                                        </form>
-                                    <% } %>
-                                <% } %>
-                            <% } %>
-                            <% /* --- End Conditional Button Logic --- */ %>
-
                         </div>
-                        <% if (profileUser.title) { %>
-                            <p class="profile-title"><%= profileUser.title %></p>
-                        <% } %>
-                    </div>
+                            <% if (profileUser.title) { %>
+                                <p class="profile-title"><%= profileUser.title %></p>
+                            <% } %>
+                        </div>
                 </div>
+
+                <div class="d-flex align-items-center mb-4">
+                    <!--edit btn only work when logged in, and when both profileUser and currentUser exist-->
+                    <% if (profileUser && currentUser && currentUser.id === profileUser.id) { %>
+                        <% /* Case 1: Viewing OWN profile ,so only edit button is shown */ %>
+                        <div style="margin:5px">
+                            <a href="/profile/edit/<%= profileUser.id %>" class="btn btn-md btn-edit-profile">Edit Profile</a>
+                        </div>
+                    <% }else{%> <!--either for logged in or not logged in-->
+                                <!--viewing other person profile ,so follow,unfollow btn is shown--> 
+                                <div style="margin:24px">
+                                    <form action="/auth/toggle-follow" method="post">
+                                        <input type="hidden" name="authorToFollowId" value="<%= profileUser.id %>">
+                                        <%
+                                            // Determine if currentUser is already following profileUser
+                                            // You'll need to pass 'isFollowing' from your backend route, or
+                                            // check it here if profileUser.followers or currentUser.following is available.
+                                            // For now, let's assume 'isFollowing' is passed from the server.
+                                            let isFollowing=false;
+                                            if(currentUser){
+                                                isFollowing = profileUser.followers.some(f => f.followerId === currentUser.id);
+                                                console.log('isAlreadyFollowing?:',isFollowing);
+                                            }
+                                        %>
+                                        <button type="submit"
+                                                class="btn btn-md <%= isFollowing ? 'btn-outline-secondary' : 'btn-info' %>"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="<%= isFollowing ? 'Unfollow this author' : 'Follow this author' %>"
+                                        >
+                                            <i class="bi <%= isFollowing ? 'bi-person-dash' : 'bi-person-plus' %>"></i>
+                                            <%= isFollowing ? 'Following' : 'Follow' %>
+                                        </button>
+                                    </form>
+                                </div>
+                    <% } %>
+
+                </div> <!--end follow button-->
 
                 <div class="profile-bio-section mt-3">
                     <% if (profileUser.bio) { %>
@@ -56,6 +73,7 @@
                     <% } %>
                 </div>
 
+                <!--count posts of profile user-->
                 <div class="profile-stats mt-4 d-flex">
                     <div class="stat-item me-4">
                         <span class="stat-number">

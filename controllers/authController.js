@@ -2,27 +2,77 @@ const bcrypt=require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+exports.toggleFollow=async(req,res)=>{
+    const authorToFollowId = parseInt(req.body.authorToFollowId); //you will get this id from hidden
+    const currentUserId = req.session.userId; // Assuming you store user ID in session
+
+    console.log("currentUserId:",currentUserId,",authorToFollowId:",authorToFollowId);
+    try {
+        // Check if already following
+        const existingFollow = await prisma.userFollow.findUnique({
+            where: {
+                followerId_followingId: {
+                    followerId: currentUserId,
+                    followingId: authorToFollowId,
+                },
+            },
+        });
+
+        if (existingFollow) {
+            // Unfollow
+            await prisma.userFollow.delete({
+                where: {
+                    followerId_followingId: {
+                        followerId: currentUserId,
+                        followingId: authorToFollowId,
+                    },
+                },
+            });
+        } else {
+            // Follow
+            await prisma.userFollow.create({
+                data: {
+                    followerId: currentUserId,
+                    followingId: authorToFollowId,
+                },
+            });
+        }
+        res.redirect('back'); // Redirect back to the profile page
+
+    } catch (error) {
+        console.error('Error toggling follow:', error);
+        res.redirect('back');
+    }
+}
+
 exports.showProfile=async (req,res)=>{
-    let currentUser = res.locals.currentUser; 
+    let currentUser = res.locals.currentUser; //get user from res.locals
     const profileUser=await prisma.user.findUnique({
-        where:{id:parseInt(req.params.id)},
+        where:{id:parseInt(req.params.id)}, //need to know profile user id to get his info
         include:{
             _count:{
                 select:{
                     posts:true,
-                    userFollowers:true
+                    followers:true
                 }
-                
+            },
+            followers:{
+                select:{
+                    followerId:true //to check if the currentUser is already following profileUser or not
+                }
             }
         }
     });
+    //console.log('profile user is:',profileUser);
     res.render('user/profile',{profileUser,currentUser});
 }
+
 exports.showRegister=async(_,res)=>{
     const categories=await prisma.category.findMany({
     });
     res.render('auth/register',{title:'Register',categories}); //register.ejs(view)
 }
+
 exports.register=async (req,res)=>{
     const {name,email,password,profilePictureUrl,title,bio,githubUrl,twitterUrl,linkedinUrl}=req.body;
     try{

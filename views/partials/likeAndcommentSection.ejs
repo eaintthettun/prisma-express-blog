@@ -52,34 +52,47 @@
             font-family: inherit;
         }
 
-        /* Orange theme integration */
+        /* Replace the existing orange theme integration section with this red theme */
         .btn-outline-danger {
-            --bs-btn-color: #FF8C00;
-            --bs-btn-border-color: #FF8C00;
+            --bs-btn-color: #dc3545;
+            --bs-btn-border-color: #dc3545;
         }
 
         .btn-outline-danger:hover {
-            --bs-btn-hover-bg: #FF8C00;
-            --bs-btn-hover-border-color: #E67E00;
+            --bs-btn-hover-bg: #dc3545;
+            --bs-btn-hover-border-color: #c82333;
         }
 
         .btn-danger {
-            --bs-btn-bg: #FF8C00;
-            --bs-btn-border-color: #FF8C00;
+            --bs-btn-bg: #dc3545;
+            --bs-btn-border-color: #dc3545;
         }
 
         .btn-danger:hover {
-            --bs-btn-hover-bg: #E67E00;
-            --bs-btn-hover-border-color: #E67E00;
+            --bs-btn-hover-bg: #c82333;
+            --bs-btn-hover-border-color: #bd2130;
+        }
+
+        /* Additional styles for better red heart effect */
+        .btn-danger .bi-heart-fill {
+            color: white !important;
+        }
+
+        .btn-outline-danger .bi-heart {
+            color: #dc3545 !important;
+        }
+
+        .btn-outline-danger:hover .bi-heart {
+            color: white !important;
         }
     </style>
 </head>
 <body>
     <div>
     <%
-        console.log('post',post);
+        //console.log('post',post);
         // Use res.locals.currentUser and res.locals.userId directly
-        const postLiked = req.session.currentUserId && post.likes.some(like => like.authorId === req.session.currentUserId);
+        const postLiked = req.session.userId && post.likes.some(like => like.authorId === req.session.userId);
         const likeCount = post.likes.length;
         const commentCount = post._count.comments;
 
@@ -119,7 +132,7 @@
             <div class="d-flex align-items-center gap-2">
                 <!-- Like Button -->
                 <form action="/posts/<%= post.id %>/toggle-like" method="POST" class="d-inline">
-                    <% if (!req.session.currentUserId) { %>
+                    <% if (!req.session.userId) { %>
                         <button type="button" 
                                 class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 rounded-pill px-3 py-1"
                                 data-bs-toggle="tooltip" 

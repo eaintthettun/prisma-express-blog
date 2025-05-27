@@ -117,10 +117,6 @@ app.get('/',async(req,res)=>{
             }
         },
     });
-    // Now, when you pass 'posts' to your EJS template:
-    // res.render('your_template', { recentPosts: posts, currentUser: req.user });
-    // Each 'post' object in 'recentPosts' will have a '_count' property:
-    // post._count.comments will hold the number of comments for that post.
     res.render('index',{featuredPost,recentPosts
         ,req:req,
     });
