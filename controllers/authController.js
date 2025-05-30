@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 exports.toggleFollow=async(req,res)=>{
     const authorToFollowId = parseInt(req.body.authorToFollowId); //you will get this id from hidden
     const currentUserId = req.session.userId; // Assuming you store user ID in session
+    const redirectTo = req.header('Referer') || `/posts`; // Fallback to the all posts page
 
     console.log("currentUserId:",currentUserId,",authorToFollowId:",authorToFollowId);
     try {
@@ -28,6 +29,7 @@ exports.toggleFollow=async(req,res)=>{
                     },
                 },
             });
+            res.redirect(redirectTo);
         } else {
             // Follow
             await prisma.userFollow.create({
@@ -36,12 +38,10 @@ exports.toggleFollow=async(req,res)=>{
                     followingId: authorToFollowId,
                 },
             });
+            res.redirect(redirectTo);
         }
-        res.redirect('back'); // Redirect back to the profile page
-
     } catch (error) {
         console.error('Error toggling follow:', error);
-        res.redirect('back');
     }
 }
 
@@ -70,7 +70,7 @@ exports.showProfile=async (req,res)=>{
 exports.showRegister=async(_,res)=>{
     const categories=await prisma.category.findMany({
     });
-    res.render('auth/register',{title:'Register',categories}); //register.ejs(view)
+    res.render('auth/register',{title:'Register',categories,layout:false}); //register.ejs(view)
 }
 
 exports.register=async (req,res)=>{
@@ -83,7 +83,7 @@ exports.register=async (req,res)=>{
         if(existingUser){
             return res.status(400).render('auth/register',{
                 title:'Register',
-                error:'Email already in use'
+                error:'Email already in use',
             });
         }
         //hash password
@@ -101,7 +101,7 @@ exports.register=async (req,res)=>{
     }
 }
 exports.showLogin=(req,res)=>{
-    res.render('auth/login',{title:'Login'}); //view login form
+    res.render('auth/login',{title:'Login',layout:false}); //view login form
 }
 exports.login=async (req,res)=>{
     const {email,password}=req.body;
@@ -110,7 +110,7 @@ exports.login=async (req,res)=>{
             return res.status(401).render(
                 'auth/login',{
                     title:'Login',
-                    error:"Email not found"
+                    error:"Email not found",
                 }
             );
     }
@@ -120,14 +120,6 @@ exports.login=async (req,res)=>{
         console.log('login success',user,password);
         req.session.userId=user.id;
         req.session.role="Super Admin";
-        const posts=await prisma.post.findMany({
-            where:{authorId:req.session.userId},
-            include:{
-                author:true
-            }
-        });
-        const categories=await prisma.category.findMany();
-        console.log(posts)
         return res.redirect('/');
     }
     res.redirect('/auth/login');

@@ -1,0 +1,104 @@
+<div>
+    <%
+        const postLiked = currentUser && post.likes.some(like => like.authorId === currentUser.id);
+        const likeCount = post._count.likes;
+        const commentCount = post._count.comments;
+
+        const authorProfilePic = post.author && post.author.profilePictureUrl ? post.author.profilePictureUrl : '/images/default-avatar.png';
+
+        // New: Check if the current user has bookmarked this post
+        //if isBookmarked=true, show bookmark icon filled
+        const isBookmarked = currentUser && post.bookmarks.some(bookmark=>bookmark.userId === currentUser.id);
+
+        //you cannot bookmark your own post
+        const isOwnPost= currentUser && post.authorId===currentUser.id;
+    %>
+
+    <div class="post-meta-section p-3">
+        <!-- Author Info and Actions Row -->
+        <div class="d-flex align-items-center justify-content-between">
+            <!-- Left side: Author profile -->
+            <div class="d-flex align-items-center gap-3">
+                <a href="/auth/profile/<%= post.authorId %>" class="author-avatar-link">
+                    <img src="<%= authorProfilePic %>" 
+                         alt="<%= post.author.name %>'s profile picture" 
+                         class="rounded-circle border border-2 border-light shadow-sm" 
+                         style="width: 45px; height: 45px; object-fit: cover;">
+                </a>
+                <div class="author-info">
+                    <a href="/auth/profile/<%= post.authorId %>" 
+                       class="author-name-link text-decoration-none text-dark fw-bold d-block" 
+                       style="font-size: 0.95em; line-height: 1.2;">
+                        <%= post.author.name %>
+                    </a>
+                    <small class="text-muted d-block" style="font-size: 0.8em;">
+                        <%= post.createdAt.toLocaleString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                        }) %>
+                    </small>
+                </div>
+            </div>
+
+            <!-- Right side: Like, Comment, and Read Time, and bookmark -->
+            <div class="d-flex align-items-center gap-2">
+                <!-- Like Button -->
+                <form action="/posts/<%= post.id %>/toggle-like" method="POST" class="d-inline">
+                    <% if (!currentUser) { %>
+                        <button type="submit" 
+                                class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 rounded-pill px-3 py-1"
+                        >
+                            <i class="bi bi-heart" style="font-size: 0.9em;"></i>
+                            <span style="font-size: 0.85em; font-weight: 500;"><%= likeCount %></span>
+                        </button>
+                    <% } else { %>
+                        <button type="submit" 
+                                class="btn btn-sm d-flex align-items-center gap-1 rounded-pill px-3 py-1 <%= postLiked ? 'btn-danger' : 'btn-outline-danger' %>"
+                        >
+                            <i class="bi <%= postLiked ? 'bi-heart-fill' : 'bi-heart' %>" style="font-size: 0.9em;"></i>
+                            <span style="font-size: 0.85em; font-weight: 500;"><%= likeCount %></span>
+                        </button>
+                    <% } %>
+                </form>
+
+                <!-- Comment Button -->
+                <a href="/posts/<%= post.id %>#comments" 
+                   class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 rounded-pill px-3 py-1"
+                >
+                    <i class="bi bi-chat" style="font-size: 0.9em;"></i>
+                    <span style="font-size: 0.85em; font-weight: 500;"><%= commentCount %></span>
+                </a>
+
+                <!-- Read Time -->
+                <span class="badge bg-light text-dark border px-2 py-1" 
+                      style="font-size: 0.75em; font-weight: 500;">
+                    <i class="bi bi-clock me-1"></i><%= post.readTime %>
+                </span>
+
+                <!--bookmark form-->
+                <form action="/posts/<%= post.id %>/toggle-bookmark" method="POST" class="d-inline">
+                    <% if (!currentUser) { %>
+                        <button type="submit"
+                                class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                        >
+                            <i class="bi bi-bookmark" style="font-size: 0.9em;"></i>
+                        </button>
+                    <% } else { %>
+                            <%if(isOwnPost){%>   <!--if the post is your own post, show edit post btn-->
+                                <a href="/posts/edit/<%= post.id %>" class="btn btn-sm btn-secondary">Edit Post</a>
+                            <%}else{%>
+                                <button type="submit"
+                                        class="btn btn-sm d-flex align-items-center gap-1 <%= isBookmarked ? 'btn-primary' : 'btn-outline-secondary' %>"
+                                >
+                                    <i class="bi <%= isBookmarked ? 'bi-bookmark-fill' : 'bi-bookmark' %>" style="font-size: 0.9em;"></i>
+                                </button>
+                            <%}%>
+                    <% } %>
+                </form>
+            </div> 
+        </div>
+        </div> <!--end post-meta-section-->
+    </div> <!--end wraps whole like and comment section-->

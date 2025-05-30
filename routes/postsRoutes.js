@@ -13,5 +13,7 @@ router.post('/edit/:id',auth,postController.updatePost);
 router.post('/delete/:id',auth,postController.deletePost);
 router.get('/search',postController.searchPosts);
 router.post('/:id/toggle-like',auth,postController.likePost); //post id
+router.post('/:id/toggle-bookmark',auth,postController.bookMarkPost);
+router.get('/:id',postController.showPostDetails);
 
 module.exports=router;

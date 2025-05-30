@@ -1,14 +1,132 @@
 const {PrismaClient}=require('@prisma/client');
 const { name } = require('ejs');
+const { post } = require('../routes/postsRoutes');
 const prisma=new PrismaClient();
 
+exports.showPostDetails=async(req,res)=>{
+    const currentUser=res.locals.currentUser;
+    const postId=parseInt(req.params.id);
+    const parentId=null;
+
+    const post=await prisma.post.findUnique({
+        where:{id:postId},
+        include:{
+            likes:{
+                select:{
+                    authorId:true
+                }
+            },// includes list of users who liked this post
+            author:{
+                select:{
+                    id:true,
+                    email:true,
+                    name:true,
+                    profilePictureUrl:true
+                }
+            },
+            comments: {
+                where:{parentId:null},
+                include: {
+                  children:{ //children= child comment(reply)
+                    include:{
+                        author:{
+                            select:{
+                                profilePictureUrl:true,
+                                name:true
+                            }
+                        },
+                        commentLikes:{
+                            select:{
+                                authorId:true
+                            }
+                        },
+                    }
+                  },
+                  commentLikes:{
+                    select:{
+                        authorId:true
+                    }
+                  },
+                  author: {
+                    select:{
+                        name:true,
+                        profilePictureUrl:true,
+                    }
+                  }
+                },
+                orderBy: {
+                  createdAt: 'asc'
+                }
+            },
+            category:{
+                select:{
+                    name:true,
+                }
+            },
+            bookmarks:{
+                select:{
+                    userId:true,
+                    postId:true
+                }
+            },
+            _count:{
+                select:{
+                    likes:true,
+                    comments:true
+                }
+            }
+        }
+        });
+    //console.log('post details',post);
+    res.render('posts/postDetails',{post,currentUser});
+}
+
+exports.bookMarkPost=async(req,res)=>{
+    const postId = parseInt(req.params.id);
+    const currentUserId = req.session.userId; // Ensure currentUserId is correctly set in your session
+    const redirectTo = req.header('Referer') || `/posts`; // Fallback to the all posts page
+
+    try {
+        const existingBookmark = await prisma.bookMark.findUnique({
+            where: {
+                userId_postId: {
+                    userId: currentUserId,
+                    postId: postId,
+                },
+            },
+        });
+
+        if (existingBookmark) {
+            // If exists, delete (unbookmark)
+            await prisma.bookMark.delete({
+                where: {
+                    userId_postId: {
+                        userId: currentUserId,
+                        postId: postId,
+                    },
+                },
+            });
+            res.redirect(redirectTo);
+        } else {
+            // If not exists, create (bookmark)
+            await prisma.bookMark.create({
+                data: {
+                    userId: currentUserId,
+                    postId: postId,
+                },
+            });
+            res.redirect(redirectTo);
+        }
+    } catch (error) {
+        console.error('Error toggling bookmark:', error);
+    }
+}
 
 //toggle like method
 exports.likePost=async(req,res)=>{
     const authorId = req.session.userId; //who like the post
     const postId = parseInt(req.params.id);  //which post he likes
-    const featuredPost=req.body.featuredPost;
-    const recentPost=req.body.recentPost;
+    const redirectTo = req.header('Referer') || `/posts`; // Fallback to the all posts page
     // Check if like already exists
     const existingLike = await prisma.like.findUnique({
         where: {
@@ -36,10 +154,7 @@ exports.likePost=async(req,res)=>{
                 postId },
           });
     }
-    if(featuredPost || recentPost) res.redirect('/');
-    else{
-        res.redirect('/posts');
-    }      
+    res.redirect(redirectTo);
 }
 
 
@@ -126,26 +241,19 @@ exports.listAllPosts=async (req,res)=>{
     const skip=(page-1)*ITEMS_PER_PAGE;
     console.log('index skip=',skip);
     
-    const categoryId = parseInt(req.query.categoryId);
-    const search = req.query.search || "";
-    const filter = {
-        ...(categoryId ? { categoryId: categoryId } : {}), //if category is selected
-        ...(search ? { //if search is done
-            OR: [
-                { title: { contains: search, mode: "insensitive" } },
-                { content: { contains: search, mode: "insensitive" } }
-            ]
-        } : {})
-      };
 
     //show all posts on index.ejs
     try{
         const posts=await prisma.post.findMany({
-            where:filter,
             include:{
-                likes:true,// includes list of users who liked this post
+                likes:{
+                    select:{
+                        authorId:true
+                    }
+                },// includes list of users who liked this post
                 author:{
                     select:{
+                        id:true,
                         email:true,
                         name:true,
                         profilePictureUrl:true
@@ -165,8 +273,15 @@ exports.listAllPosts=async (req,res)=>{
                         name:true,
                     }
                 },
+                bookmarks:{
+                    select:{
+                        userId:true,
+                        postId:true
+                    }
+                },
                 _count:{
                     select:{
+                        likes:true,
                         comments:true
                     }
                 }
@@ -179,10 +294,7 @@ exports.listAllPosts=async (req,res)=>{
         });
         //console.log('all posts show:',posts);
         
-        const totalItems=await prisma.post.count({
-            where:filter
-        }
-        );
+        const totalItems=await prisma.post.count();
         const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
         
         res.render("posts/allPosts",{posts,
@@ -203,15 +315,56 @@ exports.listAllPosts=async (req,res)=>{
 
 //sql query (select * from posts where authorId=req.session.userId)
 exports.listMyPosts=async (req,res)=>{
-    const myPosts=await prisma.post.findMany({
+    const currentUser=res.locals.currentUser;
+    let ITEMS_PER_PAGE=5;
+
+    //for pagination
+    const page = parseInt(req.query.page) || 1;  // default to page 1
+    //console.log('index page=',page);
+    const skip=(page-1)*ITEMS_PER_PAGE;
+    //console.log('index skip=',skip);
+
+    const posts=await prisma.post.findMany({
         where:{authorId:req.session.userId},
         include:{
-            comments:{
-                include:{
-                    author:true
+            author:{
+                select:{
+                    name:true
+                }
+            },
+            likes:{
+                select:{
+                    authorId:true
+                }
+            },// includes list of users who liked this post
+            comments: {
+                include: {
+                  commentLikes:{
+                    select:{
+                        authorId:true
+                    }
+                  }, //include userId and commentId
+                  author: true
                 },
-                orderBy:{
-                    createdAt:'asc'
+                orderBy: {
+                  createdAt: 'asc'
+                }
+            },
+            bookmarks:{
+                select:{
+                    userId:true,
+                    postId:true
+                }
+            },
+            category:{
+                select:{
+                    name:true,
+                }
+            },
+            _count:{
+                select:{
+                    likes:true,
+                    comments:true
                 }
             }
         },
@@ -219,7 +372,22 @@ exports.listMyPosts=async (req,res)=>{
             createdAt:'asc'
         }
     });
-    res.render('posts/myPosts',{myPosts});
+
+    const totalItems=await prisma.post.count({
+        where:{authorId:req.session.userId}
+    });
+
+    const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
+        
+        res.render("posts/myPosts",{posts,
+            currentPage:page,
+            totalPages,
+            hasNextPage:page<totalPages,
+            hasPreviousPage:page>1,
+            nextPage:page+1,
+            previousPage:page-1,
+            currentUser
+        }); //posts/myPosts.ejs
 }
 
 exports.showCreateForm=async(req,res)=>{

@@ -1,0 +1,117 @@
+<!--carried post and currentUser from postDetails-->
+<div class="container my-5">
+    <h3 class="mb-4">Comments (<%= post._count.comments %>)</h3>
+    <div class="d-flex align-items-center mb-4">
+        <% if (!currentUser) { %>
+            <img src="/images/default-avatar.png" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+        <% } else { %>
+            <img src="<%= currentUser.profilePictureUrl || '/images/default-avatar.png' %>" alt="<%= currentUser.name %>'s Profile Picture" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+        <% } %>
+        <div class="flex-grow-1">
+            <form action="/comments" method="POST">
+                <input type="hidden" name="postId" value="<%= post.id %>">
+                <div class="input-group">
+                    <input type="text" name="content" class="form-control rounded-pill" placeholder="Leave a comment..." required>
+                    <button type="submit" class="btn btn-primary rounded-pill ms-2">Post</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr class="my-4">
+    <div class="comments-list">
+        <% if (post.comments && post._count.comments > 0) { %>
+            <% post.comments.forEach(comment => { %>
+                <%
+                    const commentLiked = currentUser && comment.commentLikes.some(like => like.authorId === currentUser.id);
+                    const commentLikeCount = comment.commentLikes.length;
+                %>
+                <div class="d-flex align-items-start mb-4">
+                    <img src="<%= comment.author.profilePictureUrl || '/images/default-avatar.png' %>" alt="<%= comment.author.name %>'s Profile Picture" class="rounded-circle me-3" style="width: 35px; height: 35px; object-fit: cover;">
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 fw-bold"><%= comment.author.name %></h6>
+                            <small class="text-muted"><%= new Date(comment.createdAt).toLocaleString() %></small>
+                        </div>
+                        <p class="mb-2"><%= comment.content %></p>
+                        <div class="d-flex align-items-center gap-3">
+                            <form action="/comments/<%= comment.id %>/toggle-like" method="POST" class="d-inline">
+                                <% if (!currentUser) { %>
+                                    <button type="submit" class="btn btn-sm btn-link text-muted p-0"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Login to like this comment">
+                                        <i class="bi bi-heart"></i> <%= commentLikeCount %>
+                                    </button>
+                                <% } else { %>
+                                    <button type="submit" class="btn btn-sm btn-link p-0 <%= commentLiked ? 'text-danger' : 'text-muted' %>"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="<%= commentLiked ? 'Unlike comment' : 'Like comment' %>">
+                                        <i class="bi <%= commentLiked ? 'bi-heart-fill' : 'bi-heart' %>"></i> <%= commentLikeCount %>
+                                    </button>
+                                <% } %>
+                            </form>
+                            <button class="btn btn-sm btn-link text-muted p-0 reply-button"
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Reply to comment"
+                                    data-comment-author="<%= comment.author.name %>"
+                                    data-comment-id="<%= comment.id %>">
+                                <i class="bi bi-reply"></i> Reply
+                            </button>
+                        </div>
+                        <% if (currentUser) { %>
+                            <div class="reply-form-container mt-3" style="display: none;">
+                                <form action="/comments" method="POST">
+                                    <input type="hidden" name="postId" value="<%= post.id %>">
+                                    <input type="hidden" name="parentId" value="<%= comment.id %>">
+                                    <div class="input-group">
+                                        <textarea name="content" class="form-control" rows="3" placeholder="Replying to <%= comment.author.name %>" required></textarea>
+                                    </div>
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2 cancel-reply">Cancel</button>
+                                        <button type="submit" class="btn btn-sm btn-primary">Respond</button>
+                                    </div>
+                                </form>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                <!--double loop withing comments loop-->
+                <% if (comment.children && comment.children.length > 0) { %>
+                    <div class="ms-5 mt-3">
+                        <% comment.children.forEach(reply => { %>
+                            <%
+                                const replyLiked = currentUser && reply.commentLikes.some(like => like.authorId === currentUser.id);
+                                const replyLikeCount = reply.commentLikes.length;
+                            %>
+                            <div class="d-flex align-items-start mb-3">
+                                <img src="<%= reply.author.profilePictureUrl || '/images/default-avatar.png' %>" alt="<%= reply.author.name %>'s Profile Picture" class="rounded-circle me-3" style="width: 30px; height: 30px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0 fw-bold"><%= reply.author.name %></h6>
+                                        <small class="text-muted"><%= new Date(reply.createdAt).toLocaleString() %></small>
+                                    </div>
+                                    <p class="mb-2"><%= reply.content %></p>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <form action="/comments/<%= reply.id %>/toggle-like" method="POST" class="d-inline">
+                                            <% if (!currentUser) { %>
+                                                <button type="submit" class="btn btn-sm btn-link text-muted p-0"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Login to like this reply"
+                                                        >
+                                                    <i class="bi bi-heart"></i> <%= replyLikeCount %>
+                                                </button>
+                                            <% } else { %>
+                                                <button type="submit" class="btn btn-sm btn-link p-0 <%= replyLiked ? 'text-danger' : 'text-muted' %>"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="<%= replyLiked ? 'Unlike reply' : 'Like reply' %>">
+                                                    <i class="bi <%= replyLiked ? 'bi-heart-fill' : 'bi-heart' %>"></i> <%= replyLikeCount %>
+                                                </button>
+                                            <% } %>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+                <hr class="my-4">
+            <% }); %>
+        <% } else { %>
+            <p class="text-muted text-center">No comments yet. Be the first to comment!</p>
+        <% } %>
+    </div>
+</div>

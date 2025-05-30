@@ -19,7 +19,7 @@
             <% if (featuredPost.subtitle) { %>
                     <p><%= featuredPost.subtitle %></p>
             <% } %>
-            <%- include('../partials/likeAndCommentSection',{ post: featuredPost, req: req })%>
+            <%- include('../partials/profileLikeCommentBar',{ post: featuredPost, currentUser})%>
             <br>
         </div> <!--end feature post content col-->
         

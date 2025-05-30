@@ -33,6 +33,22 @@ model User {
   //follows relation(many-many relationship join table)
   followers UserFollow[] @relation("FollowerFollowing")
   following UserFollow[] @relation("FollowingFollower")
+
+  bookmarks BookMark[] //user can save many posts
+}
+
+//m-m relationship between user and post
+//explicit join table
+model BookMark {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int
+
+  @@unique([userId, postId])
 }
 
 //m-m relationship with self-referencing
@@ -50,20 +66,21 @@ model UserFollow {
 }
 
 model Post {
-  id         Int       @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   title      String
   subtitle   String?
   imageUrl   String?
   content    String
   readTime   String?
-  featured   Boolean   @default(false)
-  author     User      @relation(fields: [authorId], references: [id])
+  featured   Boolean    @default(false)
+  author     User       @relation(fields: [authorId], references: [id])
   authorId   Int
-  createdAt  DateTime  @default(now())
-  category   Category? @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime   @default(now())
+  category   Category?  @relation(fields: [categoryId], references: [id])
   categoryId Int?
   comments   Comment[]
   likes      Like[] // Likes received by this post
+  bookmarks  BookMark[] //post have many bookmarks
 }
 
 model CommentLike {
@@ -101,6 +118,11 @@ model Comment {
   authorId     Int
   createdAt    DateTime      @default(now())
   commentLikes CommentLike[]
+
+  //for reply under comment //self referencing relationship one to many
+  parentId Int?      @map("parent_id")
+  parent   Comment?  @relation("CommentChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children Comment[] @relation("CommentChildren") // This defines the relation for nested comments
 }
 
 //npx prisma init

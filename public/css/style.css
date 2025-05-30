@@ -68,163 +68,50 @@ a:hover {
   /* Optional: underline on hover */
 }
 
-/* --- END GLOBAL / BASE STYLES --- */
-
-/* --- Header & Navbar Styles --- */
-/* Your .navbar, .logo, .nav-link, .search-bar, .form-control, .login-button styles */
-/* ... keep only ONE definition for each ... */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  /* Puts logo on left, nav-right on right */
-  align-items: center;
-  background-color: #f0faf8;
-  /* A solid light teal color from your spectrum for the header */
-  padding: 15px 40px;
-  /* Adjust padding as needed */
-  color: #172e28;
-  /* Default text color for the navbar */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  /* Subtle shadow for depth */
-}
-
-.logo {
-  font-size: 1.8em;
-  /* Make logo prominent */
+a.nav-logo {
+  font-size: 1.5rem;
   font-weight: bold;
-  color: #172e28;
-  /* White color for logo text */
   text-decoration: none;
+  color: #333;
   transition: color 0.3s ease;
 }
 
-.logo:hover {
-  color: #60b4a3;
-  /* Slightly lighter white on hover */
-  text-decoration: none;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  /* Space between nav items, search, category, and login */
-}
-
-/* Search Bar Styles */
-.search-bar {
-  padding: 8px 12px;
-  border: 1px solid #295247;
-  /* White border */
-  border-radius: 20px;
-  /* Rounded corners */
-  background-color: rgba(255, 255, 255, 0.2);
-  /* Semi-transparent white background */
-  color: #172e28;
-  /* White text input */
-  font-size: 1em;
-  outline: none;
-  /* Remove default focus outline */
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.search-bar::placeholder {
-  color: #214347;
-  /* Lighter white placeholder text */
-}
-
-.search-bar:focus {
-  background-color: rgba(255, 255, 255, 0.3);
-  /* Slightly less transparent on focus */
-  border-color: #72e7c8;
-  /* Lighter border on focus */
-}
-
-.btn-search-header {
-  background-color: #69c9b4;
-  /* Main color from your banner */
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  /* Slightly rounded corners */
-  padding: 8px 15px;
-  /* Adjusted padding for narrower width and good height */
-  font-size: 0.9em;
-  /* Slightly smaller font if needed */
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  white-space: nowrap;
-  /* Prevent button text from wrapping */
-}
-
-.btn-search-header:hover {
-  background-color: #5ab19e;
-  /* Darker shade on hover */
-}
-
-/* Category Select Styles */
-.form-control {
-  /* Re-using your existing class for select */
-  padding: 8px 12px;
-  border: 1px solid #fff;
-  /* White border */
-  border-radius: 20px;
-  /* Rounded corners */
-  background-color: rgba(255, 255, 255, 0.2);
-  /* Semi-transparent white background */
-  color: #fff;
-  /* White text for selected option */
-  font-size: 1em;
-  outline: none;
-  appearance: none;
-  /* Remove default arrow for custom styling */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-  /* Custom white arrow */
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 20px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.form-control option {
-  background-color: #abf8e8;
-  /* Background for options in dropdown */
-  color: #1f2e2b;
-  /* Text color for options */
-}
-
-.form-control:focus {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-color: #e0f7fa;
-}
-
-.form-control:hover {
-  color: #64bdab;
-}
-
-/* Login Button Styles */
-.login-button {
-  display: inline-block;
-  background-color: #69c9b4;
-  /* Light teal button background */
-  color: #fff;
-  /* White text */
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
+a.nav-logo:hover {
+  font-size: 1.5rem;
   font-weight: bold;
-  font-size: 0.95em;
+  color: #315e54;
+  /* Light teal on hover */
+}
+
+.create-post-btn,
+.back-to-post-btn {
+  display: inline-block;
+  align-self: flex-start;
+  /* Align button to the left within the card */
+  background-color: #58bea6;
+  text-decoration: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-top: auto;
+  /* Push button to the bottom of the card */
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.login-button:hover {
-  background-color: #428174;
-  /* Slightly darker teal on hover */
+.create-post-btn:hover {
+  background-color: #439985;
   text-decoration: none;
-  color: #fff;
+  color: white;
 }
+
+.back-to-post-btn:hover {
+  background-color: #439985;
+  text-decoration: none;
+  color: white;
+}
+/* --- END GLOBAL / BASE STYLES --- */
 
 /* --- Banner Styles --- */
 /* Your .banner-container, .banner-content, .banner-button styles */
@@ -890,14 +777,10 @@ footer {
   /* Stronger hover shadow */
 }
 
-.blog-post-card .post-thumbnail {
-  width: 100%; /* Ensures the image takes the full width of its container */
-  height: 100%;
+img.post-thumbnail {
+  width: 220px; /* Ensures the image takes the full width of its container */
+  height: 180px;
   object-fit: cover; /* Ensures the image covers the area, cropping if necessary */
-}
-
-.blog-post-card:hover .post-thumbnail {
-  transform: scale(1.05);
 }
 
 .post-content-col {
@@ -929,7 +812,7 @@ footer {
 }
 
 .category-pill-link:hover {
-  background-color: #90e4c1;
+  background-color: #3b6151;
   color: #fff;
 }
 
@@ -1290,25 +1173,6 @@ footer {
 
 /* --- Media Queries (should all be together at the end) --- */
 @media (max-width: 992px) {
-  .navbar {
-    padding: 15px 20px;
-  }
-
-  .nav-right {
-    gap: 15px;
-    /* Reduce gap on smaller screens */
-  }
-
-  .logo {
-    font-size: 1.5em;
-  }
-
-  .nav-link,
-  .search-bar,
-  .form-control,
-  .login-button {
-    font-size: 0.95em;
-  }
   .featured-post-container {
     flex-direction: column;
     /* Stack columns vertically on smaller screens */
@@ -1402,43 +1266,8 @@ footer {
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    /* Stack logo and nav-right vertically */
-    align-items: flex-start;
-    /* Align items to the left */
-    padding: 15px;
-  }
-
-  .logo {
-    margin-bottom: 15px;
-    /* Space below logo when stacked */
-  }
-
-  .nav-right {
-    width: 100%;
-    flex-wrap: wrap;
-    /* Allow items to wrap to next line */
-    justify-content: flex-start;
-    /* Align items to the left */
-    gap: 10px;
-    /* Smaller gap when wrapping */
-  }
-
-  .search-bar,
-  .form-control {
-    flex-grow: 1;
-    /* Allow search and category to take available space */
-    min-width: 150px;
-    /* Ensure they don't become too small */
-  }
-
   /* banner */
   /* Adjust padding for stacked items */
-  .nav-link,
-  .login-button {
-    padding: 8px 15px;
-  }
 
   .banner-content h1 {
     font-size: 2.2em;
@@ -1603,23 +1432,6 @@ footer {
 }
 
 @media (max-width: 480px) {
-  .search-bar,
-  .form-control {
-    min-width: unset;
-    /* Remove min-width to allow more flexibility */
-    width: 100%;
-    /* Make them full width */
-  }
-
-  .nav-link,
-  .login-button {
-    width: calc(50% - 5px);
-    /* Two items per row, with a small gap */
-    text-align: center;
-    box-sizing: border-box;
-    /* Include padding in width */
-  }
-
   /* banner */
   .banner-content h1 {
     font-size: 1.8em;

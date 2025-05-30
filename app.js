@@ -16,6 +16,8 @@ const { fi } = require('@faker-js/faker');
 dotenv.config();
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,"views")); 
+app.use(expressLayouts); 
+app.set('layout', 'layout'); // Specify your default layout file (e.g., views/layout.ejs)
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('public')); //D:\JavaScript online class workspace\prisma-express-blog\public
 app.use(session({
@@ -33,7 +35,7 @@ app.use(async(req,res,next)=>{
         try {
             const user = await prisma.user.findUnique({
                 where: { id: req.session.userId },
-                select: { id: true, name: true } // Select necessary user data
+                select: { id: true, name: true, profilePictureUrl:true } // Select necessary user data
             });
             res.locals.currentUser = user;
         } catch (error) {
@@ -54,6 +56,7 @@ app.use('/topics',topicRoutes);
 
 
 app.get('/',async(req,res)=>{
+    const currentUser=res.locals.currentUser;
     const featuredPost = await prisma.post.findUnique(
         { 
             where: { id: 36 },
@@ -71,8 +74,14 @@ app.get('/',async(req,res)=>{
                         authorId: true, // Only need the authorId to check for a match
                     },
                 },
+                bookmarks:{
+                    select:{
+                        userId:true,
+                    }
+                },
                 _count: {
                     select: {
+                        likes:true,
                         comments: true, // This will give you the count of comments
                     },
                 },
@@ -104,8 +113,14 @@ app.get('/',async(req,res)=>{
                     authorId: true, // Only need the authorId to check for a match
                 },
             },
+            bookmarks:{
+                select:{
+                    userId:true,
+                }
+            },
             _count: {
                 select: {
+                    likes:true,
                     comments: true, // This will give you the count of comments
                 },
             },
@@ -117,8 +132,7 @@ app.get('/',async(req,res)=>{
             }
         },
     });
-    res.render('index',{featuredPost,recentPosts
-        ,req:req,
+    res.render('index',{currentUser,featuredPost,recentPosts
     });
 });
 

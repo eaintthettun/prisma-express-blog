@@ -1,0 +1,30 @@
+<%
+    const commentCount = post._count.comments;
+%>
+
+<div class="container my-5">
+    <h1 class="display-4 fw-bold mb-3"><%= post.title %></h1>
+
+    <% if (post.subtitle) { %>
+        <h2 class="lead text-muted mb-4"><%= post.subtitle %></h2>
+    <% } %>
+
+    <%- include('../partials/profileLikeCommentBar', { post, currentUser }) %>
+
+    <hr class="my-4">
+
+    <% if (post.imageUrl) { %>
+        <div class="text-center mb-5">
+            <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="img-fluid rounded shadow-sm" style="max-width: 680px; height: 453px; object-fit: cover;">
+        </div>
+    <% } %>
+
+    <div class="post-content fs-5 lh-base mb-5">
+        <p><%= post.content %></p>
+        <% // If post.content is long, you might want to parse markdown or add more paragraphs %>
+    </div>
+
+    <hr class="my-4">
+
+    <%- include('../partials/allCommentsSection',{post,currentUser})%>
+</div>
