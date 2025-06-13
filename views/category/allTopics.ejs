@@ -1,0 +1,62 @@
+<section class="explore-topics-section">
+
+  <!-- Horizontal Scrollable Topics Bar -->
+  <div class="topic-scrollbar-container py-3 px-4 mb-4 bg-light border-bottom">
+    <div class="scrollable-topics d-flex gap-2 overflow-auto">
+      <% if (categories && categories.length > 0) { %>
+        <% categories.forEach(category => { %>
+          <% if (category.topics && category.topics.length > 0) { %>
+            <% category.topics.forEach(topic => { %>
+              <a href="/topics/<%= topic.slug %>" class="btn btn-outline-secondary rounded-pill btn-sm flex-shrink-0">
+                <%= topic.name %>
+              </a>
+            <% }) %>
+          <% } %>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="topics-header text-center my-4">
+    <h1>Explore Topics</h1>
+    <p>Find articles based on subjects that interest you. Click a topic to see all related posts.</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="container mb-4">
+    <form method="GET" action="/search-topics">
+      <input
+        type="text"
+        name="q"
+        class="form-control form-control-lg"
+        placeholder="Search topics..."
+      />
+    </form>
+  </div>
+
+  <!-- Category-wise Topic Display -->
+  <div class="container topics-scroll-container">
+    <% if (categories && categories.length > 0) { %>
+      <% categories.forEach(category => { %>
+        <div class="mb-4">
+        <!--uses topics route for both categories and topics,no use id to avoid id conflicts-->
+          <a href="/topics/<%= category.slug %>"><%=category.name%></a>
+          <div class="d-flex flex-wrap gap-2">
+            <% if (category.topics && category.topics.length > 0) { %>
+              <% category.topics.forEach(topic => { %>
+                <a href="/topics/<%= topic.slug %>" class="badge bg-secondary text-light p-2 rounded-pill text-decoration-none">
+                  <%= topic.name %>
+                </a>
+              <% }) %>
+            <% } else { %>
+              <p class="text-muted">No topics available.</p>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p class="no-topics-message text-center text-muted">No topics available yet.</p>
+    <% } %>
+  </div>
+</section>

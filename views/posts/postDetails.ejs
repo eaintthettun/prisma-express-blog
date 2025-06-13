@@ -18,6 +18,10 @@
         <div class="text-center mb-5">
             <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="img-fluid rounded shadow-sm" style="max-width: 680px; height: 453px; object-fit: cover;">
         </div>
+    <% }else { %>
+    <div class="text-center mb-5">
+        <img src="/images/defaultPostImage.avif" alt="Default Post Image" class="img-fluid rounded shadow-sm"  style="max-width: 680px; height: 453px; object-fit: cover;">
+    </div>
     <% } %>
 
     <div class="post-content fs-5 lh-base mb-5 mx-auto" style="max-width: 680px;">

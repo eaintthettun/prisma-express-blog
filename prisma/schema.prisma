@@ -78,6 +78,8 @@ model Post {
   createdAt  DateTime   @default(now())
   category   Category?  @relation(fields: [categoryId], references: [id])
   categoryId Int?
+  topic      Topic?     @relation(fields: [topicId], references: [id])
+  topicId    Int? //to prevent conflicts with old records that don't have topics
   comments   Comment[]
   likes      Like[] // Likes received by this post
   bookmarks  BookMark[] //post have many bookmarks
@@ -104,9 +106,27 @@ model Like {
 }
 
 model Category {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  posts Post[]
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String? //to prevent confict with old records that does not have slug
+  posts     Post[]
+  topics    Topic[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+//one category has many topics
+model Topic {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  slug       String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  posts      Post[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([name, categoryId]) // Prevents duplicate topic names within same category
 }
 
 model Comment {

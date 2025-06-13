@@ -1,4 +1,4 @@
-<!--this ejs shows author profile,follow btn,read time and pubished date-->
+<!--this ejs accepts post,shows author profile,follow btn,read time and pubished date-->
 <%
     const authorProfilePic = post.author.profilePictureUrl || '/images/default-avatar.png';
     const isOwnProfile = currentUser && currentUser.id === post.author.id;
@@ -77,10 +77,10 @@
 
     <!-- Read Time Badge -->
     <span class="d-inline-flex align-items-center text-muted">
-    <%if(post.readTime){%>
-    <i class="bi bi-dot"></i>
-    <small style="font-size: 1rem;"><%= post.readTime %> read</small>
-    <%}%>
+        <%if(post.readTime){%>
+        <i class="bi bi-dot"></i>
+        <small style="font-size: 1rem;"><%= post.readTime %> read</small>
+        <%}%>
     </span>
 </div>
 

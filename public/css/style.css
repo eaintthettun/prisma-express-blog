@@ -1136,6 +1136,26 @@ img.post-thumbnail {
   object-fit: cover;
 }
 
+/*for topics page*/
+.scrollable-topics {
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollable-topics a {
+  white-space: nowrap;
+}
+
+.scrollable-topics::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollable-topics::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
 /* --- Media Queries for Explore Topics --- */
 @media (max-width: 768px) {
   .explore-topics-section {

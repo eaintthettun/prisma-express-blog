@@ -1,0 +1,135 @@
+<!--this page accepts either category object or post object-->
+<!--the business is same,so only use one ejs file for both category and topic-->
+
+<%
+// Determine if it's a category or topic page
+  let typeObj;
+  if(category){
+    typeObj=category;
+  }else{
+    typeObj=topic;
+  }
+%>
+
+<div class="container my-5">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2 class="fw-bold mb-2"><%= typeObj.name %></h2>
+      <div class="d-flex align-items-center gap-3 text-muted">
+        <button class="btn btn-sm btn-outline-dark rounded-pill px-3" id="followBtn" data-topic-id="<%= typeObj.id %>">
+          <i class="bi bi-plus-lg me-1"></i> Follow
+        </button>
+        <span><i class="bi bi-people"></i> <%= typeObj.followersCount || 0 %> followers</span>
+        <span><i class="bi bi-file-text"></i> <%= typeObj.relatedStoriesCount || 0 %> related stories</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <hr class="my-4">
+  <h1>Related Articles</h1><br>
+  <!-- List of Related Posts in Card Style -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+    <% typeObj.posts.forEach(post => { %>
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm hover-shadow">
+            <a href="/posts/<%= post.id %>" class="text-decoration-none">
+              <% if (post.imageUrl) { %>
+                <img src="<%= post.imageUrl %>" alt="<%= post.title %>"
+                 style="width: 100%; height: 280px; object-fit: cover;">
+              <% } else { %>
+                  <img src="/images/defaultPostImage.avif" alt="Default Post Image" 
+                  style="width: 100%; height: 280px; object-fit: cover;">
+              <% } %>
+            </a>
+          <div class="card-body">
+            <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark">
+              <h5 class="card-title fw-bold mb-2"><%= post.title %></h5>
+            </a>
+            <p class="card-text text-muted mb-3"><%= post.subtitle %></p>
+            
+            <%- include('../partials/authorInfoBar',{post,currentUser})%>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- Show More Link -->
+  <div class="text-center mb-5">
+    <a href="/topics/<%= typeObj.id %>/stories" class="btn btn-outline-dark rounded-pill px-4 py-2">
+      Show more related stories
+      <i class="bi bi-arrow-right ms-2"></i>
+    </a>
+  </div>
+</div>
+
+<style>
+  .hover-shadow {
+    transition: all 0.3s ease;
+  }
+  
+  .hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+  }
+  
+  .card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+  
+  .card-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+</style>
+
+<!--this script is for both categories and topics -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const followBtn = document.getElementById('followBtn');
+    
+    followBtn.addEventListener('click', async function() {
+      const topicId = this.getAttribute('data-topic-id');
+      
+      try {
+        const response = await fetch(`/topics/${topicId}/toggle-follow`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.following) {
+            followBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Following';
+            followBtn.classList.remove('btn-outline-dark');
+            followBtn.classList.add('btn-dark');
+          } else {
+            followBtn.innerHTML = '<i class="bi bi-plus-lg me-1"></i> Follow';
+            followBtn.classList.remove('btn-dark');
+            followBtn.classList.add('btn-outline-dark');
+          }
+          
+          // Update followers count
+          const followersCountEl = document.querySelector('span:contains("followers")');
+          if (followersCountEl) {
+            followersCountEl.textContent = `${data.followersCount} followers`;
+          }
+        }
+      } catch (error) {
+        console.error('Error following topic:', error);
+      }
+    });
+  });
+</script>

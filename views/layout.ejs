@@ -41,16 +41,17 @@
             });
         });
     </script>
-    <!--for follow btn notification alert-->
+    <!--for author follow btn notification alert-->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const followBtn = document.getElementById('followBtn');
 
             if (followBtn) {
                 followBtn.addEventListener('click', async function () {
-                    const authorId = this.dataset.authorId; //you get authorId from btn dataset
+                    const authorId = this.dataset.authorId; //you get authorId from btn dataset defined in authorInfoBar.ejs
                     const authorName=this.dataset.authorName; 
                     try {
+                        //you can also write fetch('/auth/${authorId}/toggle-follow')
                         const response = await fetch('/auth/toggle-follow', {
                             method: 'POST',
                             headers: {
