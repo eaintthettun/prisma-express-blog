@@ -17,11 +17,12 @@ exports.showPostDetails=async(req,res)=>{
                 }
             },// includes list of users who liked this post
             author:{
-                select:{
-                    id:true,
-                    email:true,
-                    name:true,
-                    profilePictureUrl:true
+                include:{
+                    followers:{
+                        select:{
+                            followerId:true,
+                        }
+                    }
                 }
             },
             comments: {
@@ -234,6 +235,7 @@ exports.searchPosts=async(req,res)=>{
 
 //show all posts including me and other users
 exports.listAllPosts=async (req,res)=>{
+    const currentUser=res.locals.currentUser;
     let ITEMS_PER_PAGE=5;
     //for pagination
     const page = parseInt(req.query.page) || 1;  // default to page 1
@@ -304,7 +306,7 @@ exports.listAllPosts=async (req,res)=>{
             hasPreviousPage:page>1,
             nextPage:page+1,
             previousPage:page-1,
-            req
+            currentUser
         }); //posts/allPosts.ejs
     
     }catch(error){

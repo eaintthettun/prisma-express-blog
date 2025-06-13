@@ -19,18 +19,15 @@
                 </div>
                 <!--start follow btn-->
                 <div class="d-flex align-items-center mb-4">
-                    <form action="/auth/toggle-follow" method="POST" class="d-inline">
-                        <input type="hidden" name="authorToFollowId" value="<%= profileUser.id %>">
                         <% if (!currentUser) { %>
-                            <button type="submit"
-                                    class="btn btn-md btn-info"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Login to follow this author"
-                                    style="margin:24px">
-                                <i class="bi bi-person-plus"></i>
-                                Follow
-                            </button>
+                            <form action="/auth/toggle-follow" method="POST" class="d-inline">
+                                <button type="submit"
+                                        class="btn btn-md btn-outline-secondary rounded-pill"
+                                        style="margin: 24px;">
+                                    <i class="bi bi-person-plus"></i>
+                                    Follow
+                                </button>
+                            </form>
                         <% }else{%>
                                 <%if(isOwnProfile){%>
                                     <div style="margin:5px">
@@ -38,16 +35,13 @@
                                     </div>
                                 <%}else{%>
                                     <div style="margin:24px">
-                                            <button type="submit"
-                                                    class="btn btn-md <%= isFollowing ? 'btn-outline-secondary rounded-pill' : 'btn-info rounded-pill' %>"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    title="<%= isFollowing ? 'Unfollow this author' : 'Follow this author' %>"
-                                            >
-                                                <i class="bi <%= isFollowing ? 'bi-person-dash' : 'bi-person-plus' %>"></i>
-                                                <%= isFollowing ? 'Following' : 'Follow' %>
+                                            <button id="followBtn"
+                                                    class="btn btn-sm <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %> rounded-pill"
+                                                    data-author-id="<%= profileUser.id %>"
+                                                    data-author-name="<%= profileUser.name %>">
+                                                    <i class="<%= isFollowing ? 'bi-person-dash' : 'bi-person-plus' %>"></i>
+                                                    <%= isFollowing ? 'Following' : 'Follow' %>
                                             </button>
-                                        </form>
                                     </div>
                                 <%}%>
                         <% } %>

@@ -3,9 +3,8 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 exports.toggleFollow=async(req,res)=>{
-    const authorToFollowId = parseInt(req.body.authorToFollowId); //you will get this id from hidden
+    const authorToFollowId = parseInt(req.body.authorToFollowId); //you will get this id from fetch() in layout.ejs
     const currentUserId = req.session.userId; // Assuming you store user ID in session
-    const redirectTo = req.header('Referer') || `/posts`; // Fallback to the all posts page
 
     console.log("currentUserId:",currentUserId,",authorToFollowId:",authorToFollowId);
     try {
@@ -19,7 +18,7 @@ exports.toggleFollow=async(req,res)=>{
             },
         });
 
-        if (existingFollow) {
+        if (existingFollow) { //if already following,unfollow it if user clicks unfollow btn
             // Unfollow
             await prisma.userFollow.delete({
                 where: {
@@ -29,7 +28,7 @@ exports.toggleFollow=async(req,res)=>{
                     },
                 },
             });
-            res.redirect(redirectTo);
+            res.json({ followed: false });
         } else {
             // Follow
             await prisma.userFollow.create({
@@ -38,7 +37,7 @@ exports.toggleFollow=async(req,res)=>{
                     followingId: authorToFollowId,
                 },
             });
-            res.redirect(redirectTo);
+            res.json({followed:true});
         }
     } catch (error) {
         console.error('Error toggling follow:', error);

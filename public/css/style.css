@@ -38,48 +38,38 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+a {
+  font-family: "Roboto Slab", serif;
   margin-top: 0;
-  margin-bottom: 0.5em;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
-  color: #222;
-  /* A slightly darker color for headings */
+  color: #162523;
 }
 
 /* Base styles for paragraphs */
 p {
+  font-family: "Lora", serif;
   margin-top: 0;
-  margin-bottom: 1em;
+  line-height: 1.5em;
+  font-size: 1.2rem;
+  color: #111b1a;
 }
 
 /* Base styles for links */
-a {
-  color: #69c9b4;
-  /* Default link color (matching your theme) */
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
 
-a:hover {
-  color: #3f796c;
-  /* Hover color for links */
-  text-decoration: underline;
-  /* Optional: underline on hover */
-}
-
-a.nav-logo {
+.nav-logo-link {
   font-size: 1.5rem;
   font-weight: bold;
   text-decoration: none;
-  color: #333;
+  color: #325f55;
   transition: color 0.3s ease;
 }
 
-a.nav-logo:hover {
+.nav-logo-link:hover {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #315e54;
+  color: #50a090;
   /* Light teal on hover */
 }
 
@@ -192,14 +182,14 @@ a.nav-logo:hover {
 /* ... keep only ONE definition for each ... */
 /* --- Featured Post Section --- */
 .featured-post-section {
+  background: whitesmoke;
   padding: 60px 40px;
   /* Ample padding around the section */
-  background-color: #e8f7f2;
-  /* A very light, almost white, subtle teal background */
   margin-top: 20px;
   /* Space from the banner or previous section */
   border-top: 1px solid #e0f0f0;
   /* Subtle top border */
+  transform: translateY(10%);
 }
 
 .featured-post-section h2 {
@@ -222,7 +212,7 @@ a.nav-logo:hover {
   /* Vertically align items in the middle */
   box-shadow: 0 7px 5px rgba(0, 0, 0, 0.3);
   border-radius: 5px;
-  background: #ffff;
+  background: #ffffff;
 }
 
 .featured-post-image-col {

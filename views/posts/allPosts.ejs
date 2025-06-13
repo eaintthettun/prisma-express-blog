@@ -27,7 +27,8 @@
                         <% } %>
 
                         <div class="mt-2">
-                            <%- include('../partials/profileLikeCommentBar', { post: post, req: req }) %>
+                            <%- include('../partials/authorInfoBar',{post,currentUser})%>
+                            <%- include('../partials/profileLikeCommentBar', { post: post, currentUser }) %>
                         </div>
                     </div>
 

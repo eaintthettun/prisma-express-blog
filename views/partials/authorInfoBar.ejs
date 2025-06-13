@@ -1,0 +1,111 @@
+<!--this ejs shows author profile,follow btn,read time and pubished date-->
+<%
+    const authorProfilePic = post.author.profilePictureUrl || '/images/default-avatar.png';
+    const isOwnProfile = currentUser && currentUser.id === post.author.id;
+    const isFollowing = currentUser && post.author.followers.some(f => f.followerId === currentUser.id);
+%>
+
+<!-- Notification Bar (initially hidden) -->
+<div id="followNotification" class="alert alert-success alert-dismissible fade" role="alert" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1050; min-width: 300px;">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    <span id="followNotificationText">You followed <strong id="followedUsername"><%=post.author.name%></strong></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div class="d-flex align-items-center gap-3 mb-3">
+    <!-- Author Avatar -->
+    <a href="/auth/profile/<%= post.authorId %>" class="author-avatar-link">
+        <img src="<%= authorProfilePic %>" 
+             alt="<%= post.author.name %>'s profile picture" 
+             class="rounded-circle border border-2 border-light shadow-sm"
+             style="width: 45px; height: 45px; object-fit: cover;">
+    </a>
+
+    <!-- Author Info -->
+    <div class="author-info">
+        <a href="/auth/profile/<%= post.authorId %>" 
+           class="text-decoration-none text-dark fw-semibold d-block" 
+           style="font-size: 1rem; line-height: 1.2;">
+            <%= post.author.name %>
+        </a>
+        <small class="text-muted d-block" style="font-size: 0.8rem;">
+            <%= post.createdAt.toLocaleString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            }) %>
+        </small>
+    </div>
+
+    <!-- Follow Button Section -->
+    <div class="d-flex align-items-center">
+        <% if (!currentUser) { %>
+            <form action="/auth/toggle-follow" method="POST" class="d-inline">
+                <button type="submit"
+                        class="btn btn-md btn-outline-secondary rounded-pill"
+                        style="margin: 24px;">
+                    <i class="bi bi-person-plus"></i>
+                    Follow
+                </button>
+            </form>
+        <% } else { %>
+            <% if (isOwnProfile) { %>
+                <div style="margin: 5px;">
+                    <a href="/profile/edit/<%= post.author.id %>" 
+                       class="btn btn-md btn-outline-secondary rounded-pill"
+                       style="font-size: 0.9rem;"
+                    >
+                        Edit Profile
+                    </a>
+                </div>
+            <% } else { %>
+                <div style="margin: 24px;">
+                        <button id="followBtn"
+                                class="btn btn-sm <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %> rounded-pill"
+                                data-author-id="<%= post.author.id %>"
+                                data-author-name="<%= post.author.name %>"
+                                style="padding:7px 12px;">
+                            <i class="<%= isFollowing ? 'bi-person-dash' : 'bi-person-plus' %>"></i>
+                            <%= isFollowing ? 'Following' : 'Follow' %>
+                        </button>
+                </div>
+            <% } %>
+        <% } %>
+    </div>
+
+    <!-- Read Time Badge -->
+    <span class="d-inline-flex align-items-center text-muted">
+    <%if(post.readTime){%>
+    <i class="bi bi-dot"></i>
+    <small style="font-size: 1rem;"><%= post.readTime %> read</small>
+    <%}%>
+    </span>
+</div>
+
+
+<% if (typeof flashMessages !== 'undefined' && flashMessages.followSuccess) { %>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showFollowNotification('<%= flashMessages.followSuccess %>');
+    });
+
+    function showFollowNotification(username) {
+        const notification = document.getElementById('followNotification');
+        const usernameSpan = document.getElementById('followedUsername');
+        
+        usernameSpan.textContent = username;
+        notification.style.display = 'block';
+        notification.classList.add('show');
+        
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 150);
+        }, 3000);
+    }
+</script>
+<% } %>

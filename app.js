@@ -16,6 +16,7 @@ const { fi } = require('@faker-js/faker');
 dotenv.config();
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,"views")); 
+app.use(express.json());
 app.use(expressLayouts); 
 app.set('layout', 'layout'); // Specify your default layout file (e.g., views/layout.ejs)
 app.use(express.urlencoded({extended:true}));
@@ -35,7 +36,13 @@ app.use(async(req,res,next)=>{
         try {
             const user = await prisma.user.findUnique({
                 where: { id: req.session.userId },
-                select: { id: true, name: true, profilePictureUrl:true } // Select necessary user data
+                include:{
+                    followers:{
+                        select:{
+                            followerId:true,
+                        }
+                    }
+                },
             });
             res.locals.currentUser = user;
         } catch (error) {
@@ -61,12 +68,14 @@ app.get('/',async(req,res)=>{
         { 
             where: { id: 36 },
             include: {
-                author: {
-                    select: {
-                        id: true,
-                        name: true,
-                        profilePictureUrl: true, // Include author's profile picture if you show it
-                    },
+                author:{
+                    include:{
+                        followers:{
+                            select:{
+                                followerId:true, //to check if you are following this user or not
+                            }
+                        }
+                    }
                 },
                 likes: {
                     // Include likes to check if the current user has liked it
@@ -101,11 +110,13 @@ app.get('/',async(req,res)=>{
         take: 2,
         include: {
             author: {
-                select: {
-                    id: true,
-                    name: true,
-                    profilePictureUrl: true, // Include author's profile picture if you show it
-                },
+                include:{
+                    followers:{
+                        select:{
+                            followerId:true,  //to check if you are following this user or not
+                        }
+                    }
+                }
             },
             likes: {
                 // Include likes to check if the current user has liked it

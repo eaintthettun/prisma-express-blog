@@ -9,408 +9,108 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/style.css">
-    
     <style>
-        :root {
-            --navy-blue: #0A2463;
-            --teal-accent: #20A39E;
-            --orange-accent:rgb(253, 161, 48);
-            --light-bg: #F8F9FA;
-            --dark-text: #333333;
-        }
-
-        body {
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem;
-        }
-        
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            max-width: 900px;
-            width: 100%;
-        }
-
-        .login-left {
-            background: linear-gradient(135deg, var(--navy-blue), var(--teal-accent));
-            color: white;
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-left::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-
-        .login-left > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .login-right {
-            padding: 3rem;
-        }
-
-        .brand-logo {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary-orange);
-            margin-bottom: 0.5rem;
-        }
-
-        .welcome-text {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--navy-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle-text {
-            color: #6c757d;
-            margin-bottom: 2rem;
-        }
-
-        .form-floating {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-floating > .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 1rem 0.75rem;
-            height: auto;
-            transition: all 0.3s ease;
-        }
-
-        .form-floating > .form-control:focus {
-            box-shadow: 0 0 0 0.1rem rgba(96, 240, 235, 0.3);
-        }
-
-        .form-floating > label {
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        .btn-login {
-            background: transparent;
-            border: 2px solid var(--teal-accent);
-            color: var(--teal-accent);
-            padding: 0.875rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
-            width: 100%;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-login:hover {
-            background: var(--teal-accent);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(32, 163, 158, 0.3);
-        }
-
-        .btn-register{
-            background: transparent;
-            border: 2px solid var(--orange-accent);
-            color: var(--orange-accent);
-            padding: 0.875rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
-            width: 100%;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-register:hover {
-            background: var(--orange-accent);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(32, 163, 158, 0.3);
-        }
-
-        .divider {
-            text-align: center;
-            margin: 1.5rem 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #dee2e6;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 1rem;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .alert-info {
-            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
-            border: none;
-            border-radius: 12px;
-            color: var(--navy-blue);
-            border-left: 4px solid var(--primary-orange);
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #6c757d;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        .password-toggle:hover {
-            color: var(--primary-orange);
-        }
-
-        @media (max-width: 768px) {
-            .login-left {
-                padding: 2rem;
-                min-height: 200px;
-            }
-            
-            .login-right {
-                padding: 2rem;
-            }
-            
-            .welcome-text {
-                font-size: 1.5rem;
-            }
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            opacity: 0.9;
-        }
-
-        .feature-item i {
-            font-size: 1.2rem;
-            margin-right: 0.75rem;
-            color: rgba(255, 255, 255, 0.8);
+        .brand {
+        font-family: "Lora", serif;
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        font-size: 2rem;
+        font-weight: bold;
+        color:rgb(32, 82, 97);
         }
     </style>
 </head>
-<body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="row g-0 h-100">
-                <!-- Left Side - Branding -->
-                <div class="col-lg-5 d-none d-lg-block">
-                    <div class="login-left h-100">
-                        <div>
-                            <div class="brand-logo mb-4">
-                                <i class="bi bi-journal-richtext"></i>
-                            </div>
-                            <h2 class="h3 mb-3">Welcome to MyBlog</h2>
-                            <p class="mb-4 opacity-75">Join our community of writers and readers sharing amazing stories and insights.</p>
-                            
-                            <div class="text-start">
-                                <div class="feature-item">
-                                    <i class="bi bi-pencil-square"></i>
-                                    <span>Write and publish your stories</span>
+<body class="bg-light">
+    <!-- Centered Login Form -->
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="row g-0 shadow-sm border rounded overflow-hidden">
+                        <!-- Left Side - Branding (Hidden on small screens) -->
+                        <div class="col-lg-5 d-none d-lg-block bg-white p-4">
+                            <div>
+                                <div class="brand-logo mb-4 fs-2 text-primary">
+                                    <i class="bi bi-journal-richtext"></i>
                                 </div>
-                                <div class="feature-item">
-                                    <i class="bi bi-people"></i>
-                                    <span>Connect with other writers</span>
-                                </div>
-                                <div class="feature-item">
-                                    <i class="bi bi-heart"></i>
-                                    <span>Engage with amazing content</span>
+                                <h2 class="h4 mb-3">Welcome to MyBlog</h2>
+                                <p class="mb-4 text-muted">Join our community of writers and readers sharing amazing stories and insights.</p>
+
+                                <div class="text-start small text-muted">
+                                    <div class="mb-2">
+                                        <i class="bi bi-pencil-square me-2 text-primary"></i>
+                                        Write and publish your stories
+                                    </div>
+                                    <div class="mb-2">
+                                        <i class="bi bi-people me-2 text-primary"></i>
+                                        Connect with other writers
+                                    </div>
+                                    <div class="mb-2">
+                                        <i class="bi bi-heart me-2 text-primary"></i>
+                                        Engage with amazing content
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Right Side - Login Form -->
-                <div class="col-lg-7">
-                    <div class="login-right">
-                        <!-- Mobile Brand -->
-                        <div class="d-lg-none text-center mb-4">
-                            <div class="brand-logo">MyBlog</div>
-                        </div>
-
-                        <h1 class="welcome-text">Sign In</h1>
-                        <p class="subtitle-text">Welcome back! Please sign in to your account.</p>
-
-                        <!-- Login Form -->
-                        <form action="/auth/login" method="POST" id="loginForm">
-                            <div class="form-floating">
-                                <input type="email" 
-                                       class="form-control" 
-                                       id="email" 
-                                       name="email" 
-                                       placeholder="name@example.com" 
-                                       required>
-                                <label for="email">
-                                    <i class="bi bi-envelope me-2"></i>Email Address
-                                </label>
+                        <!-- Right Side - Login Form -->
+                        <div class="col-lg-7 bg-white p-4">
+                            <!-- Mobile Brand -->
+                            <div class="d-lg-none text-center mb-3 fw-bold fs-4 text-primary">
+                                📝 MyBlog
                             </div>
 
-                            <div class="form-floating position-relative">
-                                <input type="password" 
-                                       class="form-control" 
-                                       id="password" 
-                                       name="password" 
-                                       placeholder="Password" 
-                                       required>
-                                <label for="password">
-                                    <i class="bi bi-lock me-2"></i>Password
-                                </label>
-                                <button type="button" class="password-toggle" onclick="togglePassword()">
-                                    <i class="bi bi-eye" id="toggleIcon"></i>
-                                </button>
-                            </div>
+                            <h1 class="h3 mb-2">Sign In</h1>
+                            <p class="text-muted mb-4">Welcome back! Please sign in to your account.</p>
 
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="rememberMe">
-                                    <label class="form-check-label text-muted" for="rememberMe">
-                                        Remember me
+                            <form action="/auth/login" method="POST" id="loginForm">
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                                    <label for="email">
+                                        <i class="bi bi-envelope me-2"></i>Email Address
                                     </label>
                                 </div>
-                                <a href="/auth/forgot-password" class="text-decoration-none" style="color: var(--primary-orange);">
-                                    Forgot password?
+
+                                <div class="form-floating mb-3 position-relative">
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                                    <label for="password">
+                                        <i class="bi bi-lock me-2"></i>Password
+                                    </label>
+                                    <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-3 border-0 bg-transparent" onclick="togglePassword()">
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                                        <label class="form-check-label text-muted" for="rememberMe">Remember me</label>
+                                    </div>
+                                    <a href="/auth/forgot-password" class="text-decoration-none" style="color: var(--primary-orange);">Forgot password?</a>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mb-3">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                                </button>
+
+                                <div class="text-center text-muted mb-3">or</div>
+
+                                <a href="/auth/register" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-person-plus me-2"></i>Create New Account
                                 </a>
+                            </form>
+
+                            <div class="alert alert-info mt-4 d-flex align-items-center" role="alert">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <small>New to MyBlog? Create an account to start sharing your stories!</small>
                             </div>
-
-                            <button type="submit" class="btn btn-login mb-3">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>
-                                Sign In
-                            </button>
-
-                            <div class="divider">
-                                <span>or</span>
-                            </div>
-
-                            <a href="/auth/register" class="btn btn-register">
-                                <i class="bi bi-person-plus me-2"></i>
-                                Create New Account
-                            </a>
-                        </form>
-
-                        <!-- Info Alert -->
-                        <div class="alert alert-info mt-4 d-flex align-items-center" role="alert">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <small>New to MyBlog? Create an account to start sharing your stories!</small>
-                        </div>
-                    </div>
+                        </div> <!-- End Right -->
+                    </div> <!-- End Card -->
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Password toggle functionality
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggleIcon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.className = 'bi bi-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.className = 'bi bi-eye';
-            }
-        }
-
-        // Form validation and loading state
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            
-            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Signing In...';
-            submitBtn.disabled = true;
-            
-            // Re-enable button after 3 seconds in case of error
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 3000);
-        });
-
-        // Add floating animation to form elements
-        document.addEventListener('DOMContentLoaded', function() {
-            const formControls = document.querySelectorAll('.form-control');
-            
-            formControls.forEach(control => {
-                control.addEventListener('focus', function() {
-                    this.parentElement.style.transform = 'translateY(-2px)';
-                });
-                
-                control.addEventListener('blur', function() {
-                    this.parentElement.style.transform = 'translateY(0)';
-                });
-            });
-        });
-    </script>
-
-    <style>
-        .spin {
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .form-floating {
-            transition: transform 0.2s ease;
-        }
-    </style>
 </body>
+
 </html>

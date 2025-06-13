@@ -1,0 +1,190 @@
+<%
+    const postLiked = currentUser && post.likes.some(like => like.authorId === currentUser.id);
+    const likeCount = post._count.likes;
+    const commentCount = post._count.comments;
+    const authorProfilePic = post.author && post.author.profilePictureUrl ? post.author.profilePictureUrl : '/images/default-avatar.png';
+    
+    // Check if the current user has bookmarked this post
+    const isBookmarked = currentUser && post.bookmarks.some(bookmark => bookmark.userId === currentUser.id);
+    
+    // You cannot bookmark your own post
+    const isOwnPost = currentUser && post.authorId === currentUser.id;
+%>
+
+<div class="post-meta-section p-3">
+    <!-- 3-Column Layout -->
+    <div class="row align-items-center">
+        <!-- First Column: Like and Comment Buttons -->
+        <div class="col-auto">
+            <div class="d-flex align-items-center gap-2">
+                <!-- Like Button -->
+                <form action="/posts/<%= post.id %>/toggle-like" method="POST" class="d-inline">
+                    <% if (!currentUser) { %>
+                        <button type="submit" 
+                                class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 rounded-pill px-3 py-1">
+                            <i class="bi bi-heart" style="font-size: 0.9em;"></i>
+                            <span style="font-size: 0.85em; font-weight: 500;"><%= likeCount %></span>
+                        </button>
+                    <% } else { %>
+                        <button type="submit" 
+                                class="btn btn-sm d-flex align-items-center gap-1 rounded-pill px-3 py-1 <%= postLiked ? 'btn-danger' : 'btn-outline-danger' %>">
+                            <i class="bi <%= postLiked ? 'bi-heart-fill' : 'bi-heart' %>" style="font-size: 0.9em;"></i>
+                            <span style="font-size: 0.85em; font-weight: 500;"><%= likeCount %></span>
+                        </button>
+                    <% } %>
+                </form>
+
+                <!-- Comment Button -->
+                <form action="/posts/<%= post.id %>/comments" method="GET" class="d-inline-block">
+                    <button type="submit"
+                            class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 rounded-pill px-3 py-1"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="View comments">
+                        <i class="bi bi-chat" style="font-size: 0.9em;"></i>
+                        <span style="font-size: 0.85em; font-weight: 500;"><%= commentCount %></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Second Column: Spacer (blank) -->
+        <div class="col"></div>
+
+        <!-- Third Column: Bookmark/Edit, Share, and More Buttons -->
+        <div class="col-auto">
+            <div class="d-flex align-items-center gap-2">
+                <!-- Bookmark/Edit Button -->
+                <% if (!currentUser) { %>
+                    <form action="/posts/<%= post.id %>/toggle-bookmark" method="POST" class="d-inline">
+                        <button type="submit"
+                                class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+                            <i class="bi bi-bookmark" style="font-size: 0.9em;"></i>
+                        </button>
+                    </form>
+                <% } else { %>
+                    <% if (isOwnPost) { %>
+                        <a href="/posts/edit/<%= post.id %>" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil" style="font-size: 0.9em;"></i>
+                        </a>
+                    <% } else { %>
+                        <form action="/posts/<%= post.id %>/toggle-bookmark" method="POST" class="d-inline">
+                            <button type="submit"
+                                    class="btn btn-sm d-flex align-items-center <%= isBookmarked ? 'btn-primary' : 'btn-outline-secondary' %>">
+                                <i class="bi <%= isBookmarked ? 'bi-bookmark-fill' : 'bi-bookmark' %>" style="font-size: 0.9em;"></i>
+                            </button>
+                        </form>
+                    <% } %>
+                <% } %>
+
+                <!-- Share Button with Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                            type="button" 
+                            id="shareDropdown<%= post.id %>" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false">
+                        <i class="bi bi-share" style="font-size: 0.9em;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="shareDropdown<%= post.id %>">
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="copyPostLink('<%= post.id %>')">
+                                <i class="bi bi-link-45deg me-2"></i>Copy Link
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="shareOnX('<%= post.id %>', '<%= post.title %>')">
+                                <i class="fa-brands fa-x-twitter me-2"></i>Share on X
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="shareOnLinkedIn('<%= post.id %>', '<%= post.title %>')">
+                                <i class="bi bi-linkedin me-2"></i>Share on LinkedIn
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="shareOnFacebook('<%= post.id %>', '<%= post.title %>')">
+                                <i class="bi bi-facebook me-2"></i>Share on Facebook
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="shareOnInstagram('<%= post.id %>')">
+                                <i class="bi bi-instagram me-2"></i>Share on Instagram
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- More Options Button -->
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary" 
+                            type="button" 
+                            id="moreOptions<%= post.id %>" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false">
+                        <i class="bi bi-three-dots" style="font-size: 0.9em;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="moreOptions<%= post.id %>">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-flag me-2"></i>Report Post</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye-slash me-2"></i>Hide Post</a></li>
+                        <% if (currentUser && isOwnPost) { %>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Delete Post</a></li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show follow notification
+function showFollowNotification(username) {
+    const notification = document.getElementById('followNotification');
+    const usernameSpan = document.getElementById('followedUsername');
+    
+    usernameSpan.textContent = username;
+    notification.style.display = 'block';
+    notification.classList.add('show');
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 150);
+    }, 3000);
+}
+
+// Share functions
+function copyPostLink(postId) {
+    const url = `${window.location.origin}/posts/${postId}`;
+    navigator.clipboard.writeText(url).then(() => {
+        // Show a small toast or alert
+        alert('Link copied to clipboard!');
+    });
+}
+
+function shareOnX(postId, title) {
+    const url = `${window.location.origin}/posts/${postId}`;
+    const text = encodeURIComponent(`Check out this post: ${title}`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`, '_blank');
+}
+
+function shareOnLinkedIn(postId, title) {
+    const url = `${window.location.origin}/posts/${postId}`;
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+}
+
+function shareOnFacebook(postId, title) {
+    const url = `${window.location.origin}/posts/${postId}`;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+}
+
+function shareOnInstagram(postId) {
+    // Instagram doesn't support direct URL sharing, so we'll copy the link
+    copyPostLink(postId);
+    alert('Link copied! You can paste it in your Instagram story or bio.');
+}
+
+</script>

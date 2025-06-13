@@ -9,7 +9,8 @@
         <h2 class="lead text-muted mb-4"><%= post.subtitle %></h2>
     <% } %>
 
-    <%- include('../partials/profileLikeCommentBar', { post, currentUser }) %>
+    <%- include('../partials/authorInfoBar',{post,currentUser})%>
+    <%- include('../partials/likeCommentBookmarkShare', { post, currentUser }) %>
 
     <hr class="my-4">
 
@@ -19,12 +20,14 @@
         </div>
     <% } %>
 
-    <div class="post-content fs-5 lh-base mb-5">
-        <p><%= post.content %></p>
-        <% // If post.content is long, you might want to parse markdown or add more paragraphs %>
+    <div class="post-content fs-5 lh-base mb-5 mx-auto" style="max-width: 680px;">
+        <% let paragraphs = post.content.split(/\r?\n\s*\r?\n/); %>
+            <% paragraphs.forEach(p => { %>
+            <p><%= p.trim() %></p>
+            <% }) 
+        %>
     </div>
 
     <hr class="my-4">
-
     <%- include('../partials/allCommentsSection',{post,currentUser})%>
 </div>
