@@ -62,7 +62,7 @@
                 </div>
             <% } else { %>
                 <div style="margin: 24px;">
-                        <button id="followBtn"
+                        <button id="authorFollowBtn"
                                 class="btn btn-sm <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %> rounded-pill"
                                 data-author-id="<%= post.author.id %>"
                                 data-author-name="<%= post.author.name %>"
@@ -83,29 +83,3 @@
         <%}%>
     </span>
 </div>
-
-
-<% if (typeof flashMessages !== 'undefined' && flashMessages.followSuccess) { %>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        showFollowNotification('<%= flashMessages.followSuccess %>');
-    });
-
-    function showFollowNotification(username) {
-        const notification = document.getElementById('followNotification');
-        const usernameSpan = document.getElementById('followedUsername');
-        
-        usernameSpan.textContent = username;
-        notification.style.display = 'block';
-        notification.classList.add('show');
-        
-        // Auto-hide after 3 seconds
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 150);
-        }, 3000);
-    }
-</script>
-<% } %>

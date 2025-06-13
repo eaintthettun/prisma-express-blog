@@ -39,3 +39,94 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// for author follow btn notification alert
+        document.addEventListener('DOMContentLoaded', function () {
+            const authorFollowBtn = document.getElementById('authorFollowBtn');
+
+            if (authorFollowBtn) {  
+                authorFollowBtn.addEventListener('click', async function () {
+                    const authorId = this.dataset.authorId; //you get authorId from btn dataset defined in authorInfoBar.ejs
+                    const authorName=this.dataset.authorName; 
+                    try {
+                        //you can also write fetch('/auth/${authorId}/toggle-follow')
+                        const response = await fetch('/auth/toggle-follow', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ authorToFollowId: authorId })
+                        });
+                        if (response.status === 401) {
+                            const result = await response.json();
+                            alert(result.error); // ✅ Show "You must be logged in to follow topics."
+                            return;
+                        }
+                        const result = await response.json();
+                        if (result.followed) {
+                            authorFollowBtn.classList.remove('btn-secondary');
+                            authorFollowBtn.classList.add('btn-outline-secondary');
+                            authorFollowBtn.innerHTML = `<i class="bi-person-plus"></i> Following`;
+                            alert(`You followed user ${authorName}`);
+                        } else if(!result.followed) {
+                            authorFollowBtn.classList.remove('btn-outline-secondary');
+                            authorFollowBtn.classList.add('btn-secondary');
+                            authorFollowBtn.innerHTML = `<i class="bi-person-plus"></i> Follow`;
+                            alert(`You unfollowed user ${authorName}`);
+                        }
+                    } catch (error) {
+                        console.error('Follow error:', error);
+                        alert('Something went wrong.');
+                    }
+                });
+            }
+        });
+
+        //for topic follow btn notification alert
+            document.addEventListener('DOMContentLoaded', function() {
+                const topicFollowBtn = document.getElementById('topicFollowBtn');
+                if(topicFollowBtn){
+                    topicFollowBtn.addEventListener('click', async function() {
+                        const topicId = this.dataset.topicId; //this topicId is from topicFollowBtn dataset in categoryOrTopicDetails.js
+                        console.log('topicId:',topicId);
+                        try {
+                            const response = await fetch(`/topics/${topicId}/toggle-follow`, { 
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'  //this line very important
+                            }
+                            });
+                            if (response.status === 401) {
+                                const data = await response.json(); //accept json from auth middleware
+                                const goLogin = confirm(`${data.error}\n\nClick OK to log in.`);
+                                if (goLogin) {
+                                  window.location.href = data.loginUrl; // Go to login
+                                }
+                                return; // Don't proceed further
+                            }
+                            const data = await response.json();
+                            if (data.followed) {
+                                topicFollowBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Following';
+                                topicFollowBtn.classList.remove('btn-outline-dark');
+                                topicFollowBtn.classList.add('btn-dark');
+                                alert(`You followed topic`);
+                            } else {
+                                topicFollowBtn.innerHTML = '<i class="bi bi-plus-lg me-1"></i> Follow';
+                                topicFollowBtn.classList.remove('btn-dark');
+                                topicFollowBtn.classList.add('btn-outline-dark');
+                                alert(`You unfollowed topic`);
+                            }
+                            
+                            // Update followers count
+                            const followersCountEl = document.querySelector('.followers-count');
+                            if (followersCountEl) {
+                                followersCountEl.textContent = `${data.followersCount} followers`;
+                            }
+                        }catch (error) {
+                            console.error('Follow error:', error);
+                            alert('Something went wrong.');
+                        }
+                    });
+                };//end if
+            });

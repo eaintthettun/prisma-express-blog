@@ -25,16 +25,21 @@ model User {
   twitterUrl        String? // New: Social links
   linkedinUrl       String? // New: Social links
 
-  posts        Post[] //user can write many posts
-  comments     Comment[]
-  likes        Like[] //Likes given by this user
-  commentLikes CommentLike[]
+  posts          Post[] //user can write many posts
+  comments       Comment[]
+  likes          Like[] //Likes given by this user
+  commentLikes   CommentLike[]
+  followedTopics TopicFollow[]
 
   //follows relation(many-many relationship join table)
   followers UserFollow[] @relation("FollowerFollowing")
   following UserFollow[] @relation("FollowingFollower")
 
-  bookmarks BookMark[] //user can save many posts
+  bookmarks  BookMark[] //user can save many posts
+  Category   Category?  @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  Topic      Topic?     @relation(fields: [topicId], references: [id])
+  topicId    Int?
 }
 
 //m-m relationship between user and post
@@ -106,27 +111,45 @@ model Like {
 }
 
 model Category {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  slug      String? //to prevent confict with old records that does not have slug
-  posts     Post[]
-  topics    Topic[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  id         Int           @id @default(autoincrement())
+  name       String        @unique
+  slug       String? //to prevent confict with old records that does not have slug
+  posts      Post[]
+  topics     Topic[] //one category has many topics
+  followedBy TopicFollow[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime?     @updatedAt
+  User       User[]
 }
 
-//one category has many topics
+//a topic can have only one category
 model Topic {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique
+  id         Int           @id @default(autoincrement())
+  name       String        @unique
   slug       String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category      @relation(fields: [categoryId], references: [id])
   categoryId Int
   posts      Post[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  followedBy TopicFollow[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  User       User[]
 
   @@unique([name, categoryId]) // Prevents duplicate topic names within same category
+}
+
+//join table between Topic and User(m-m rs)
+model TopicFollow {
+  id         Int       @id @default(autoincrement())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     Int
+  topic      Topic     @relation(fields: [topicId], references: [id])
+  topicId    Int
+  createdAt  DateTime  @default(now())
+  Category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+
+  @@unique([userId, topicId]) // prevent duplicate follows
 }
 
 model Comment {

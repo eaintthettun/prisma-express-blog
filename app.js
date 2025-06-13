@@ -55,7 +55,6 @@ app.use(async(req,res,next)=>{
     next();
 });
 
-
 app.use('/auth',authRoutes);
 app.use('/posts',postRoutes); //only write posts when only login
 app.use('/comments',commentRoutes);

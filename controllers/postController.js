@@ -1,6 +1,4 @@
 const {PrismaClient}=require('@prisma/client');
-const { name } = require('ejs');
-const { post } = require('../routes/postsRoutes');
 const prisma=new PrismaClient();
 
 exports.showPostDetails=async(req,res)=>{

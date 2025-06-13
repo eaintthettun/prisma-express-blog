@@ -4,7 +4,7 @@
 <%
 // Determine if it's a category or topic page
   let typeObj;
-  if(category){
+  if(isCategory){
     typeObj=category;
   }else{
     typeObj=topic;
@@ -17,11 +17,11 @@
     <div class="col-md-8">
       <h2 class="fw-bold mb-2"><%= typeObj.name %></h2>
       <div class="d-flex align-items-center gap-3 text-muted">
-        <button class="btn btn-sm btn-outline-dark rounded-pill px-3" id="followBtn" data-topic-id="<%= typeObj.id %>">
+        <button class="btn btn-sm btn-outline-dark rounded-pill px-3" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
           <i class="bi bi-plus-lg me-1"></i> Follow
         </button>
-        <span><i class="bi bi-people"></i> <%= typeObj.followersCount || 0 %> followers</span>
-        <span><i class="bi bi-file-text"></i> <%= typeObj.relatedStoriesCount || 0 %> related stories</span>
+        <span class="followers-count"><i class="bi bi-people"></i> <%= typeObj._count.followers || 0 %> followers</span>
+        <span><i class="bi bi-file-text"></i> <%= typeObj._count.posts || 0 %> related stories</span>
       </div>
     </div>
   </div>
@@ -91,45 +91,3 @@
     line-height: 1.5;
   }
 </style>
-
-<!--this script is for both categories and topics -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const followBtn = document.getElementById('followBtn');
-    
-    followBtn.addEventListener('click', async function() {
-      const topicId = this.getAttribute('data-topic-id');
-      
-      try {
-        const response = await fetch(`/topics/${topicId}/toggle-follow`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          if (data.following) {
-            followBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Following';
-            followBtn.classList.remove('btn-outline-dark');
-            followBtn.classList.add('btn-dark');
-          } else {
-            followBtn.innerHTML = '<i class="bi bi-plus-lg me-1"></i> Follow';
-            followBtn.classList.remove('btn-dark');
-            followBtn.classList.add('btn-outline-dark');
-          }
-          
-          // Update followers count
-          const followersCountEl = document.querySelector('span:contains("followers")');
-          if (followersCountEl) {
-            followersCountEl.textContent = `${data.followersCount} followers`;
-          }
-        }
-      } catch (error) {
-        console.error('Error following topic:', error);
-      }
-    });
-  });
-</script>

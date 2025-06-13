@@ -41,48 +41,6 @@
             });
         });
     </script>
-    <!--for author follow btn notification alert-->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const followBtn = document.getElementById('followBtn');
-
-            if (followBtn) {
-                followBtn.addEventListener('click', async function () {
-                    const authorId = this.dataset.authorId; //you get authorId from btn dataset defined in authorInfoBar.ejs
-                    const authorName=this.dataset.authorName; 
-                    try {
-                        //you can also write fetch('/auth/${authorId}/toggle-follow')
-                        const response = await fetch('/auth/toggle-follow', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ authorToFollowId: authorId })
-                        });
-                        if (response.status === 401) {
-                            alert('You need to log in to follow users.');
-                            return;
-                        }
-                        const result = await response.json();
-                        if (result.followed) {
-                            followBtn.classList.remove('btn-secondary');
-                            followBtn.classList.add('btn-outline-secondary');
-                            followBtn.innerHTML = `<i class="bi-person-plus"></i> Following`;
-                            alert(`You followed user ${authorName}`);
-                        } else if(!result.followed) {
-                            followBtn.classList.remove('btn-outline-secondary');
-                            followBtn.classList.add('btn-secondary');
-                            followBtn.innerHTML = `<i class="bi-person-plus"></i> Follow`;
-                            alert(`You unfollowed user ${authorName}`);
-                        }
-                    } catch (error) {
-                        console.error('Follow error:', error);
-                        alert('Something went wrong.');
-                    }
-                });
-            }
-        });
-        </script>
-        <script type="module" src="/js/main.js"></script>
+    <script type="module" src="/js/main.js"></script>
 </body>
 </html>
