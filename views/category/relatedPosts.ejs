@@ -1,0 +1,235 @@
+<!--this page accepts either category object or post object-->
+<!--the business is same,so only use one ejs file for both category and typeObj-->
+
+<%
+// Determine if it's a category or typeObj page
+  let typeObj;
+  if(isCategory){
+    typeObj=category;
+  }else{
+    typeObj=typeObj;
+  }
+%>
+
+<div class="container-fluid py-5">
+    <div class="row">
+        <!-- Left Sidebar - Header Section -->
+        <div class="col-lg-3 col-md-4">
+            <div class="sticky-top" style="top: 2rem;">
+                <div class="sidebar-header bg-light rounded-3 p-4 mb-4">
+                    <h1 class="h3 fw-bold mb-3 text-primary"><%= typeObj.name %></h1>
+                    <p class="text-muted mb-3">Related stories you might enjoy</p>
+                    
+                    <!-- Category Stats -->
+                    <div class="category-stats">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-file-text me-2 text-success"></i>
+                            <small class="text-muted"><%= typeObj.posts.length %> stories</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-eye me-2 text-info"></i>
+                            <small class="text-muted">Popular category</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Follow Category Button -->
+                    <button class="btn btn-outline-primary btn-sm rounded-pill mt-3 w-100">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Follow Category
+                    </button>
+                </div>
+                
+                <!-- Quick Navigation -->
+                <div class="quick-nav bg-white rounded-3 p-3 shadow-sm">
+                    <h6 class="fw-semibold mb-3">Quick Navigation</h6>
+                    <div class="d-grid gap-2">
+                        <a href="#latest" class="btn btn-sm btn-outline-secondary">Latest Posts</a>
+                        <a href="#popular" class="btn btn-sm btn-outline-secondary">Popular</a>
+                        <a href="#trending" class="btn btn-sm btn-outline-secondary">Trending</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Content - Posts -->
+        <div class="col-lg-9 col-md-8">
+            <div class="posts-container">
+                <% if (typeObj.posts.length === 0) { %>
+                    <div class="no-posts-container text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-file-text display-1 text-muted"></i>
+                        </div>
+                        <h3 class="h4 text-muted mb-3">No posts to show yet</h3>
+                        <p class="text-muted">Check back soon for new content!</p>
+                    </div>
+                <% } else { %>
+                    <!-- Posts Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="h4 fw-bold mb-1">Latest Stories</h2>
+                            <p class="text-muted mb-0">Showing <%= typeObj.posts.length %> posts</p>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Sort by
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="?sort=latest">Latest</a></li>
+                                <li><a class="dropdown-item" href="?sort=popular">Most Popular</a></li>
+                                <li><a class="dropdown-item" href="?sort=oldest">Oldest</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Posts List -->
+                    <div class="posts-list">
+                        <% typeObj.posts.forEach((post, index) => { %>
+                            <article class="post-item bg-white rounded-3 shadow-sm mb-4 overflow-hidden hover-lift">
+                                <div class="row g-0">
+                                    <!-- Post Content -->
+                                    <div class="col-md-8">
+                                        <div class="p-4">
+                                            <!-- Category Badge -->
+                                            <div class="mb-2">
+                                                <a href="/category/<%= post.categoryId %>" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none">
+                                                    <%=typeObj.name%>
+                                                </a>
+                                            </div>
+                                            
+                                            <!-- Post Title -->
+                                            <h3 class="post-title h5 fw-bold mb-2">
+                                                <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark hover-primary">
+                                                    <%= post.title %>
+                                                </a>
+                                            </h3>
+                                            
+                                            <!-- Post Subtitle -->
+                                            <% if (post.subtitle) { %>
+                                                <p class="post-subtitle text-muted mb-3 line-clamp-2">
+                                                    <%= post.subtitle %>
+                                                </p>
+                                            <% } %>
+                                            
+                                            <!-- Author Info -->
+                                            <div class="mb-3">
+                                                <%- include('../partials/authorInfoBar',{post,currentUser})%>
+                                            </div>
+                                            
+                                            <!-- Post Actions -->
+                                            <div class="post-actions">
+                                                <%- include('../partials/likeCommentBookmarkShare', { post: post, currentUser }) %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Post Image -->
+                                    <div class="col-md-4">
+                                        <div class="h-100 position-relative">
+                                            <a href="/posts/<%= post.id %>">
+                                                <% if (post.imageUrl) { %>
+                                                    <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="post-image w-100 h-100">
+                                                <% } else { %>
+                                                    <img src="/images/defaultPostImage.avif" alt="Default Post Image" class="post-image w-100 h-100">
+                                                <% } %>
+                                            </a>
+                                            <!-- Reading Time -->
+                                            <div class="position-absolute top-0 end-0 m-2">
+                                                <span class="badge bg-dark bg-opacity-75">
+                                                    <i class="bi bi-clock me-1"></i><%= post.readTime || '5 min' %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Hover Effects */
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .hover-primary:hover {
+        color: var(--bs-primary) !important;
+    }
+    
+    /* Post Image Styling */
+    .post-image {
+        object-fit: cover;
+        min-height: 200px;
+        max-height: 250px;
+        transition: transform 0.3s ease;
+    }
+    
+    .post-item:hover .post-image {
+        transform: scale(1.05);
+    }
+    
+    /* Line Clamp for Text */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* Sidebar Styling */
+    .sidebar-header {
+        border-left: 4px solid var(--bs-primary);
+    }
+    
+    .category-stats {
+        border-top: 1px solid #dee2e6;
+        padding-top: 1rem;
+    }
+    
+    /* Pagination Styling */
+    .page-link {
+        border: none;
+        color: var(--bs-primary);
+        font-weight: 500;
+    }
+    
+    .page-item.active .page-link {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .sticky-top {
+            position: relative !important;
+            top: auto !important;
+        }
+        
+        .sidebar-header {
+            margin-bottom: 2rem;
+        }
+        
+        .post-image {
+            min-height: 150px;
+            max-height: 200px;
+        }
+    }
+    
+    /* Quick Navigation */
+    .quick-nav {
+        border: 1px solid #e9ecef;
+    }
+    
+    .quick-nav .btn {
+        font-size: 0.875rem;
+    }
+</style>

@@ -11,83 +11,274 @@
   }
 %>
 
-<div class="container my-5">
-  <!-- Header Section -->
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <h2 class="fw-bold mb-2"><%= typeObj.name %></h2>
-      <div class="d-flex align-items-center gap-3 text-muted">
-        <button class="btn btn-sm btn-outline-dark rounded-pill px-3" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
-          <i class="bi bi-plus-lg me-1"></i> Follow
-        </button>
-        <span class="followers-count"><i class="bi bi-people"></i> <%= typeObj._count.followers || 0 %> followers</span>
-        <span><i class="bi bi-file-text"></i> <%= typeObj._count.posts || 0 %> related stories</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Divider -->
-  <hr class="my-4">
-  <h1>Related Articles</h1><br>
-  <!-- List of Related Posts in Card Style -->
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
-    <% typeObj.posts.forEach(post => { %>
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm hover-shadow">
-            <a href="/posts/<%= post.id %>" class="text-decoration-none">
-              <% if (post.imageUrl) { %>
-                <img src="<%= post.imageUrl %>" alt="<%= post.title %>"
-                 style="width: 100%; height: 280px; object-fit: cover;">
-              <% } else { %>
-                  <img src="/images/defaultPostImage.avif" alt="Default Post Image" 
-                  style="width: 100%; height: 280px; object-fit: cover;">
-              <% } %>
-            </a>
-          <div class="card-body">
-            <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark">
-              <h5 class="card-title fw-bold mb-2"><%= post.title %></h5>
-            </a>
-            <p class="card-text text-muted mb-3"><%= post.subtitle %></p>
-            
-            <%- include('../partials/authorInfoBar',{post,currentUser})%>
-          </div>
-        </div>
-      </div>
-    <% }) %>
-  </div>
-
-  <!-- Show More Link -->
-  <div class="text-center mb-5">
-    <a href="/topics/<%= typeObj.id %>/stories" class="btn btn-outline-dark rounded-pill px-4 py-2">
-      Show more related stories
-      <i class="bi bi-arrow-right ms-2"></i>
-    </a>
-  </div>
-</div>
-
+<!-- Compact card styles -->
 <style>
-  .hover-shadow {
+  .topic-header-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+  }
+  
+  .topic-title-custom {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 1rem;
+  }
+  
+  .custom-follow-btn {
+    background: #0d6efd;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+  }
+  
+  .custom-follow-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+  }
+  
+  .custom-post-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    height: 420px;
+  }
+  
+  .custom-post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+  
+  .custom-post-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .custom-post-card:hover .custom-post-image {
+    transform: scale(1.05);
+  }
+  
+  .custom-card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    height: 240px;
+  }
+  
+  .custom-post-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 0.75rem;
+    color: #212529;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .custom-post-subtitle {
+    color: #6c757d;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1;
+  }
+  
+  .custom-stats {
+    font-size: 1.1rem;
+    color: #495057;
+  }
+  
+  .custom-section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #212529;
+  }
+  
+  .custom-show-more {
+    background: transparent;
+    border: 2px solid #0d6efd;
+    color: #0d6efd;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
     transition: all 0.3s ease;
   }
   
-  .hover-shadow:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+  .custom-show-more:hover {
+    background: #0d6efd;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3);
   }
-  
-  .card-title {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.5;
+
+  .reading-time-badge {
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
   }
-  
-  .card-text {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.5;
+
+  /* Ensure 3 cards per row on larger screens */
+  @media (min-width: 992px) {
+    .custom-grid-3 .col {
+      flex: 0 0 33.333333%;
+      max-width: 33.333333%;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 991px) {
+    .custom-post-card {
+      height: auto;
+    }
+    .custom-card-body {
+      height: auto;
+    }
   }
 </style>
+
+<div class="topic-header-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <h1 class="topic-title-custom"><%= typeObj.name %></h1>
+        <p class="lead text-muted mb-4">Discover amazing stories and insights</p>
+        
+        <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-4">
+          <button class="btn custom-follow-btn text-white" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
+            <i class="bi bi-plus-lg me-2"></i>Follow Topic
+          </button>
+        </div>
+        
+        <div class="d-flex justify-content-center gap-4 custom-stats">
+          <span class="followers-count">
+            <i class="bi bi-people-fill me-2 text-primary"></i>
+            <strong><%= typeObj._count.followers || 0 %></strong> followers
+          </span>
+          <span>
+            <i class="bi bi-file-text-fill me-2 text-success"></i>
+            <strong><%= typeObj._count.posts || 0 %></strong> stories
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-11">
+      
+      <div class="text-center mb-5">
+        <h2 class="custom-section-title">Related Articles</h2>
+        <p class="text-muted">Explore the best stories from this topic</p>
+      </div>
+
+      <!-- 3 Cards per row with compact design -->
+      <div class="row custom-grid-3 g-4 mb-5">
+      <!--to show only three Posts-->
+        <% typeObj.posts.slice(0,3).forEach(post => { %>
+            <div class="col">
+            <div class="card custom-post-card">
+              <div class="position-relative overflow-hidden">
+                <a href="/posts/<%= post.id %>">
+                  <% if (post.imageUrl) { %>
+                    <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="custom-post-image">
+                  <% } else { %>
+                    <img src="/images/defaultPostImage.avif" alt="Default Post Image" class="custom-post-image">
+                  <% } %>
+                </a>
+                <div class="position-absolute top-0 end-0 m-2">
+                  <span class="badge reading-time-badge">
+                    <i class="bi bi-clock me-1"></i><%= post.readTime || '5 min' %>
+                  </span>
+                </div>
+              </div>
+              
+              <div class="custom-card-body">
+                <a href="/posts/<%= post.id %>" class="text-decoration-none">
+                  <h3 class="custom-post-title"><%= post.title %></h3>
+                </a>
+                <p class="custom-post-subtitle"><%= post.subtitle %></p>
+                
+                <div class="mt-auto">
+                  <%- include('../partials/authorInfoBar',{post,currentUser})%>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }) %> <!--end for loop-->
+      </div>
+
+      <div class="text-center">
+        <a href="/topics/<%= typeObj.slug %>/stories" class="btn custom-show-more">
+          <i class="bi bi-arrow-right me-2"></i>
+          Show More Related Stories
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const followBtn = document.getElementById('topicFollowBtn');
+  
+  followBtn.addEventListener('click', async function() {
+    const topicId = this.getAttribute('data-topic-id');
+    const originalHTML = this.innerHTML;
+    
+    // Loading state
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+    this.disabled = true;
+    
+    try {
+      const response = await fetch(`/topics/${topicId}/follow`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.following) {
+          this.innerHTML = '<i class="bi bi-check-lg me-2"></i>Following';
+          this.style.background = '#198754';
+        } else {
+          this.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Follow Topic';
+          this.style.background = '#0d6efd';
+        }
+        
+        // Update follower count
+        const followersEl = document.querySelector('.followers-count strong');
+        if (followersEl) {
+          followersEl.textContent = data.followersCount || 0;
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      this.innerHTML = originalHTML;
+    } finally {
+      this.disabled = false;
+    }
+  });
+});
+</script>
