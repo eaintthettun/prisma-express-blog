@@ -1,10 +1,10 @@
 const {PrismaClient}=require('@prisma/client');
 const prisma=new PrismaClient();
+const getPostsQuery = require('../utils/getPosts');
 
 exports.showPostDetails=async(req,res)=>{
     const currentUser=res.locals.currentUser;
     const postId=parseInt(req.params.id);
-    const parentId=null;
 
     const post=await prisma.post.findUnique({
         where:{id:postId},
@@ -125,7 +125,7 @@ exports.bookMarkPost=async(req,res)=>{
 exports.likePost=async(req,res)=>{
     const authorId = req.session.userId; //who like the post
     const postId = parseInt(req.params.id);  //which post he likes
-    const redirectTo = req.header('Referer') || `/posts`; // Fallback to the all posts page
+    const redirectTo = req.header('Referer') || `/posts#like`; // Fallback to the all posts page
     // Check if like already exists
     const existingLike = await prisma.like.findUnique({
         where: {
@@ -157,70 +157,37 @@ exports.likePost=async(req,res)=>{
 }
 
 
-//search posts with pagination
-let ITEMS_PER_PAGE=5;
-exports.searchPosts=async(req,res)=>{
-    const page=parseInt(req.query.page) || 1;
-    console.log('page',page);
-    const skip=(page-1)*ITEMS_PER_PAGE;
-    console.log('skip',skip);
 
-    const searchQuery=req.query.search;
-    console.log('searchQuery',searchQuery);
+//getPostsQuery(...)=used for searchPosts,listAllPosts,listMyPosts
+exports.searchPosts=async(req,res)=>{
+    const page = parseInt(req.query.page) || 1;
+    let ITEMS_PER_PAGE=5;
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+
+    const searchWord=req.query.search;
     let posts=[];
-    if (searchQuery.trim() !== "") {
-        posts=await prisma.post.findMany({
-            where:{
+    if (searchWord.trim() !== "") {
+        //getPostsQuery method takes skip,take and where{} as params and returns post array
+        posts=await getPostsQuery({ skip, take:ITEMS_PER_PAGE,  
+            where: {
                 OR: [
-                    { title: { contains: searchQuery, mode: 'insensitive' } },
-                    { content: { contains: searchQuery, mode: 'insensitive' } }
+                    { title: { contains: searchWord, mode: 'insensitive' } },
+                    { content: { contains: searchWord, mode: 'insensitive' } }
                   ]
-            },
-            orderBy:{
-                createdAt:"desc"
-            },
-            include:{
-                likes:true,
-                comments:{
-                    select:{
-                        content:true,
-                        createdAt:true,
-                        author:{
-                            select:{
-                                name:true
-                            }
-                        }
-                    },
-                },
-                author:{
-                    select:{
-                        id: true,
-                        name: true,
-                    }
-                },
-                category:{
-                    select:{
-                        name:true
-                    }
-                },
-            },
-            skip,
-            take:ITEMS_PER_PAGE,
+                } 
         });
     }
-    
     const totalItems=await prisma.post.count({
         where:{
-            title:{
-                contains:searchQuery,
-                mode:"insensitive"
-            }
+            OR: [
+                { title: { contains: searchWord, mode: 'insensitive' } },
+                { content: { contains: searchWord, mode: 'insensitive' } }
+              ]
         }
     });
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
-    
-    console.log('search posts:',posts);
-    res.render("posts/allPosts",{
+
+    res.render('posts/allPosts', { 
         posts,
         currentPage:page,
         totalPages,
@@ -230,165 +197,59 @@ exports.searchPosts=async(req,res)=>{
         previousPage:page-1,
     });
 }
-
-//show all posts including me and other users
-exports.listAllPosts=async (req,res)=>{
-    const currentUser=res.locals.currentUser;
+  // Show all posts including current user and others
+exports.listAllPosts = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
     let ITEMS_PER_PAGE=5;
-    //for pagination
-    const page = parseInt(req.query.page) || 1;  // default to page 1
-    console.log('index page=',page);
-    const skip=(page-1)*ITEMS_PER_PAGE;
-    console.log('index skip=',skip);
-    
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+    //getPostsQuery method takes skip,take and where{} as params and returns post array
+    const posts = await getPostsQuery(
+        { skip, ITEMS_PER_PAGE }); //return posts from prisma
 
-    //show all posts on index.ejs
-    try{
-        const posts=await prisma.post.findMany({
-            include:{
-                likes:{
-                    select:{
-                        authorId:true
-                    }
-                },// includes list of users who liked this post
-                author:{
-                    select:{
-                        id:true,
-                        email:true,
-                        name:true,
-                        profilePictureUrl:true
-                    }
-                },
-                comments: {
-                    include: {
-                      commentLikes:true, //include userId and commentId
-                      author: true
-                    },
-                    orderBy: {
-                      createdAt: 'asc'
-                    }
-                },
-                category:{
-                    select:{
-                        name:true,
-                    }
-                },
-                bookmarks:{
-                    select:{
-                        userId:true,
-                        postId:true
-                    }
-                },
-                _count:{
-                    select:{
-                        likes:true,
-                        comments:true
-                    }
-                }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            },
-            skip,
-            take:ITEMS_PER_PAGE,
-        });
-        //console.log('all posts show:',posts);
-        
-        const totalItems=await prisma.post.count();
-        const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
-        
-        res.render("posts/allPosts",{posts,
-            currentPage:page,
-            totalPages,
-            hasNextPage:page<totalPages,
-            hasPreviousPage:page>1,
-            nextPage:page+1,
-            previousPage:page-1,
-            currentUser
-        }); //posts/allPosts.ejs
+    const totalItems=await prisma.post.count();
     
-    }catch(error){
-        console.error(error);
-        res.status(500).send('An error occurred while fetching posts');
-    }
-}
+    const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
+
+    res.render('posts/allPosts', { posts,
+        currentPage:page,
+        totalPages,
+        hasNextPage:page<totalPages,
+        hasPreviousPage:page>1,
+        nextPage:page+1,
+        previousPage:page-1,
+    });
+};
+  
 
 //sql query (select * from posts where authorId=req.session.userId)
 exports.listMyPosts=async (req,res)=>{
-    const currentUser=res.locals.currentUser;
+    const page = parseInt(req.query.page) || 1;
     let ITEMS_PER_PAGE=5;
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+    //getPostsQuery method takes skip,take and where{} as params and returns post array
+    const posts = await getPostsQuery({ skip, ITEMS_PER_PAGE,
+        where:{
+            authorId:req.session.userId
+        }
+     });
 
-    //for pagination
-    const page = parseInt(req.query.page) || 1;  // default to page 1
-    //console.log('index page=',page);
-    const skip=(page-1)*ITEMS_PER_PAGE;
-    //console.log('index skip=',skip);
-
-    const posts=await prisma.post.findMany({
-        where:{authorId:req.session.userId},
-        include:{
-            author:{
-                select:{
-                    name:true
-                }
-            },
-            likes:{
-                select:{
-                    authorId:true
-                }
-            },// includes list of users who liked this post
-            comments: {
-                include: {
-                  commentLikes:{
-                    select:{
-                        authorId:true
-                    }
-                  }, //include userId and commentId
-                  author: true
-                },
-                orderBy: {
-                  createdAt: 'asc'
-                }
-            },
-            bookmarks:{
-                select:{
-                    userId:true,
-                    postId:true
-                }
-            },
-            category:{
-                select:{
-                    name:true,
-                }
-            },
-            _count:{
-                select:{
-                    likes:true,
-                    comments:true
-                }
-            }
-        },
-        orderBy:{
-            createdAt:'asc'
+     const totalItems=await prisma.post.count({
+        where:{
+            authorId:req.session.userId
         }
     });
-
-    const totalItems=await prisma.post.count({
-        where:{authorId:req.session.userId}
-    });
-
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
-        
-        res.render("posts/myPosts",{posts,
-            currentPage:page,
-            totalPages,
-            hasNextPage:page<totalPages,
-            hasPreviousPage:page>1,
-            nextPage:page+1,
-            previousPage:page-1,
-            currentUser
-        }); //posts/myPosts.ejs
-}
+
+    res.render('posts/allPosts', { 
+        posts,
+        currentPage:page,
+        totalPages,
+        hasNextPage:page<totalPages,
+        hasPreviousPage:page>1,
+        nextPage:page+1,
+        previousPage:page-1,
+        currentUser:res.locals.currentUser });   
+};
 
 exports.showCreateForm=async(req,res)=>{
     const categories=await prisma.category.findMany();
@@ -445,3 +306,4 @@ exports.deletePost=async(req,res)=>{
     });
     res.redirect('/posts');
 }
+

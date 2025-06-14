@@ -38,10 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-});
 
 // for author follow btn notification alert
-        document.addEventListener('DOMContentLoaded', function () {
             const authorFollowBtn = document.getElementById('authorFollowBtn');
 
             if (authorFollowBtn) {  
@@ -80,10 +78,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
             }
-        });
 
         //for topic follow btn notification alert
-            document.addEventListener('DOMContentLoaded', function() {
                 const topicFollowBtn = document.getElementById('topicFollowBtn');
                 if(topicFollowBtn){
                     topicFollowBtn.addEventListener('click', async function() {
@@ -129,4 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
                 };//end if
+
+                
             });

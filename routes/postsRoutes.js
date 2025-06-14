@@ -16,4 +16,5 @@ router.post('/:id/toggle-like',auth,postController.likePost); //post id
 router.post('/:id/toggle-bookmark',auth,postController.bookMarkPost);
 router.get('/:id',postController.showPostDetails);
 
+
 module.exports=router;

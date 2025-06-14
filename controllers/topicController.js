@@ -1,6 +1,119 @@
 const {PrismaClient}=require('@prisma/client');
 const { name } = require('ejs');
 const prisma=new PrismaClient();
+const getPostsQuery=require('../utils/getPosts');
+
+//to use this method across all topic methods
+const getCategory=async (options = {}) => {
+  const {
+    where = {},         // custom filters (e.g. { slug: business }
+  } = options;
+
+  return await prisma.category.findFirst({
+    where,
+    include:{
+      posts:{
+        include:{
+            author:{ //to show author profile
+                include:{
+                    followers:{
+                        select:{ //to check if you already followed the user
+                            followerId:true,
+                        }
+                    }
+                }
+            },
+            likes: {
+              select: { authorId: true }
+            },
+            comments: {
+              include: {
+                commentLikes: true,
+                author: true
+              },
+              orderBy: {
+                createdAt: 'asc'
+              }
+            },
+            bookmarks: {
+              select: {
+                userId: true,
+                postId: true
+              }
+            },
+            _count: {
+              select: {
+                likes: true,
+                comments: true
+              }
+            }
+        }
+    },
+        _count:{
+          select:{
+              followedBy:true,
+              posts:true,
+          }
+        }
+    },
+});
+}
+
+//to use this method across all topic methods
+const getTopic=async(options = {}) => {
+  const {
+    where = {},         // custom filters (e.g. { slug: business }
+  } = options;
+
+  return await prisma.topic.findFirst({
+    where,
+    include:{
+        posts:{
+            include:{
+                author:{ //to show author profile
+                    include:{
+                        followers:{
+                            select:{ //to check if you already followed the user
+                                followerId:true,
+                            }
+                        }
+                    }
+                },
+                likes: {
+                  select: { authorId: true }
+                },
+                comments: {
+                  include: {
+                    commentLikes: true,
+                    author: true
+                  },
+                  orderBy: {
+                    createdAt: 'asc'
+                  }
+                },
+                bookmarks: {
+                  select: {
+                    userId: true,
+                    postId: true
+                  }
+                },
+                _count: {
+                  select: {
+                    likes: true,
+                    comments: true
+                  }
+                }
+            }
+        },
+        _count:{
+            select:{
+                followedBy:true,
+                posts:true,
+            }
+        }
+    },
+});
+}
 
 exports.listTopics=async(req,res)=>{
     const categories=await prisma.category.findMany({ //get both categories and topics
@@ -27,57 +140,13 @@ exports.showTopic=async(req,res)=>{
     const isCategory = categories.find(c => c.slug === slug);
     //console.log('isCategory?:',isCategory);
     if(isCategory){
-        let category=await prisma.category.findFirst({
-            where:{slug:slug},
-            include:{
-                posts:{
-                    include:{
-                        author:{ //to show author profile
-                            include:{
-                                followers:{
-                                    select:{ //to check if you already followed the user
-                                        followerId:true,
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                _count:{
-                  select:{
-                      followedBy:true,
-                      posts:true,
-                  }
-                }
-            },
-        });
+      //get category first ,then you can call category.posts to get posts
+        let category=await getCategory({where:{slug:slug}});
+        console.log('category length:',category.posts.length);
         return res.render('category/categoryOrTopicDetails',
             {isCategory,category,currentUser});
     }else{ //is not category so this is topic
-        let topic=await prisma.topic.findFirst({
-            where:{slug:slug},
-            include:{
-                posts:{
-                    include:{
-                        author:{ //to show author profile
-                            include:{
-                                followers:{
-                                    select:{ //to check if you already followed the user
-                                        followerId:true,
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                _count:{
-                    select:{
-                        followedBy:true,
-                        posts:true,
-                    }
-                }
-            },
-        });
+        let topic=await getTopic({where:{slug:slug}});
         return res.render('category/categoryOrTopicDetails',{isCategory,topic,currentUser});
     }
 }  
@@ -128,4 +197,22 @@ exports.toggleFollow=async(req,res)=>{
         } catch (error) {
           console.error("Toggle follow error:", error);
         }
+}
+
+exports.showMoreRelatedStories=async(req,res)=>{
+  const currentUser=res.locals.currentUser;
+  const slug=req.params.slug;
+  
+  //to know category or topic ==> need to check slug name
+  const categories=res.locals.categories;  //get categories from local storage
+  const isCategory = categories.find(c => c.slug === slug);
+  if(isCategory){
+    //get category first ,then you can call category.posts to get posts
+      let category=await getCategory({where:{slug:slug}});
+      return res.render('category/relatedPosts',
+          {isCategory,category,currentUser});
+  }else{ //is not category so this is topic
+      let topic=await getTopic({where:{slug:slug}});
+      return res.render('category/relatedPosts',{isCategory,topic,currentUser});
+  }
 }
