@@ -1,58 +1,105 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm"  style="height: 70px;">
-  <div class="container-fluid">
-    <a class="nav-logo-link" href="/">📝 MyBLOG</a>
+<!-- FIXED: Navbar structure with improved accessibility, consistency, and performance -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top border-bottom" style="height: 70px;">
+  <div class="container-fluid px-4">
+    <!-- Logo -->
+    <a href="/" class="logo-link">
+      <span class="logo-icon me-2">📝</span>
+      <span class="fw-bold">MY<span class="blog-bgcolor-fill">BLOG<span></span>
+    </a>
 
-    <form class="d-flex ms-3" action="/posts/search" method="GET">
-      <input class="form-control me-2 rounded-pill" type="search" placeholder="Search posts..." name="search" aria-label="Search">
+    <!-- Search Form (Desktop) -->
+    <form class="search-form d-none d-lg-flex ms-4 flex-grow-1" action="/posts/search" method="GET" style="max-width: 400px;">
+      <div class="search-container position-relative w-100" style="max-width: 400px;">
+        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+        <input class="form-control ps-5 py-2 custom-search-input" type="search" placeholder="Search posts..." name="search" aria-label="Search">
+      </div>
     </form>
- 
-      <a class="nav-logo-link" href="/topics">Explore topics
-      </a>
-    
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
 
+    <!-- Navigation Items -->
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <ul class="nav navbar-nav">
-        <% if (currentUser) { %>
-        <li class="nav-item">
-          <a class="nav-logo-link" href="/posts/new" title="Write a new post">
-            <i class="bi bi-pencil-square"></i>
+      <!-- Mobile Search -->
+      <form class="d-lg-none mb-3 mt-2" action="/posts/search" method="GET">
+        <div class="search-container position-relative">
+          <svg class="search-icon position-absolute" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input class="form-control search-input" type="search" placeholder="Search posts..." name="search" aria-label="Search">
+        </div>
+      </form>
+
+      <ul class="navbar-nav align-items-lg-center">
+        <li class="nav-item me-3">
+          <a href="/write" class="write-something-btn">
+            <i class="bi bi-pencil me-1"></i> Write Something
           </a>
         </li>
-        <% } %>
-
-        <li class="nav-item">
-          <a class="nav-link" href="/posts">All Posts</a>
+        <li class="nav-item me-3">
+          <a class="nav-link" href="/topics">Explore</a>
         </li>
 
-        <% if (currentUser) { %>
-        <li class="nav-item">
-          <a class="nav-link" href="/posts/myPosts">My Posts</a>
+        <li class="nav-item me-3">
+          <a class="nav-link" href="/posts">Posts</a>
         </li>
-        <% } %>
 
-        <li class="nav-item">
-          <a class="nav-link" href="/topics">Categories</a>
+        <li class="nav-item dropdown me-3">
+          <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Categories
+          </a>
+          <ul class="dropdown-menu categories-dropdown" aria-labelledby="categoriesDropdown">
+            <li><a class="dropdown-item" href="/topics/business">Business</a></li>
+            <li><a class="dropdown-item" href="/topics/technology">Technology</a></li>
+            <li><a class="dropdown-item" href="/topics/self-improvement">Self Improvement</a></li>
+            <li><a class="dropdown-item" href="/topics/writing">Writing</a></li>
+            <li><a class="dropdown-item" href="/topics/finance">Finance</a></li>
+            <li><a class="dropdown-item" href="/topics/design">Design</a></li>
+            <li><a class="dropdown-item" href="/topics/education">Education</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item fw-semibold" href="/topics">View All Topics</a></li>
+          </ul>
         </li>
 
         <% if (!currentUser) { %>
         <li class="nav-item">
-          <a class="btn btn-outline-secondary rounded-pill" href="/auth/login">Login / Signup</a>
+          <a class="btn btn-dark rounded-pill px-4" href="/auth/login">Get started</a>
         </li>
         <% } else { %>
         <li class="nav-item dropdown">
-          <a class="nav-logo-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            You
+          <a class="nav-link dropdown-toggle user-dropdown d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="user-avatar me-2">
+              <% if (currentUser.profilePictureUrl) { %>
+                <img src="<%= currentUser.profilePictureUrl %>" alt="Profile" class="rounded-circle">
+              <% } else { %>
+                <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
+                  <%= currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U' %>
+                </div>
+              <% } %>
+            </div>
+            <span class="d-none d-lg-inline">Me</span>
           </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+          <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userDropdown">
+            <li class="dropdown-header">
+              <div class="d-flex align-items-center">
+                <div class="user-avatar me-2">
+                  <% if (currentUser.profilePictureUrl) { %>
+                    <img src="<%= currentUser.profilePictureUrl %>" alt="Profile" class="rounded-circle">
+                  <% } else { %>
+                    <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
+                      <%= currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U' %>
+                    </div>
+                  <% } %>
+                </div>
+                <div>
+                  <div class="fw-semibold"><%= currentUser.name || 'User' %></div>
+                  <small class="text-muted"><%= currentUser.email %></small>
+                </div>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="/auth/profile/<%= currentUser.id %>">Profile</a></li>
             <li><a class="dropdown-item" href="/settings">Settings</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+            <li><a class="dropdown-item text-danger" href="/auth/logout">Sign out</a></li>
           </ul>
         </li>
         <% } %>
@@ -60,3 +107,172 @@
     </div>
   </div>
 </nav>
+
+<style>
+/* Logo */
+.navbar-brand {
+  font-family: 'Georgia', serif;
+  color: #212529 !important;
+  font-size: 1.25rem;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.navbar-brand:hover {
+  color: #212529 !important;
+  opacity: 0.8;
+}
+
+.logo-icon {
+  font-size: 1.2em;
+}
+
+
+
+/* Navigation Links */
+.nav-link {
+  color: #495057 !important;
+  font-weight: 400;
+  font-size: 15px;
+  padding: 8px 12px !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: #212529 !important;
+  background-color: #f8f9fa;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  margin-top: 8px;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #495057;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.dropdown-item:active {
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+/* Categories Dropdown */
+.categories-dropdown {
+  min-width: 200px;
+}
+
+/* User Avatar */
+.user-avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  background: #6c757d;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* User Dropdown */
+.user-dropdown {
+  border: none;
+  background: none;
+  padding: 4px 8px !important;
+}
+
+.user-dropdown:hover {
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
+}
+
+.user-dropdown-menu {
+  min-width: 250px;
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Get Started Button */
+.btn-dark {
+  background-color: #212529;
+  border-color: #212529;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 20px;
+  transition: all 0.2s ease;
+}
+
+.btn-dark:hover {
+  background-color: #495057;
+  border-color: #495057;
+}
+
+/* Mobile Styles */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+  }
+  
+  
+  .user-dropdown {
+    padding: 12px 0 !important;
+  }
+  
+  .btn-dark {
+    margin-top: 1rem;
+    width: 100%;
+  }
+}
+
+/* Navbar Toggler */
+.navbar-toggler {
+  color: #495057;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+/* Active States */
+.nav-link.active {
+  color: #212529 !important;
+  font-weight: 500;
+  background-color: #f8f9fa;
+}
+
+/* Focus States for Accessibility */
+.nav-link:focus,
+.dropdown-item:focus {
+  outline: 2px solid #495057;
+  outline-offset: 2px;
+}
+</style>

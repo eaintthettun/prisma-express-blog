@@ -1,117 +1,468 @@
 <!--carried post and currentUser from postDetails-->
-<div class="container my-5">
-    <h3 class="mb-4">Comments (<%= post._count.comments %>)</h3>
-    <div class="d-flex align-items-center mb-4">
-        <% if (!currentUser) { %>
-            <img src="/images/default-avatar.png" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
-        <% } else { %>
-            <img src="<%= currentUser.profilePictureUrl || '/images/default-avatar.png' %>" alt="<%= currentUser.name %>'s Profile Picture" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
-        <% } %>
-        <div class="flex-grow-1">
-            <form action="/comments" method="POST">
-                <input type="hidden" name="postId" value="<%= post.id %>">
-                <div class="input-group">
-                    <input type="text" name="content" class="form-control rounded-pill" placeholder="Leave a comment..." required>
-                    <button type="submit" class="btn btn-primary rounded-pill ms-2">Post</button>
+<div class="comments-section bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Comments Header -->
+                <div class="comments-header mb-5">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h3 class="comments-title fw-bold mb-0">
+                            <i class="bi bi-chat-dots me-2 text-primary"></i>
+                            Discussion (<%= post._count.comments %>)
+                        </h3>
+                    </div>
                 </div>
-            </form>
-        </div>
-    </div>
-    <hr class="my-4">
-    <div class="comments-list">
-        <% if (post.comments && post._count.comments > 0) { %>
-            <% post.comments.forEach(comment => { %>
-                <%
-                    const commentLiked = currentUser && comment.commentLikes.some(like => like.authorId === currentUser.id);
-                    const commentLikeCount = comment.commentLikes.length;
-                %>
-                <div class="d-flex align-items-start mb-4">
-                    <img src="<%= comment.author.profilePictureUrl || '/images/default-avatar.png' %>" alt="<%= comment.author.name %>'s Profile Picture" class="rounded-circle me-3" style="width: 35px; height: 35px; object-fit: cover;">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <h6 class="mb-0 fw-bold"><%= comment.author.name %></h6>
-                            <small class="text-muted"><%= new Date(comment.createdAt).toLocaleString() %></small>
+
+                <!-- Comment Input Section -->
+                <div class="comment-input-section bg-white rounded-4 shadow-sm p-4 mb-5">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="user-avatar">
+                            <% if (!currentUser) { %>
+                                <img src="/images/default-avatar.png" class="rounded-circle avatar-lg" alt="Guest Avatar">
+                            <% } else { %>
+                                <img src="<%= currentUser.profilePictureUrl || '/images/default-avatar.png' %>" 
+                                     alt="<%= currentUser.name %>'s Profile Picture" 
+                                     class="rounded-circle avatar-lg">
+                            <% } %>
                         </div>
-                        <p class="mb-2"><%= comment.content %></p>
-                        <div class="d-flex align-items-center gap-3">
-                            <form action="/comments/<%= comment.id %>/toggle-like" method="POST" class="d-inline">
-                                <% if (!currentUser) { %>
-                                    <button type="submit" class="btn btn-sm btn-link text-muted p-0"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Login to like this comment">
-                                        <i class="bi bi-heart"></i> <%= commentLikeCount %>
-                                    </button>
-                                <% } else { %>
-                                    <button type="submit" class="btn btn-sm btn-link p-0 <%= commentLiked ? 'text-danger' : 'text-muted' %>"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="<%= commentLiked ? 'Unlike comment' : 'Like comment' %>">
-                                        <i class="bi <%= commentLiked ? 'bi-heart-fill' : 'bi-heart' %>"></i> <%= commentLikeCount %>
-                                    </button>
-                                <% } %>
-                            </form>
-                            <button class="btn btn-sm btn-link text-muted p-0 reply-button"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Reply to comment"
-                                    data-comment-author="<%= comment.author.name %>"
-                                    data-comment-id="<%= comment.id %>">
-                                <i class="bi bi-reply"></i> Reply
-                            </button>
-                        </div>
-                        <% if (currentUser) { %>
-                            <div class="reply-form-container mt-3" style="display: none;">
-                                <form action="/comments" method="POST">
+                        
+                        <div class="flex-grow-1">
+                            <% if (!currentUser) { %>
+                                <div class="login-prompt text-center py-4">
+                                    <p class="text-muted mb-3">Join the discussion! Sign in to share your thoughts.</p>
+                                    <a href="/auth/login" class="btn btn-primary rounded-pill px-4">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In to Comment
+                                    </a>
+                                </div>
+                            <% } else { %>
+                                <form action="/comments" method="POST" class="comment-form">
                                     <input type="hidden" name="postId" value="<%= post.id %>">
-                                    <input type="hidden" name="parentId" value="<%= comment.id %>">
-                                    <div class="input-group">
-                                        <textarea name="content" class="form-control" rows="3" placeholder="Replying to <%= comment.author.name %>" required></textarea>
+                                    <div class="form-group mb-3">
+                                        <label class="form-label fw-semibold text-dark">Share your thoughts</label>
+                                        <textarea name="content" 
+                                                class="form-control comment-textarea" 
+                                                rows="4" 
+                                                placeholder="What do you think about this article? Share your insights, ask questions, or start a discussion..."
+                                                required></textarea>
                                     </div>
-                                    <div class="d-flex justify-content-end mt-2">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2 cancel-reply">Cancel</button>
-                                        <button type="submit" class="btn btn-sm btn-primary">Respond</button>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Be respectful and constructive in your comments
+                                        </small>
+                                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                            <i class="bi bi-send me-2"></i>Post Comment
+                                        </button>
                                     </div>
                                 </form>
-                            </div>
-                        <% } %>
+                            <% } %>
+                        </div>
                     </div>
                 </div>
-                <!--double loop withing comments loop-->
-                <% if (comment.children && comment.children.length > 0) { %>
-                    <div class="ms-5 mt-3">
-                        <% comment.children.forEach(reply => { %>
-                            <%
-                                const replyLiked = currentUser && reply.commentLikes.some(like => like.authorId === currentUser.id);
-                                const replyLikeCount = reply.commentLikes.length;
-                            %>
-                            <div class="d-flex align-items-start mb-3">
-                                <img src="<%= reply.author.profilePictureUrl || '/images/default-avatar.png' %>" alt="<%= reply.author.name %>'s Profile Picture" class="rounded-circle me-3" style="width: 30px; height: 30px; object-fit: cover;">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <h6 class="mb-0 fw-bold"><%= reply.author.name %></h6>
-                                        <small class="text-muted"><%= new Date(reply.createdAt).toLocaleString() %></small>
-                                    </div>
-                                    <p class="mb-2"><%= reply.content %></p>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <form action="/comments/<%= reply.id %>/toggle-like" method="POST" class="d-inline">
-                                            <% if (!currentUser) { %>
-                                                <button type="submit" class="btn btn-sm btn-link text-muted p-0"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Login to like this reply"
-                                                        >
-                                                    <i class="bi bi-heart"></i> <%= replyLikeCount %>
+
+                <!-- Comments List -->
+                <div class="comments-list">
+                    <% if (post.comments && post._count.comments > 0) { %>
+                        <div class="comments-container">
+                            <% post.comments.forEach((comment, index) => { %>
+                                <%
+                                    const commentLiked = currentUser && comment.commentLikes.some(like => like.authorId === currentUser.id);
+                                    const commentLikeCount = comment.commentLikes.length;
+                                %>
+                                <div class="comment-item bg-white rounded-4 shadow-sm p-4 mb-4">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="user-avatar">
+                                            <img src="<%= comment.author.profilePictureUrl || '/images/default-avatar.png' %>" 
+                                                 alt="<%= comment.author.name %>'s Profile Picture" 
+                                                 class="rounded-circle avatar-md">
+                                        </div>
+                                        
+                                        <div class="flex-grow-1">
+                                            <!-- Comment Header -->
+                                            <div class="comment-header mb-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="author-info">
+                                                        <h6 class="author-name fw-bold mb-0"><%= comment.author.name %></h6>
+                                                        <small class="comment-time text-muted">
+                                                            <i class="bi bi-clock me-1"></i>
+                                                            <%= new Date(comment.createdAt).toLocaleString('en-US', { 
+                                                                month: 'short', 
+                                                                day: 'numeric', 
+                                                                year: 'numeric',
+                                                                hour: 'numeric',
+                                                                minute: '2-digit'
+                                                            }) %>
+                                                        </small>
+                                                    </div>
+                                                    <div class="comment-number">
+                                                        <span class="badge bg-light text-muted">#<%= index + 1 %></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Comment Content -->
+                                            <div class="comment-content mb-3">
+                                                <p class="comment-text mb-0"><%= comment.content %></p>
+                                            </div>
+                                            
+                                            <!-- Comment Actions -->
+                                            <div class="comment-actions d-flex align-items-center gap-3">
+                                                <form action="/comments/<%= comment.id %>/toggle-like" method="POST" class="d-inline">
+                                                    <% if (!currentUser) { %>
+                                                        <button type="button" class="btn btn-sm btn-outline-light text-muted action-btn"
+                                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Sign in to like">
+                                                            <i class="bi bi-heart me-1"></i>
+                                                            <span class="like-count"><%= commentLikeCount %></span>
+                                                        </button>
+                                                    <% } else { %>
+                                                        <button type="submit" class="btn btn-sm action-btn <%= commentLiked ? 'btn-danger' : 'btn-outline-light text-muted' %>"
+                                                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                                title="<%= commentLiked ? 'Unlike comment' : 'Like comment' %>">
+                                                            <i class="bi <%= commentLiked ? 'bi-heart-fill' : 'bi-heart' %> me-1"></i>
+                                                            <span class="like-count"><%= commentLikeCount %></span>
+                                                        </button>
+                                                    <% } %>
+                                                </form>
+                                                
+                                                <% if (currentUser) { %>
+                                                    <button class="btn btn-sm btn-outline-light text-muted action-btn reply-button"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Reply to comment"
+                                                            data-comment-author="<%= comment.author.name %>"
+                                                            data-comment-id="<%= comment.id %>">
+                                                        <i class="bi bi-reply me-1"></i>Reply
+                                                    </button>
+                                                <% } %>
+                                                
+                                                <button class="btn btn-sm btn-outline-light text-muted action-btn"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Share comment">
+                                                    <i class="bi bi-share me-1"></i>Share
                                                 </button>
-                                            <% } else { %>
-                                                <button type="submit" class="btn btn-sm btn-link p-0 <%= replyLiked ? 'text-danger' : 'text-muted' %>"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="<%= replyLiked ? 'Unlike reply' : 'Like reply' %>">
-                                                    <i class="bi <%= replyLiked ? 'bi-heart-fill' : 'bi-heart' %>"></i> <%= replyLikeCount %>
-                                                </button>
+                                            </div>
+                                            
+                                            <!-- Reply Form -->
+                                            <% if (currentUser) { %>
+                                                <div class="reply-form-container mt-4" style="display: none;">
+                                                    <div class="reply-form bg-light rounded-3 p-3">
+                                                        <form action="/comments" method="POST">
+                                                            <input type="hidden" name="postId" value="<%= post.id %>">
+                                                            <input type="hidden" name="parentId" value="<%= comment.id %>">
+                                                            <div class="d-flex gap-2 mb-3">
+                                                                <img src="<%= currentUser.profilePictureUrl || '/images/default-avatar.png' %>" 
+                                                                     class="rounded-circle avatar-sm" alt="Your Avatar">
+                                                                <div class="flex-grow-1">
+                                                                    <textarea name="content" 
+                                                                            class="form-control reply-textarea" 
+                                                                            rows="3" 
+                                                                            placeholder="Replying to <%= comment.author.name %>..." 
+                                                                            required></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="d-flex justify-content-end gap-2">
+                                                                <button type="button" class="btn btn-sm btn-outline-secondary cancel-reply">
+                                                                    Cancel
+                                                                </button>
+                                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                                    <i class="bi bi-send me-1"></i>Reply
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             <% } %>
-                                        </form>
+                                        </div>
                                     </div>
+                                    
+                                    <!-- Nested Replies -->
+                                    <% if (comment.children && comment.children.length > 0) { %>
+                                        <div class="replies-section mt-4 ms-4">
+                                            <div class="replies-header mb-3">
+                                                <small class="text-muted fw-semibold">
+                                                    <i class="bi bi-arrow-return-right me-1"></i>
+                                                    <%= comment.children.length %> <%= comment.children.length === 1 ? 'Reply' : 'Replies' %>
+                                                </small>
+                                            </div>
+                                            
+                                            <% comment.children.forEach(reply => { %>
+                                                <%
+                                                    const replyLiked = currentUser && reply.commentLikes.some(like => like.authorId === currentUser.id);
+                                                    const replyLikeCount = reply.commentLikes.length;
+                                                %>
+                                                <div class="reply-item bg-light rounded-3 p-3 mb-3">
+                                                    <div class="d-flex align-items-start gap-2">
+                                                        <img src="<%= reply.author.profilePictureUrl || '/images/default-avatar.png' %>" 
+                                                             alt="<%= reply.author.name %>'s Profile Picture" 
+                                                             class="rounded-circle avatar-sm">
+                                                        
+                                                        <div class="flex-grow-1">
+                                                            <div class="reply-header mb-2">
+                                                                <div class="d-flex justify-content-between align-items-center">
+                                                                    <h6 class="reply-author fw-semibold mb-0"><%= reply.author.name %></h6>
+                                                                    <small class="reply-time text-muted">
+                                                                        <%= new Date(reply.createdAt).toLocaleString('en-US', { 
+                                                                            month: 'short', 
+                                                                            day: 'numeric',
+                                                                            hour: 'numeric',
+                                                                            minute: '2-digit'
+                                                                        }) %>
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <p class="reply-text mb-2"><%= reply.content %></p>
+                                                            
+                                                            <div class="reply-actions">
+                                                                <form action="/comments/<%= reply.id %>/toggle-like" method="POST" class="d-inline">
+                                                                    <% if (!currentUser) { %>
+                                                                        <button type="button" class="btn btn-sm btn-link text-muted p-0"
+                                                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Sign in to like">
+                                                                            <i class="bi bi-heart me-1"></i><%= replyLikeCount %>
+                                                                        </button>
+                                                                    <% } else { %>
+                                                                        <button type="submit" class="btn btn-sm btn-link p-0 <%= replyLiked ? 'text-danger' : 'text-muted' %>"
+                                                                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                                                title="<%= replyLiked ? 'Unlike reply' : 'Like reply' %>">
+                                                                            <i class="bi <%= replyLiked ? 'bi-heart-fill' : 'bi-heart' %> me-1"></i><%= replyLikeCount %>
+                                                                        </button>
+                                                                    <% } %>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <% }); %>
+                                        </div>
+                                    <% } %>
                                 </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <div class="no-comments-state text-center py-5">
+                            <div class="mb-4">
+                                <i class="bi bi-chat-square-dots display-1 text-muted opacity-50"></i>
                             </div>
-                        <% }); %>
-                    </div>
-                <% } %>
-                <hr class="my-4">
-            <% }); %>
-        <% } else { %>
-            <p class="text-muted text-center">No comments yet. Be the first to comment!</p>
-        <% } %>
+                            <h4 class="text-muted mb-3">No comments yet</h4>
+                            <p class="text-muted mb-4">Be the first to share your thoughts on this article!</p>
+                            <% if (!currentUser) { %>
+                                <a href="/auth/login" class="btn btn-primary rounded-pill px-4">
+                                    <i class="bi bi-chat-plus me-2"></i>Sign In to Comment
+                                </a>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    /* Comments Section Styling */
+    .comments-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .comments-title {
+        color: #2c3e50;
+        font-size: 1.75rem;
+    }
+    
+    /* Avatar Sizes */
+    .avatar-lg {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .avatar-md {
+        width: 42px;
+        height: 42px;
+        object-fit: cover;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+        border: 2px solid #fff;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Comment Input */
+    .comment-input-section {
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .comment-input-section:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .comment-textarea {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 1rem;
+        line-height: 1.6;
+        resize: vertical;
+        min-height: 120px;
+        transition: all 0.3s ease;
+    }
+    
+    .comment-textarea:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+    }
+    
+    .reply-textarea {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        resize: vertical;
+    }
+    
+    /* Comment Items */
+    .comment-item {
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .comment-item:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transform: translateY(-1px);
+    }
+    
+    .comment-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        border-radius: 4px 0 0 4px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .comment-item:hover::before {
+        opacity: 1;
+    }
+    
+    /* Author Info */
+    .author-name {
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+    
+    .comment-time {
+        font-size: 0.85rem;
+    }
+    
+    /* Comment Content */
+    .comment-text {
+        color: #495057;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    /* Action Buttons */
+    .action-btn {
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: 1px solid #dee2e6;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn.btn-danger {
+        background: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+    
+    /* Reply Section */
+    .replies-section {
+        border-left: 3px solid #e9ecef;
+        padding-left: 1rem;
+    }
+    
+    .reply-item {
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease;
+    }
+    
+    .reply-item:hover {
+        background: #f8f9fa;
+        border-color: #ced4da;
+    }
+    
+    .reply-form {
+        border: 1px solid #dee2e6;
+    }
+    
+    /* No Comments State */
+    .no-comments-state {
+        background: white;
+        border-radius: 20px;
+        border: 2px dashed #dee2e6;
+    }
+    
+    /* Login Prompt */
+    .login-prompt {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 12px;
+        border: 1px solid #dee2e6;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .comments-title {
+            font-size: 1.5rem;
+        }
+        
+        .comment-textarea {
+            min-height: 100px;
+        }
+        
+        .avatar-lg {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .avatar-md {
+            width: 36px;
+            height: 36px;
+        }
+        
+        .replies-section {
+            margin-left: 0;
+            padding-left: 0.5rem;
+        }
+    }
+    
+    /* Animation for new comments */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .comment-item {
+        animation: slideInUp 0.3s ease-out;
+    }
+</style>
+
