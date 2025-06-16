@@ -8,7 +8,8 @@
     <% if (post.subtitle) { %>
         <h2 class="lead text-muted mb-4"><%= post.subtitle %></h2>
     <% } %>
-
+    
+    <hr>
     <%- include('../partials/authorInfoBar',{post,currentUser})%>
     <%- include('../partials/likeCommentBookmarkShare', { post, currentUser }) %>
 
@@ -32,6 +33,6 @@
         %>
     </div>
 
-    <hr class="my-4">
+    <hr>
     <%- include('../partials/allCommentsSection',{post,currentUser})%>
 </div>

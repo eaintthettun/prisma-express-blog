@@ -7,7 +7,7 @@
   if(isCategory){
     typeObj=category;
   }else{
-    typeObj=typeObj;
+    typeObj=topic;
   }
 %>
 
@@ -17,7 +17,7 @@
         <div class="col-lg-3 col-md-4">
             <div class="sticky-top" style="top: 2rem;">
                 <div class="sidebar-header bg-light rounded-3 p-4 mb-4">
-                    <h1 class="h3 fw-bold mb-3 text-primary"><%= typeObj.name %></h1>
+                    <h1 class="h3 fw-bold mb-3"><%= typeObj.name %></h1>
                     <p class="text-muted mb-3">Related stories you might enjoy</p>
                     
                     <!-- Category Stats -->
@@ -33,7 +33,7 @@
                     </div>
                     
                     <!-- Follow Category Button -->
-                    <button class="btn btn-outline-primary btn-sm rounded-pill mt-3 w-100">
+                    <button class="base-follow-btn" style="padding:5px 25px;margin-top:8px;">
                         <i class="bi bi-plus-lg me-1"></i>
                         Follow Category
                     </button>
@@ -91,14 +91,14 @@
                                         <div class="p-4">
                                             <!-- Category Badge -->
                                             <div class="mb-2">
-                                                <a href="/category/<%= post.categoryId %>" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none">
+                                                <a href="/category/<%= post.categoryId %>" class="category-pill-link">
                                                     <%=typeObj.name%>
                                                 </a>
                                             </div>
                                             
                                             <!-- Post Title -->
                                             <h3 class="post-title h5 fw-bold mb-2">
-                                                <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark hover-primary">
+                                                <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark">
                                                     <%= post.title %>
                                                 </a>
                                             </h3>
@@ -111,7 +111,7 @@
                                             <% } %>
                                             
                                             <!-- Author Info -->
-                                            <div class="mb-3">
+                                            <div>
                                                 <%- include('../partials/authorInfoBar',{post,currentUser})%>
                                             </div>
                                             

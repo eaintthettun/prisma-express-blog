@@ -26,21 +26,6 @@
     margin-bottom: 1rem;
   }
   
-  .custom-follow-btn {
-    background: #0d6efd;
-    border: none;
-    padding: 0.75rem 2rem;
-    font-weight: 600;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-  }
-  
-  .custom-follow-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
-  }
-  
   .custom-post-card {
     border: none;
     border-radius: 16px;
@@ -108,24 +93,6 @@
     margin-bottom: 0.5rem;
     color: #212529;
   }
-  
-  .custom-show-more {
-    background: transparent;
-    border: 2px solid #0d6efd;
-    color: #0d6efd;
-    padding: 1rem 3rem;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-  }
-  
-  .custom-show-more:hover {
-    background: #0d6efd;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3);
-  }
 
   .reading-time-badge {
     background: rgba(0,0,0,0.7);
@@ -162,7 +129,7 @@
         <p class="lead text-muted mb-4">Discover amazing stories and insights</p>
         
         <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-4">
-          <button class="btn custom-follow-btn text-white" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
+          <button class="base-follow-btn" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
             <i class="bi bi-plus-lg me-2"></i>Follow Topic
           </button>
         </div>
@@ -228,7 +195,7 @@
       </div>
 
       <div class="text-center">
-        <a href="/topics/<%= typeObj.slug %>/stories" class="btn custom-show-more">
+        <a href="/topics/<%= typeObj.slug %>/stories" class="base-showmore-btn">
           <i class="bi bi-arrow-right me-2"></i>
           Show More Related Stories
         </a>
@@ -237,48 +204,3 @@
     </div>
   </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const followBtn = document.getElementById('topicFollowBtn');
-  
-  followBtn.addEventListener('click', async function() {
-    const topicId = this.getAttribute('data-topic-id');
-    const originalHTML = this.innerHTML;
-    
-    // Loading state
-    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-    this.disabled = true;
-    
-    try {
-      const response = await fetch(`/topics/${topicId}/follow`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        
-        if (data.following) {
-          this.innerHTML = '<i class="bi bi-check-lg me-2"></i>Following';
-          this.style.background = '#198754';
-        } else {
-          this.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Follow Topic';
-          this.style.background = '#0d6efd';
-        }
-        
-        // Update follower count
-        const followersEl = document.querySelector('.followers-count strong');
-        if (followersEl) {
-          followersEl.textContent = data.followersCount || 0;
-        }
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      this.innerHTML = originalHTML;
-    } finally {
-      this.disabled = false;
-    }
-  });
-});
-</script>

@@ -1,4 +1,6 @@
 /* public/css/style.css */
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap");
 
 /* --- GLOBAL / BASE STYLES --- */
 html {
@@ -7,7 +9,13 @@ html {
   /* Add any other global HTML settings here, like scroll-behavior */
   scroll-behavior: smooth;
 }
-
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+}
 *,
 *::before,
 *::after {
@@ -20,7 +28,7 @@ body {
   /* Remove default browser margin */
   padding: 0;
   /* Remove default browser padding */
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Roboto", Tahoma, Geneva, Verdana, sans-serif;
   /* Your preferred font */
   font-size: 16px;
   /* A base font size for the whole document */
@@ -38,8 +46,7 @@ h2,
 h3,
 h4,
 h5,
-h6,
-a {
+h6 {
   font-family: "Roboto Slab", serif;
   margin-top: 0;
   font-weight: 600;
@@ -52,27 +59,126 @@ p {
   font-family: "Lora", serif;
   margin-top: 0;
   line-height: 1.5em;
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #111b1a;
 }
-
-/* Base styles for links */
-
-.nav-logo-link {
-  font-size: 1.5rem;
-  font-weight: bold;
+.logo-link {
+  font-size: 1.2rem;
+  margin-left: 10px;
   text-decoration: none;
-  color: #325f55;
-  transition: color 0.3s ease;
+  color: #111b1a;
 }
-
-.nav-logo-link:hover {
-  font-size: 1.5rem;
+/*base style for links*/
+.base-link {
+  color: #2e5a51;
+  text-decoration: none;
+  font-size: 1.2rem;
   font-weight: bold;
-  color: #50a090;
-  /* Light teal on hover */
+  transition: 0.3s;
+}
+.base-link:hover {
+  color: #5fbba8;
+}
+/* base style of button */
+.base-btn {
+  background-color: #58bea6;
+  color: white;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  padding: 15px 25px;
 }
 
+.base-btn:hover {
+  background-color: #6de7cb;
+}
+
+/*topic follow btn*/
+.base-follow-btn {
+  background-color: #58bea6;
+  color: white;
+  border: none;
+  outline: none;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  padding: 15px 25px;
+  transition: 0.3s;
+}
+.base-follow-btn:hover {
+  background-color: #66dbc0;
+}
+/*base showmore btn*/
+.base-showmore-btn {
+  background-color: #4ba590;
+  color: white;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  padding: 15px 25px;
+  transition: 0.3s;
+}
+.base-showmore-btn:hover {
+  background-color: #357566;
+}
+
+.search-container {
+  max-width: 100%;
+}
+/* Optional: Make the input more stylish */
+.custom-search-input {
+  border-radius: 25px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccccccc5;
+  transition: all 0.3s ease;
+}
+
+.custom-search-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(31, 65, 57, 0.205); /* match your orange theme */
+  border-color: #44857a;
+  background-color: #fff;
+}
+
+.search-input-topic {
+  border: 1px solid #ced4da;
+  border-radius: 25px;
+  padding: 10px 16px 10px 45px;
+  background: #f8f9fa;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.search-input-topic:focus {
+  outline: none;
+  border-color: #495057;
+  box-shadow: 0 0 0 0.2rem rgba(73, 80, 87, 0.25);
+  background: #fff;
+}
+
+.search-input-topic::placeholder {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+.write-something-btn {
+  background: rgb(24, 128, 128);
+  color: white;
+  padding: 9px 15px;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+.write-something-btn:hover {
+  background: rgb(36, 179, 179);
+}
+.blog-bgcolor-fill {
+  background: rgb(56, 102, 92);
+  color: white;
+  border-radius: 8px;
+  padding: 2px 5px;
+}
 .create-post-btn,
 .back-to-post-btn {
   display: inline-block;
@@ -230,6 +336,7 @@ p {
   border-radius: 8px;
   /* Slightly rounded corners for the image */
   /* Soft shadow */
+  transform: translateX(7%);
 }
 
 .featured-post-content-col {
@@ -253,11 +360,6 @@ p {
   /* Make link color same as text */
   text-decoration: none;
   transition: color 0.3s ease;
-}
-
-.featured-post-content-col h3 a:hover {
-  color: #3e796c;
-  /* Light teal on hover */
 }
 
 .featured-post-excerpt {
@@ -543,7 +645,7 @@ footer {
 }
 
 .social-links a {
-  color: rgba(218, 233, 227, 0.699);
+  color: #333333c2;
   /* Light color for icons */
   font-size: 1.5em;
   /* Size of icons */
@@ -551,7 +653,7 @@ footer {
 }
 
 .social-links a:hover {
-  color: rgba(234, 248, 243, 0.699);
+  color: #6b6b6b;
   /* Brighter teal on hover */
   transform: translateY(-3px);
   /* Slight lift effect */
@@ -791,10 +893,10 @@ img.post-thumbnail {
 .category-pill-link {
   background-color: #e2fcf6;
   color: #1e3a34;
-  padding: 6px 12px;
+  padding: 5px 12px;
   /* Reverted to 6px 12px padding */
   border-radius: 20px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   /* Reverted to 0.9em font size */
   font-weight: 600;
   text-decoration: none;
