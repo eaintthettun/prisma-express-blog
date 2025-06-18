@@ -102,13 +102,6 @@
     border-radius: 12px;
   }
 
-  /* Ensure 3 cards per row on larger screens */
-  @media (min-width: 992px) {
-    .custom-grid-3 .col {
-      flex: 0 0 33.333333%;
-      max-width: 33.333333%;
-    }
-  }
 
   /* Responsive adjustments */
   @media (max-width: 991px) {
@@ -130,7 +123,7 @@
         
         <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-4">
           <button class="base-follow-btn" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
-            <i class="bi bi-plus-lg me-2"></i>Follow Topic
+            <i class="bi bi-plus-lg me-2"></i>Follow
           </button>
         </div>
         
@@ -158,10 +151,10 @@
         <p class="text-muted">Explore the best stories from this topic</p>
       </div>
 
-      <!-- 3 Cards per row with compact design -->
-      <div class="row custom-grid-3 g-4 mb-5">
-      <!--to show only three Posts-->
-        <% typeObj.posts.slice(0,3).forEach(post => { %>
+      <!-- 2 Cards per row with compact design -->
+      <div class="row custom-grid-2 g-4 mb-5">
+      <!--to show only two Posts-->
+        <% typeObj.posts.slice(0,2).forEach(post => { %>
             <div class="col">
             <div class="card custom-post-card">
               <div class="position-relative overflow-hidden">
@@ -172,11 +165,6 @@
                     <img src="/images/defaultPostImage.avif" alt="Default Post Image" class="custom-post-image">
                   <% } %>
                 </a>
-                <div class="position-absolute top-0 end-0 m-2">
-                  <span class="badge reading-time-badge">
-                    <i class="bi bi-clock me-1"></i><%= post.readTime || '5 min' %>
-                  </span>
-                </div>
               </div>
               
               <div class="custom-card-body">

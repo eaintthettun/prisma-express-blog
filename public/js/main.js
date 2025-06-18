@@ -128,3 +128,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 
             });
+
+
+            
+            document.body.addEventListener('click', async function(event) {
+                // Like button clicked
+                if (event.target.classList.contains('like-btn')) {
+                  console.log('like btn clicked');
+                  const button = event.target;
+                  const postId = button.dataset.postId;
+              
+                  const response = await fetch('/posts/like-temp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ postId })
+                  });
+              
+                  const data = await response.json();
+                  if (data.success) {
+                    const countEl = document.getElementById(`like-count-${postId}`);
+                    const currentCount = parseInt(countEl.textContent);
+                    countEl.textContent = currentCount + 1;
+              
+                    button.textContent = '❤️ Liked';
+                    button.classList.remove('like-btn');
+                    button.classList.add('unlike-btn');
+                  }
+                }
+              
+                // Unlike button clicked
+                else if (event.target.classList.contains('unlike-btn')) {
+                  console.log('unlike btn clicked');
+                  const button = event.target;
+                  const postId = button.dataset.postId;
+              
+                  const response = await fetch(`/posts/${postId}/unlike-post`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ postId })
+                  });
+              
+                  const data = await response.json();
+                  if (data.success) {
+                    const countEl = document.getElementById(`like-count-${postId}`);
+                    const currentCount = parseInt(countEl.textContent);
+                    countEl.textContent = currentCount - 1;
+              
+                    button.textContent = '♡ Like';
+                    button.classList.remove('unlike-btn');
+                    button.classList.add('like-btn');
+                  }
+                }
+              });
+              

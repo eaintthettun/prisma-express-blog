@@ -84,7 +84,7 @@ p {
   background-color: #58bea6;
   color: white;
   border-radius: 25px;
-  font-size: 0.9rem;
+  font-size: 1mrem;
   text-decoration: none;
   padding: 15px 25px;
 }
@@ -100,8 +100,8 @@ p {
   border: none;
   outline: none;
   border-radius: 25px;
-  font-size: 1.1rem;
-  padding: 15px 25px;
+  font-size: 14px;
+  padding: 8px 25px;
   transition: 0.3s;
 }
 .base-follow-btn:hover {
@@ -873,6 +873,7 @@ img.post-thumbnail {
   width: 220px; /* Ensures the image takes the full width of its container */
   height: 180px;
   object-fit: cover; /* Ensures the image covers the area, cropping if necessary */
+  margin-top: 5px;
 }
 
 .post-content-col {

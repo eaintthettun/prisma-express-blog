@@ -1,6 +1,7 @@
 const {PrismaClient}=require('@prisma/client');
 const prisma=new PrismaClient();
 const getPostsQuery = require('../utils/getPosts');
+const { response } = require('express');
 
 exports.showPostDetails=async(req,res)=>{
     const currentUser=res.locals.currentUser;
@@ -121,42 +122,69 @@ exports.bookMarkPost=async(req,res)=>{
     }
 }
 
-//toggle like method
-exports.likePost=async(req,res)=>{
-    const authorId = req.session.userId; //who like the post
-    const postId = parseInt(req.params.id);  //which post he likes
-    const redirectTo = req.header('Referer') || `/posts#like`; // Fallback to the all posts page
-    // Check if like already exists
-    const existingLike = await prisma.like.findUnique({
-        where: {
-          authorId_postId: {
-            authorId,
-            postId,
-          },
-        },
-    });
-    if(existingLike){
-        // User already liked → unlike (delete)
-        await prisma.like.delete({
-            where: {
-            authorId_postId: {
-                authorId,
-                postId,
-            },
-            },
-        });
-    }else{
-        // User hasn't liked → create like
-        const like=await prisma.like.create({
-            data: { 
-                authorId,
-                postId },
-          });
+// Route to store like in session (not DB yet)
+//for one user
+exports.likeTemp = (req, res) => {
+    console.log('req body:',req.body);
+    const { postId } = req.body;
+    // to prevent liking the post again if already liked it.
+    if (req.session.likedPosts.includes(postId)) {
+      return res.json({ success: false, message: 'Already liked this post' });
     }
-    res.redirect(redirectTo);
+  
+    req.session.likedPosts.push(postId);
+    console.log('after push,req session post ids:',req.session.likedPosts);
+    return res.json({ success: true });
+  };
+  
+
+//toggle like method
+//when user has 10 likes,then save them in DB
+exports.saveLikes=async(req,res)=>{
+  console.log('Saving likes triggered!');
+  const userId = req.session.userId;
+  const likedPosts = req.session.likedPosts || [];
+
+    //   const existingLike = await prisma.like.findMany({
+    //     where: {
+    //       authorId_postId: {
+    //         authorId,
+    //         postId: parseInt(postId),
+    //       },
+    //     },
+    //   });
+    const response=await prisma.like.createMany({
+            data: likedPosts.map(postId => ({
+              authorId: userId,
+              postId: parseInt(postId)
+            })),
+            skipDuplicates: true // built-in protection!
+    });          
+    console.log('response data:',response.data);
+    req.session.likedPosts = []; // clear session likes
+    res.json({ success: true });         
 }
 
-
+exports.unlikePost=async(req,res)=>{
+    const userId=req.session.userId;
+    const postId=parseInt(req.params.id);
+    console.log('this is unlike post,post id',postId);
+    let likedPosts=req.session.likedPosts;
+ 
+    //remove from session
+    likedPosts=likedPosts.filter(postId=>postId!==postId);
+    console.log('after unliking,session likedPost:',likedPosts);
+    const response=await prisma.like.delete({
+        where:{
+            authorId_postId:{
+                authorId:userId,
+                postId:postId
+            }
+        }
+    });
+    console.log('response unlike data:',response.data);
+    res.json({success:true});
+}
 
 //getPostsQuery(...)=used for searchPosts,listAllPosts,listMyPosts
 exports.searchPosts=async(req,res)=>{
