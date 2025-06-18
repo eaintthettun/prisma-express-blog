@@ -24,9 +24,13 @@ app.use(express.static('public')); //D:\JavaScript online class workspace\prisma
 app.use(session({
     secret:process.env.SECRET,
     resave:false,
-    saveUninitialized:false
+    saveUninitialized:false,
+    cookie: { maxAge: 60 * 60 * 1000 } // 1 hour
 }));
 app.use(async(req,res,next)=>{
+    if (!req.session.likedPosts) {
+        req.session.likedPosts = []; // store post IDs liked but not saved yet
+    }
     res.locals.userId=req.session.userId; //important session key
     // Make selectedCategory and categories available to all views
     res.locals.selectedCategory = req.query.categoryId || "";

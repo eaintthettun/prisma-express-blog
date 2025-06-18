@@ -27,7 +27,7 @@
     <!-- Trending Topics Bar -->
     <div class="trending-section mb-5">
       <div class="d-flex align-items-center justify-content-between mb-3">
-        <h6 class="text-uppercase text-muted fw-bold mb-0 letter-spacing">Trending Topics</h6>
+        <h6 class="text-uppercase text-muted fw-bold mb-0 letter-spacing">All Topics</h6>
         <div class="scroll-controls">
           <button class="scroll-btn" id="scrollLeft" aria-label="Scroll left">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -48,9 +48,9 @@
             <% categories.forEach(category => { %>
               <% if (category.topics && category.topics.length > 0) { %>
                 <% category.topics.forEach(topic => { %>
-                  <a href="/topics/<%= topic.slug %>" class="base-btn">
-                    <%= topic.name %>
-                  </a>
+                    <a href="/topics/<%= topic.slug %>" class="base-btn">
+                      <%= topic.name %>
+                    </a>
                 <% }) %>
               <% } %>
             <% }) %>

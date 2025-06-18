@@ -18,7 +18,6 @@
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2">
                 <!-- Like Button -->
-                <form action="/posts/<%= post.id %>/toggle-like" method="POST" class="d-inline">
                     <% if (!currentUser) { %>
                         <button type="submit" 
                                 class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 rounded-pill px-3 py-1">
@@ -26,13 +25,13 @@
                             <span style="font-size: 0.85em; font-weight: 500;"><%= likeCount %></span>
                         </button>
                     <% } else { %>
-                        <button type="submit" 
-                                class="btn btn-sm d-flex align-items-center gap-1 rounded-pill px-3 py-1 <%= postLiked ? 'btn-danger' : 'btn-outline-danger' %>">
-                            <i class="bi <%= postLiked ? 'bi-heart-fill' : 'bi-heart' %>" style="font-size: 0.9em;"></i>
-                            <span style="font-size: 0.85em; font-weight: 500;"><%= likeCount %></span>
-                        </button>
+                        <p>Likes: <span id="like-count-<%= post.id %>"><%= post._count.likes %></span></p>
+                        <% if (postLiked) { %>
+                            <button class="unlike-btn" data-post-id="<%= post.id %>">❤️ Liked</button>
+                            <% } else { %>
+                            <button class="like-btn" data-post-id="<%= post.id %>">♡ Like</button>
+                        <% } %>
                     <% } %>
-                </form>
 
                 <!-- Comment Button -->
                 <form action="/posts/<%= post.id %>/comments" method="GET" class="d-inline-block">
@@ -186,5 +185,4 @@ function shareOnInstagram(postId) {
     copyPostLink(postId);
     alert('Link copied! You can paste it in your Instagram story or bio.');
 }
-
 </script>

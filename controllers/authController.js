@@ -124,8 +124,23 @@ exports.login=async (req,res)=>{
     res.redirect('/auth/login');
 }
 
-exports.logout=(req,res)=>{
-    req.session.destroy(()=>{
-        res.redirect('/'); //return to index.ejs
-    })
+exports.logout=async(req,res)=>{
+  const likedPosts = req.session.likedPosts || [];
+  const userId = req.session.userId;
+
+  // Save all unsaved likes before destroying session
+  const response=await prisma.like.createMany({
+        data: likedPosts.map(postId => ({
+        authorId: userId,
+        postId: parseInt(postId)
+    })),
+        skipDuplicates: true // built-in protection!
+    });          
+    console.log('response data:',response);
+    req.session.likedPosts = []; // clear session likes     
+
+  req.session.destroy(err => {
+    if (err) console.error('Session destroy failed:', err);
+    res.redirect('/');
+  });
 }
