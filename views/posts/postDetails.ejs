@@ -2,37 +2,291 @@
     const commentCount = post._count.comments;
 %>
 
-<div class="container my-5">
-    <h1 class="display-4 fw-bold mb-3"><%= post.title %></h1>
+<div class="container-fluid my-4">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Post Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4 p-md-5">
+                    <!-- Post Header -->
+                    <header class="mb-4">
+                        <h1 class="display-4 fw-bold mb-3"><%= post.title %></h1>
+                        
+                        <% if (post.subtitle) { %>
+                            <h2 class="lead text-muted mb-4"><%= post.subtitle %></h2>
+                        <% } %>
+                    </header>
+                    
+                    <!-- Author Info & Actions -->
+                    <div class="border-top border-bottom py-3 mb-4">
+                        <%- include('../partials/authorInfoBar',{post,currentUser})%>
+                        <div class="mt-3">
+                            <%- include('../partials/likeCommentBookmarkShare', { post, currentUser }) %>
+                        </div>
+                    </div>
 
-    <% if (post.subtitle) { %>
-        <h2 class="lead text-muted mb-4"><%= post.subtitle %></h2>
-    <% } %>
-    
-    <hr>
-    <%- include('../partials/authorInfoBar',{post,currentUser})%>
-    <%- include('../partials/likeCommentBookmarkShare', { post, currentUser }) %>
+                    <!-- Post Image -->
+                    <div class="text-center mb-5">
+                        <% if (post.imageUrl) { %>
+                            <img src="<%= post.imageUrl %>" alt="<%= post.title %>" 
+                                 class="img-fluid rounded shadow-sm w-100" 
+                                 style="max-height: 453px; object-fit: cover;">
+                        <% } else { %>
+                            <img src="/images/defaultPostImage.avif" alt="Default Post Image" 
+                                 class="img-fluid rounded shadow-sm w-100" 
+                                 style="max-height: 453px; object-fit: cover;">
+                        <% } %>
+                    </div>
 
-    <hr class="my-4">
+                    <!-- Post Content -->
+                    <article class="post-content fs-5 lh-base">
+                        <% let paragraphs = post.content.split(/\r?\n\s*\r?\n/); %>
+                        <% paragraphs.forEach(p => { %>
+                            <p class="mb-4"><%= p.trim() %></p>
+                        <% }) %>
+                    </article>
+                </div>
+            </div>
 
-    <% if (post.imageUrl) { %>
-        <div class="text-center mb-5">
-            <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="img-fluid rounded shadow-sm" style="max-width: 680px; height: 453px; object-fit: cover;">
+            <!-- Author Bio Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3 flex-shrink-0">
+                            <% if (post.author.profilePictureUrl) { %>
+                                <img src="<%= post.author.profilePictureUrl %>" 
+                                     alt="<%= post.author.name %>" 
+                                     class="rounded-circle" 
+                                     style="width: 80px; height: 80px; object-fit: cover;">
+                            <% } else { %>
+                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" 
+                                     style="width: 80px; height: 80px; font-size: 2rem;">
+                                    <%= post.author.name.charAt(0).toUpperCase() %>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold mb-2">Written by <%= post.author.name %></h4>
+                            <p class="text-muted mb-3">
+                                <% if (post.author.bio) { %>
+                                    <%= post.author.bio %>
+                                <% } else { %>
+                                    <%= post.author.name %> is a passionate writer sharing insights and stories. 
+                                    Follow for more engaging content and thoughtful perspectives on various topics.
+                                <% } %>
+                            </p>
+                            <div class="d-flex gap-2">
+                                <a href="/auth/profile/<%= post.author.id %>" class="btn btn-outline-primary btn-sm">
+                                    View Profile
+                                </a>
+                                <% if (currentUser && currentUser.id !== post.author.id) { %>
+                                    <button class="btn btn-primary btn-sm">
+                                        Follow
+                                    </button>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    <% }else { %>
-    <div class="text-center mb-5">
-        <img src="/images/defaultPostImage.avif" alt="Default Post Image" class="img-fluid rounded shadow-sm"  style="max-width: 680px; height: 453px; object-fit: cover;">
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Recent Posts -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h5 class="fw-bold mb-0">Recent Stories</h5>
+                </div>
+                <div class="card-body">
+                    <% if (typeof recentPosts !== 'undefined' && recentPosts && recentPosts.length > 0) { %>
+                        <% recentPosts.slice(0, 5).forEach((recentPost, index) => { %>
+                            <div class="d-flex mb-3 <%= index === recentPosts.slice(0, 5).length - 1 ? '' : 'border-bottom pb-3' %>">
+                                <div class="me-3 flex-shrink-0">
+                                    <% if (recentPost.imageUrl) { %>
+                                        <img src="<%= recentPost.imageUrl %>" 
+                                             alt="<%= recentPost.title %>" 
+                                             class="rounded" 
+                                             style="width: 60px; height: 60px; object-fit: cover;">
+                                    <% } else { %>
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                             style="width: 60px; height: 60px;">
+                                            <i class="bi bi-file-text text-muted"></i>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="fw-bold mb-1">
+                                        <a href="/posts/<%= recentPost.id %>" class="text-decoration-none text-dark">
+                                            <%= recentPost.title.length > 50 ? recentPost.title.substring(0, 50) + '...' : recentPost.title %>
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">
+                                        <%= new Date(recentPost.createdAt).toLocaleDateString() %>
+                                    </small>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-muted small">No recent posts available.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Most Read Posts -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h5 class="fw-bold mb-0">Most Read</h5>
+                </div>
+                <div class="card-body">
+                    <% if (typeof mostReadPosts !== 'undefined' && mostReadPosts && mostReadPosts.length > 0) { %>
+                        <% mostReadPosts.slice(0, 3).forEach((popularPost, index) => { %>
+                            <div class="d-flex align-items-center mb-3 <%= index === mostReadPosts.slice(0, 5).length - 1 ? '' : 'border-bottom pb-3' %>">
+                                <div class="me-3">
+                                    <span class="badge bg-primary rounded-circle" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                        <%= index + 1 %>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="fw-bold mb-1">
+                                        <a href="/posts/<%= popularPost.id %>" class="text-decoration-none text-dark">
+                                            <%= popularPost.title.length > 45 ? popularPost.title.substring(0, 45) + '...' : popularPost.title %>
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">
+                                        <%= popularPost.author.name %> • 
+                                        <%=formatViewCount(popularPost.viewCount)%> views • 
+                                        <%= popularPost.readTime || '5 min' %> read
+                                    </small>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-muted small">No popular posts available.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h5 class="fw-bold mb-2">Categories</h5>
+                </div>
+                <div class="card-body p-2">
+                    <% if (typeof categories !== 'undefined' && categories && categories.length > 0) { %>
+                        <div class="d-grid gap-2">
+                            <% categories.forEach((category, index) => { %>
+                                <a href="/topics/<%= category.slug %>" 
+                                class="d-flex justify-content-between align-items-center py-2 px-2 text-decoration-none bg-light rounded">
+                                    <span class="fw-medium text-dark"><%= category.name %></span>
+                                    <% if (category._count && category._count.posts) { %>
+                                        <span class="badge bg-primary text-white rounded-pill">
+                                            <%= category._count.posts %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary text-white rounded-pill">0</span>
+                                    <% } %>
+                                </a>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <div class="p-4">
+                            <p class="text-muted small mb-0">No categories available.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Newsletter Signup -->
+            <div class="card border-0 bg-light text-white">
+                <div class="card-body bg-secondary text-center rounded-2">
+                    <h5 class="fw-bold mb-3 text-white">Stay Updated</h5>
+                    <p class="small mb-3 text-white">Get the latest stories delivered to your inbox.</p>
+                    <form action="/newsletter/subscribe" method="POST">
+                        <div class="mb-3">
+                            <input type="email" class="form-control" placeholder="Your email" name="email" required>
+                        </div>
+                        <button type="submit" class="btn btn-light btn-sm w-100 px-3 py-3">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Comments Section -->
+    <div class="row mt-5">
+        <div class="col-lg-8">
+            <%- include('../partials/allCommentsSection',{post,currentUser})%>
+        </div>
+    </div>
+
+    <!-- Related Posts Section -->
+    <% if (typeof relatedPosts !== 'undefined' && relatedPosts && relatedPosts.length > 0) { %>
+        <div class="row mt-5">
+            <div class="col-12">
+                <section class="related-posts-section">
+                    <h3 class="h4 fw-bold mb-4 border-bottom pb-2">More stories you might like</h3>
+                    <div class="row">
+                        <% relatedPosts.slice(0, 3).forEach(relatedPost => { %>
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <article class="card border-0 shadow-sm h-100">
+                                    <% if (relatedPost.imageUrl) { %>
+                                        <img src="<%= relatedPost.imageUrl %>" 
+                                             alt="<%= relatedPost.title %>" 
+                                             class="card-img-top" 
+                                             style="height: 200px; object-fit: cover;">
+                                    <% } else { %>
+                                        <img src="/images/defaultPostImage.avif" 
+                                             alt="Default Post Image" 
+                                             class="card-img-top" 
+                                             style="height: 200px; object-fit: cover;">
+                                    <% } %>
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title fw-bold">
+                                            <a href="/posts/<%= relatedPost.id %>" class="text-decoration-none text-dark">
+                                                <%= relatedPost.title %>
+                                            </a>
+                                        </h5>
+                                        <% if (relatedPost.subtitle) { %>
+                                            <p class="card-text text-muted small mb-3" 
+                                               style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                <%= relatedPost.subtitle %>
+                                            </p>
+                                        <% } %>
+                                        <div class="mt-auto">
+                                            <small class="text-muted">
+                                                By <%= relatedPost.author.name %> • 
+                                                <%= relatedPost.readTime || '5 min' %> read
+                                            </small>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        <% }); %>
+                    </div>
+                </section>
+            </div>
+        </div>
     <% } %>
-
-    <div class="post-content fs-5 lh-base mb-5 mx-auto" style="max-width: 680px;">
-        <% let paragraphs = post.content.split(/\r?\n\s*\r?\n/); %>
-            <% paragraphs.forEach(p => { %>
-            <p><%= p.trim() %></p>
-            <% }) 
-        %>
-    </div>
-
-    <hr>
-    <%- include('../partials/allCommentsSection',{post,currentUser})%>
 </div>
+
+<style>
+/* Post content styling */
+.post-content p {
+    text-align: justify;
+    line-height: 1.8;
+}
+
+/* Thin box shadow for cards */
+.card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .col-lg-4 {
+        margin-top: 2rem;
+    }
+}
+</style>

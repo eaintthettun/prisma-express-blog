@@ -34,7 +34,15 @@ app.use(async(req,res,next)=>{
     res.locals.userId=req.session.userId; //important session key
     // Make selectedCategory and categories available to all views
     res.locals.selectedCategory = req.query.categoryId || "";
-    res.locals.categories = await prisma.category.findMany();
+    res.locals.categories = await prisma.category.findMany({
+        include:{
+            _count:{
+                select:{
+                    posts:true,
+                } //get no. of posts related with that category
+            }
+        }
+    });
 
     if (req.session.userId) {
         try {

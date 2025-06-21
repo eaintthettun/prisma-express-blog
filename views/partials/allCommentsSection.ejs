@@ -1,8 +1,8 @@
 <!--carried post and currentUser from postDetails-->
-<div class="comments-section bg-light py-5">
+<div class="comments-section py-5 rounded-4">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div>
                 <!-- Comments Header -->
                 <div class="comments-header mb-5">
                     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -69,7 +69,7 @@
                                     const commentLiked = currentUser && comment.commentLikes.some(like => like.authorId === currentUser.id);
                                     const commentLikeCount = comment.commentLikes.length;
                                 %>
-                                <div class="comment-item bg-white rounded-4 shadow-sm p-4 mb-4">
+                                <div class="comment-item bg-light rounded-4 shadow-sm p-4 mb-4">
                                     <div class="d-flex align-items-start gap-3">
                                         <div class="user-avatar">
                                             <img src="<%= comment.author.profilePictureUrl || '/images/default-avatar.png' %>" 
@@ -258,7 +258,7 @@
 <style>
     /* Comments Section Styling */
     .comments-section {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: white;
     }
     
     .comments-title {
