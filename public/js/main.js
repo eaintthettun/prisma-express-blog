@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
 
-            
+
             document.body.addEventListener('click', async function(event) {
                 // Like button clicked
                 if (event.target.classList.contains('like-btn')) {
@@ -169,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   });
               
                   const data = await response.json();
+                  console.log('response in front end:',data);
                   if (data.success) {
                     const countEl = document.getElementById(`like-count-${postId}`);
                     const currentCount = parseInt(countEl.textContent);
