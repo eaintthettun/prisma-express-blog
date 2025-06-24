@@ -34,10 +34,10 @@ const getPostsQuery = async (options = {}) => {
         }
       },
       category: {
-        select: { name: true }
+        select: { name: true,slug:true, }
       },
       topic:{
-        select:{ name:true }
+        select:{ name:true,slug:true }
       },
       bookmarks: {
         select: {

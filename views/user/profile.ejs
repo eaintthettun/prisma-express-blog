@@ -1,7 +1,7 @@
 <%
-        const isOwnProfile=currentUser && currentUser.id===profileUser.id;
-        const isFollowing=currentUser && profileUser.followers.some(f=>f.followerId===currentUser.id);
-    %>
+    const isOwnProfile=currentUser && currentUser.id===profileUser.id;
+    const isFollowing=currentUser && profileUser.followers.some(f=>f.followerId===currentUser.id);
+%>
 <div class="container py-5 profile-page-container">
     <div class="row">
         <div class="col-12">
@@ -31,7 +31,7 @@
                         <% }else{%>
                                 <%if(isOwnProfile){%>
                                     <div style="margin:5px">
-                                        <a href="/profile/edit/<%= profileUser.id %>" class="btn btn-md rounded-pill btn-edit-profile">Edit Profile</a>
+                                        <a href="/auth/profile/edit/<%= profileUser.id %>" class="btn btn-md rounded-pill btn-edit-profile">Edit Profile</a>
                                     </div>
                                 <%}else{%>
                                     <div style="margin:24px">
@@ -101,34 +101,262 @@
         </div>
     </div>
 
+    <!-- Posts Section -->
     <div class="row mt-5">
         <div class="col-12">
-            <h3>Posts by <%= profileUser.name %></h3>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">Posts by <%= profileUser.name %></h3>
+                <span class="text-muted">
+                    <%= profileUser.posts ? profileUser.posts.length : 0 %> 
+                    <%= profileUser.posts && profileUser.posts.length === 1 ? 'post' : 'posts' %>
+                </span>
+            </div>
             <% if (profileUser.posts && profileUser.posts.length > 0) { %>
-                <div class="row row-cols-1 row-cols-md-2 g-4">
+                <div class="posts-container">
                     <% profileUser.posts.forEach(post => { %>
-                        <div class="col">
-                            <div class="card h-100 shadow-sm">
-                                <% if (post.imageUrl) { %>
-                                    <img src="<%= post.imageUrl %>" class="card-img-top" alt="<%= post.title %>">
-                                <% } %>
-                                <div class="card-body">
-                                    <h5 class="card-title"><a href="/posts/<%= post.id %>" class="text-decoration-none"><%= post.title %></a></h5>
-                                    <p class="card-text text-muted small"><%= post.subtitle %></p>
-                                    <a href="/posts/<%= post.id %>" class="btn btn-sm btn-outline-primary">Read More</a>
+                        <article class="card border-0 shadow-sm mb-4">
+                            <div class="row g-0">
+                                <!-- Post Content -->
+                                <div class="col-md-8">
+                                    <div class="card-body p-4">
+                                        <!-- Category Badge -->
+                                        <% if (post.category) { %>
+                                            <div class="mb-2">
+                                                <a href="/category/<%= post.category.id %>" 
+                                                   class="badge bg-light text-dark text-decoration-none">
+                                                    <%= post.category.name %>
+                                                </a>
+                                            </div>
+                                        <% } %>
+                                        
+                                        <!-- Post Title -->
+                                        <h4 class="fw-bold mb-2">
+                                            <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark">
+                                                <%= post.title %>
+                                            </a>
+                                        </h4>
+                                        
+                                        <!-- Post Subtitle -->
+                                        <% if (post.subtitle) { %>
+                                            <p class="text-muted mb-3">
+                                                <%= post.subtitle %>
+                                            </p>
+                                        <% } %>
+                                        
+                                        <!-- Post Meta -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar me-1"></i>
+                                                <%= new Date(post.createdAt).toLocaleDateString('en-US', { 
+                                                    year: 'numeric', 
+                                                    month: 'long', 
+                                                    day: 'numeric' 
+                                                }) %>
+                                            </small>
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock me-1"></i>
+                                                <%= getReadTime(post.content) %>
+                                            </small>
+                                        </div>
+                                        
+                                        <!-- Post Actions -->
+                                            <%- include('../partials/likeCommentBookmarkShare', { post: post, currentUser }) %>
+                                    </div>
                                 </div>
-                                <div class="card-footer d-flex justify-content-between align-items-center small text-muted">
-                                    <span><%= new Date(post.createdAt).toLocaleDateString() %></span>
-                                    <span><%= post._count.comments %> <i class="bi bi-chat-dots"></i> | <%= post._count.likes %> <i class="bi bi-heart"></i></span>
+                                
+                                <!-- Post Image -->
+                                <div class="col-md-4">
+                                    <div class="position-relative h-100" style="min-height: 200px;">
+                                        <a href="/posts/<%= post.id %>" class="d-block h-100">
+                                            <% if (post.imageUrl) { %>
+                                                <img src="<%= post.imageUrl %>" 
+                                                     alt="<%= post.title %>" 
+                                                     class="img-fluid w-100 h-100 rounded-end"
+                                                     style="object-fit: cover;">
+                                            <% } else { %>
+                                                <img src="/images/defaultPostImage.avif" 
+                                                     alt="Default Post Image" 
+                                                     class="img-fluid w-100 h-100 rounded-end"
+                                                     style="object-fit: cover;">
+                                            <% } %>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </article>
                     <% }); %>
                 </div>
+                
+                <!-- Load More Button (if pagination is needed) -->
+                <% if (typeof pagination !== 'undefined' && pagination.hasNextPage) { %>
+                    <div class="text-center mt-4">
+                        <a href="?page=<%= pagination.nextPage %>" class="btn btn-outline-primary">
+                            Load More Posts
+                        </a>
+                    </div>
+                <% } %>
+                
             <% } else { %>
-                <p class="text-muted">No posts found for this user yet.</p>
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-file-text display-1 text-muted opacity-50"></i>
+                    </div>
+                    <h4 class="text-muted mb-3">No posts yet</h4>
+                    <p class="text-muted">
+                        <% if (isOwnProfile) { %>
+                            Start sharing your thoughts and ideas with the world!
+                            <br>
+                            <a href="/posts/create" class="btn btn-primary mt-3">
+                                <i class="bi bi-plus-lg me-2"></i>Create Your First Post
+                            </a>
+                        <% } else { %>
+                            <%= profileUser.name %> hasn't published any posts yet.
+                        <% } %>
+                    </p>
+                </div>
             <% } %>
         </div>
     </div>
-
 </div>
+
+<style>
+/* Thin box shadow for cards */
+.card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Profile header styling */
+.profile-header-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #f8f9fa;
+}
+
+.profile-name {
+    font-size: 2rem;
+    color: #212529;
+}
+
+.profile-title {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.profile-bio-text {
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Stats styling */
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #212529;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Social links */
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fa;
+    border-radius: 50%;
+    color: #495057;
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+/* Posts container */
+.posts-container {
+    max-width: none;
+}
+
+/* Post actions styling */
+.post-actions {
+    position: relative;
+    z-index: 10;
+}
+
+.post-actions button,
+.post-actions a,
+.post-actions form {
+    position: relative;
+    z-index: 11;
+}
+
+.post-actions * {
+    pointer-events: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .profile-header-card {
+        padding: 1.5rem;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .profile-name {
+        font-size: 1.5rem;
+    }
+    
+    .row.g-0 {
+        flex-direction: column;
+    }
+    
+    .col-md-4 {
+        order: -1;
+    }
+    
+    .position-relative {
+        min-height: 200px !important;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Prevent action buttons from triggering post navigation
+    document.querySelectorAll('.post-actions button, .post-actions a, .post-actions form').forEach(element => {
+        element.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+
+    // Handle form submissions in post actions
+    document.querySelectorAll('.post-actions form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.stopPropagation();
+        });
+    });
+});
+</script>

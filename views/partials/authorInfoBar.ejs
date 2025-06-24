@@ -77,9 +77,7 @@
 
     <!-- Read Time Badge -->
     <span class="d-inline-flex align-items-center text-muted">
-        <%if(post.readTime){%>
         <i class="bi bi-dot"></i>
-        <small style="font-size: 1rem;"><span><%=post.readTime%></span></small>
-        <%}%>
+        <small style="font-size: 1rem;"><span><%=getReadTime(post.content)%></span></small>
     </span>
 </div>

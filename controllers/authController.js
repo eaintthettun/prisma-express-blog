@@ -2,6 +2,65 @@ const bcrypt=require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+function getFullName(firstName,lastName){
+    const fullName = [firstName, lastName].filter(Boolean).join(' '); // handles nulls safely
+    return fullName;
+}
+exports.editProfile = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    const {
+      firstName, lastName, email, country, city, jobPosition,
+      company, bio, twitterUrl, linkedinUrl, githubUrl, newPassword
+    } = req.body;
+  
+    const dataToUpdate = {
+    };
+
+    // Only add fields if they're not empty
+    if (firstName) dataToUpdate.firstName = firstName;
+    if (lastName) dataToUpdate.lastName = lastName;
+    if (email) dataToUpdate.email = email;
+    if (country) dataToUpdate.country = country;
+    if(city) dataToUpdate.city=city;
+    if (jobPosition) dataToUpdate.jobPosition = jobPosition;
+    if (company) dataToUpdate.company = company;
+    if (bio) dataToUpdate.bio = bio;
+    if (twitterUrl) dataToUpdate.twitterUrl = twitterUrl;
+    if (linkedinUrl) dataToUpdate.linkedinUrl = linkedinUrl;
+    if (githubUrl) dataToUpdate.githubUrl = githubUrl;
+  
+    //if firstName or lastName is updated,call helper function and update fullName
+    if(firstName || lastName){
+        const finalFirstName = firstName || res.locals.currentUser.firstName; //if firstName is not edited, use old firstName in database
+        const finalLastName = lastName || res.locals.currentUser.lastName;//if lastName is not edited, use old lastName in database
+
+        const fullName=getFullName(finalFirstName,finalLastName);
+        dataToUpdate.name=fullName;
+    }
+
+    if (newPassword && newPassword.trim() !== "") {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      dataToUpdate.password = hashedPassword;
+    }
+    //console.log('req.file is:',req.file);
+    if (req.file) {
+      dataToUpdate.profilePictureUrl = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: dataToUpdate
+    });
+  
+    //console.log('updated user is:', updatedUser);
+    req.flash('success','Profile is updated successfully!');
+    res.redirect(`/auth/profile/edit/${userId}`); // or wherever your profile page is
+};  
+
+exports.showEditProfile=async(req,res)=>{
+    const currentUser=res.locals.currentUser;
+    res.render('user/editProfile',{currentUser});
+}
 exports.toggleFollow=async(req,res)=>{
     const authorToFollowId = parseInt(req.body.authorToFollowId); //you will get this id from fetch() in layout.ejs
     const currentUserId = req.session.userId; // Assuming you store user ID in session
@@ -46,6 +105,7 @@ exports.toggleFollow=async(req,res)=>{
 
 exports.showProfile=async (req,res)=>{
     let currentUser = res.locals.currentUser; //get user from res.locals
+    console.log('current user:',currentUser);
     const profileUser=await prisma.user.findUnique({
         where:{id:parseInt(req.params.id)}, //need to know profile user id to get his info
         include:{
@@ -59,11 +119,35 @@ exports.showProfile=async (req,res)=>{
                 select:{
                     followerId:true //to check if the currentUser is already following profileUser or not
                 }
+            },
+            posts:{//to show all posts written by that user
+                include:{
+                    _count:{
+                        select:{
+                            likes:true, //to show no. of likes of that post
+                            comments:true,  //to show comment count of that post
+                        }
+                    },
+                    category:{
+                        select:{
+                            name:true, //to show category of that post
+                        }
+                    },
+                    likes:{
+                        select:{
+                            authorId:true,
+                        }
+                    },
+                    bookmarks:{
+                        select:{
+                            userId:true, //who bookmark this post
+                        }
+                    }
+                }
             }
         }
     });
-    //console.log('profile user is:',profileUser);
-    res.render('user/profile',{profileUser,currentUser});
+    res.render('user/profile',{profileUser,currentUser,getReadTime:res.locals.getReadTime});
 }
 
 exports.showRegister=async(_,res)=>{
