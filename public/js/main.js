@@ -125,13 +125,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
                 };//end if
-
-                
             });
 
 
 
-            document.body.addEventListener('click', async function(event) {
+document.body.addEventListener('click', async function(event) {
                 // Like button clicked
                 if (event.target.classList.contains('like-btn')) {
                   console.log('like btn clicked');
@@ -180,5 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     button.classList.add('like-btn');
                   }
                 }
-              });
-              
+});
+
+        
+             

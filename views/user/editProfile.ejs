@@ -1,0 +1,1101 @@
+<!--for profile update success alert message-->
+<% if (successMessage && successMessage.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle me-2"></i>
+    <%= successMessage[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<% if (errorMessage && errorMessage.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    <%= errorMessage[0] %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <!-- Page Header -->
+            <div class="mb-4">
+                <h1 class="h3 fw-bold mb-2">Manage your account</h1>
+                <p class="text-muted">Update your personal information and account settings</p>
+            </div>
+
+            <!-- Main Form -->
+            <form id="mainProfileForm" action="/auth/profile/edit/<%= currentUser.id %>" method="POST" enctype="multipart/form-data">
+                <!-- Profile Picture Section -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0">Profile Picture</h5>
+                        </div>
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="position-relative">
+                                <% if (currentUser.profilePictureUrl) { %>
+                                    <img src="<%= currentUser.profilePictureUrl %>" 
+                                         alt="Profile Picture" 
+                                         class="rounded-circle" 
+                                         style="width: 100px; height: 100px; object-fit: cover;"
+                                         id="profilePreview">
+                                <% } else { %>
+                                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" 
+                                         style="width: 100px; height: 100px; font-size: 2.5rem;"
+                                         id="profilePreview">
+                                        <%= currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U' %>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="mb-2 fw-medium">Profile photo</p>
+                                <p class="text-muted small mb-3">A profile photo helps personalize your account</p>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('profilePictureInput').click()">
+                                    Change photo
+                                </button>
+                                <input type="file" 
+                                       class="d-none" 
+                                       name="profilePicture" 
+                                       accept="image/*"
+                                       id="profilePictureInput">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0">Basic info</h5>
+                            <small class="text-muted">Some info may be visible to other people</small>
+                        </div>
+                        
+                        <!-- Display Name -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Name</p>
+                                <small class="text-muted">Your display name</small>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="text" 
+                                       class="form-control-plaintext" 
+                                       id="name" 
+                                       name="name" 
+                                       value="<%= currentUser.name || '' %>" 
+                                       disabled
+                                       readonly>
+                            </div>
+                           
+                        </div>
+
+                        <!-- First Name -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">First name</p>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="text" 
+                                       class="form-control-plaintext" 
+                                       id="firstName" 
+                                       name="firstName" 
+                                       value="<%= currentUser.firstName || '' %>" 
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="firstName">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Last name</p>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="text" 
+                                       class="form-control-plaintext" 
+                                       id="lastName" 
+                                       name="lastName" 
+                                       value="<%= currentUser.lastName || '' %>" 
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="lastName">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="info-row d-flex align-items-start py-3">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Bio</p>
+                                <small class="text-muted">Tell others about yourself</small>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <textarea class="form-control-plaintext" 
+                                          id="bio" 
+                                          name="bio" 
+                                          rows="3" 
+                                          disabled
+                                          readonly><%= currentUser.bio || '' %></textarea>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="bio">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0">Contact info</h5>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Email</p>
+                                <small class="text-muted">Your email address</small>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="email" 
+                                       class="form-control-plaintext" 
+                                       id="email" 
+                                       name="email" 
+                                       value="<%= currentUser.email || '' %>" 
+                                       disabled
+                                       readonly>
+                            </div>
+                           
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="info-row d-flex align-items-center py-3">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Phone</p>
+                                <small class="text-muted">Your phone number</small>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="tel" 
+                                       class="form-control-plaintext" 
+                                       id="phone" 
+                                       name="phone" 
+                                       value="<%= currentUser.phone || '' %>" 
+                                       placeholder="Add phone number"
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="phone">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0">Address</h5>
+                        </div>
+                        
+                        <!-- Location -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Location</p>
+                                <small class="text-muted">City, Country</small>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4 d-flex gap-2">
+                                <select id="countrySelect" class="form-select" name="country" disabled>
+                                    <option value="<%= currentUser.country || '' %>"><%= currentUser.country || 'Select Country' %></option>
+                                </select>
+                                
+                                <select id="citySelect" class="form-select" name="city" disabled>
+                                    <option value="<%= currentUser.city || '' %>"><%= currentUser.city || 'Select City' %></option>
+                                </select>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="location">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+                </div>
+
+                <!-- Professional Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0">Professional info</h5>
+                        </div>
+                        
+                        <!-- Job Position -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Job title</p>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="text" 
+                                       class="form-control-plaintext" 
+                                       id="jobPosition" 
+                                       name="jobPosition" 
+                                       value="<%= currentUser.jobPosition || '' %>" 
+                                       placeholder="Add job title"
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="jobPosition">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Company -->
+                        <div class="info-row d-flex align-items-center py-3">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Company</p>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="text" 
+                                       class="form-control-plaintext" 
+                                       id="company" 
+                                       name="company" 
+                                       value="<%= currentUser.company || '' %>" 
+                                       placeholder="Add company"
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="company">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0">Social links</h5>
+                        </div>
+                        
+                        <!-- Website -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Website</p>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="url" 
+                                       class="form-control-plaintext" 
+                                       id="website" 
+                                       name="website" 
+                                       value="<%= currentUser.website || '' %>" 
+                                       placeholder="Add website"
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="website">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Twitter -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Twitter</p>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="text" 
+                                       class="form-control-plaintext" 
+                                       id="twitter" 
+                                       name="twitter" 
+                                       value="<%= currentUser.twitter || '' %>" 
+                                       placeholder="Add Twitter username"
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="twitter">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- LinkedIn -->
+                        <div class="info-row d-flex align-items-center py-3 border-bottom">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">LinkedIn</p>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="url" 
+                                       class="form-control-plaintext" 
+                                       id="linkedin" 
+                                       name="linkedin" 
+                                       value="<%= currentUser.linkedin || '' %>" 
+                                       placeholder="Add LinkedIn profile"
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="linkedin">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- GitHub -->
+                        <div class="info-row d-flex align-items-center py-3">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">GitHub</p>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="text" 
+                                       class="form-control-plaintext" 
+                                       id="github" 
+                                       name="github" 
+                                   value="<%= currentUser.github || '' %>" 
+                                   placeholder="Add GitHub username"
+                                   disabled
+                                   readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="github">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password & Security -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0">Password & security</h5>
+                        </div>
+                        
+                        <!-- Password -->
+                        <div class="info-row d-flex align-items-center py-3">
+                            <div class="info-label">
+                                <p class="mb-0 fw-medium">Password</p>
+                                <small class="text-muted">Last changed 30 days ago</small>
+                            </div>
+                            <div class="info-value flex-grow-1 mx-4">
+                                <input type="password" 
+                                       class="form-control-plaintext" 
+                                       value="••••••••••••" 
+                                       disabled
+                                       readonly>
+                            </div>
+                            <div class="info-action">
+                                <button type="button" class="btn btn-link p-0 edit-btn" data-field="password">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update Changes Button -->
+                <div class="card border-0 shadow-sm mb-4" id="updateSection" style="display: none;">
+                    <div class="card-body p-4 text-center">
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="button" class="btn btn-outline-secondary px-4" onclick="resetForm()">
+                                Cancel Changes
+                            </button>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Update Changes
+                            </button>
+                        </div>
+                        <small class="text-muted mt-2 d-block">Review your changes above and click "Update Changes" to save all modifications</small>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalTitle">Edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editForm">
+                <div class="modal-body">
+                    <div id="editFieldContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Apply Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Password Change Modal -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="passwordForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current password</label>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New password</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm new password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Apply Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Google-style card design */
+.card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px;
+}
+
+/* Info row styling */
+.info-row {
+    min-height: 60px;
+}
+
+.info-label {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.info-value {
+    min-height: 40px;
+}
+
+.info-action {
+    width: 40px;
+    flex-shrink: 0;
+}
+
+/* Form control styling - DISABLED */
+.form-control-plaintext {
+    border: none;
+    background: transparent;
+    padding: 8px 0;
+    color: #202124;
+    cursor: default;
+}
+
+.form-control-plaintext:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+/* Form control styling - ENABLED */
+.form-control-plaintext:not(:disabled) {
+    border: 2px solid #e8eaed;
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: text;
+}
+
+.form-control-plaintext:not(:disabled):focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    outline: none;
+}
+
+/* Form select styling - DISABLED */
+.form-select:disabled {
+    background-color: transparent;
+    border: none;
+    color: #202124;
+    cursor: default;
+    padding: 8px 0;
+}
+
+.form-select:disabled:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+/* Form select styling - ENABLED */
+.form-select:not(:disabled) {
+    border: 2px solid #e8eaed;
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+}
+
+.form-select:not(:disabled):focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    outline: none;
+}
+
+/* Edit button styling */
+.edit-btn {
+    color: #1a73e8;
+    border: none;
+    background: none;
+    padding: 8px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-btn:hover {
+    background-color: rgba(26, 115, 232, 0.1);
+    color: #1a73e8;
+}
+
+/* Border styling */
+.border-bottom {
+    border-bottom: 1px solid #e8eaed !important;
+}
+
+/* Modal styling */
+.modal-content {
+    border: none;
+    box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+}
+
+/* Update section styling */
+#updateSection {
+    background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+    border: 2px solid #1a73e8 !important;
+}
+
+#updateSection .btn-primary {
+    background-color: #1a73e8;
+    border-color: #1a73e8;
+    font-weight: 600;
+}
+
+#updateSection .btn-primary:hover {
+    background-color: #1557b0;
+    border-color: #1557b0;
+}
+
+/* Field changed indicator */
+.field-changed {
+    background-color: #fff3cd !important;
+    border-color: #ffc107 !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start !important;
+        padding: 16px 0 !important;
+    }
+    
+    .info-label {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .info-value {
+        width: 100%;
+        margin: 0 !important;
+    }
+    
+    .info-action {
+        position: absolute;
+        right: 0;
+        top: 16px;
+    }
+    
+    .info-row {
+        position: relative;
+    }
+    
+    #updateSection .d-flex {
+        flex-direction: column;
+    }
+    
+    #updateSection .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+
+/* Success Alert Styling */
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 1px solid #b8dacc;
+    border-radius: 8px;
+    color: #155724;
+}
+
+.alert-success .bi-check-circle-fill {
+    color: #28a745;
+    font-size: 1.2rem;
+}
+
+.alert-success .btn-close {
+    filter: invert(1) grayscale(100%) brightness(0) opacity(0.5);
+}
+
+.alert-success .btn-close:hover {
+    opacity: 0.75;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+    let hasChanges = false;
+    
+    // Handle edit button clicks
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const field = this.dataset.field;
+            
+            if (field === 'password') {
+                passwordModal.show();
+                return;
+            }
+            
+            if (field === 'location') {
+                document.getElementById('editModalTitle').textContent = 'Edit location';
+                
+                const currentCountry = document.getElementById('countrySelect').value;
+                const currentCity = document.getElementById('citySelect').value;
+                
+                const inputHtml = `
+                    <div class="mb-3">
+                        <label for="edit_country" class="form-label">Country</label>
+                        <select class="form-control" id="edit_country" name="country" required>
+                            <option value="">Select a country</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_city" class="form-label">City</label>
+                        <select class="form-control" id="edit_city" name="city" required disabled>
+                            <option value="">Select a city</option>
+                        </select>
+                    </div>
+                `;
+                
+                document.getElementById('editFieldContainer').innerHTML = inputHtml;
+                
+                // Load countries from API
+                loadCountries(currentCountry, currentCity);
+                
+                editModal.show();
+                return;
+            }
+            
+            if (field === 'jobPosition') {
+                document.getElementById('editModalTitle').textContent = 'Edit job title';
+                
+                const currentValue = document.getElementById('jobPosition').value;
+                
+                const inputHtml = `
+                    <div class="mb-3">
+                        <label for="edit_jobPosition_select" class="form-label">Choose from common job titles</label>
+                        <select class="form-control" id="edit_jobPosition_select" name="jobPositionSelect">
+                            <option value="">Select a job title</option>
+                            <option value="Software Engineer">Software Engineer</option>
+                            <option value="Frontend Developer">Frontend Developer</option>
+                            <option value="Backend Developer">Backend Developer</option>
+                            <option value="Full Stack Developer">Full Stack Developer</option>
+                            <option value="DevOps Engineer">DevOps Engineer</option>
+                            <option value="Data Scientist">Data Scientist</option>
+                            <option value="Data Analyst">Data Analyst</option>
+                            <option value="Product Manager">Product Manager</option>
+                            <option value="Project Manager">Project Manager</option>
+                            <option value="UX Designer">UX Designer</option>
+                            <option value="UI Designer">UI Designer</option>
+                            <option value="Graphic Designer">Graphic Designer</option>
+                            <option value="Marketing Manager">Marketing Manager</option>
+                            <option value="Sales Manager">Sales Manager</option>
+                            <option value="Business Analyst">Business Analyst</option>
+                            <option value="System Administrator">System Administrator</option>
+                            <option value="Database Administrator">Database Administrator</option>
+                            <option value="Quality Assurance Engineer">Quality Assurance Engineer</option>
+                            <option value="Technical Writer">Technical Writer</option>
+                            <option value="Consultant">Consultant</option>
+                            <option value="Team Lead">Team Lead</option>
+                            <option value="Senior Developer">Senior Developer</option>
+                            <option value="Junior Developer">Junior Developer</option>
+                            <option value="Intern">Intern</option>
+                            <option value="Freelancer">Freelancer</option>
+                            <option value="Entrepreneur">Entrepreneur</option>
+                            <option value="CEO">CEO</option>
+                            <option value="CTO">CTO</option>
+                            <option value="Other">Other (specify below)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_jobPosition_manual" class="form-label">Or enter your job title manually</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="edit_jobPosition_manual" 
+                               name="jobPositionManual" 
+                               value="${currentValue}" 
+                               placeholder="Enter your job title">
+                        <small class="text-muted">This field will be used if you select "Other" above or if no selection is made</small>
+                    </div>
+                `;
+                
+                document.getElementById('editFieldContainer').innerHTML = inputHtml;
+                
+                // Add event listener for select change
+                document.getElementById('edit_jobPosition_select').addEventListener('change', function() {
+                    const manualInput = document.getElementById('edit_jobPosition_manual');
+                    if (this.value && this.value !== 'Other') {
+                        manualInput.value = this.value;
+                        manualInput.disabled = true;
+                    } else {
+                        manualInput.disabled = false;
+                        if (this.value === 'Other') {
+                            manualInput.focus();
+                        }
+                    }
+                });
+                
+                // Pre-select if current value matches any option
+                const selectElement = document.getElementById('edit_jobPosition_select');
+                const options = selectElement.querySelectorAll('option');
+                let matched = false;
+                options.forEach(option => {
+                    if (option.value === currentValue) {
+                        option.selected = true;
+                        matched = true;
+                        if (currentValue !== 'Other') {
+                            document.getElementById('edit_jobPosition_manual').disabled = true;
+                        }
+                    }
+                });
+                
+                // If no match found and there's a current value, select "Other"
+                if (!matched && currentValue) {
+                    selectElement.value = 'Other';
+                    document.getElementById('edit_jobPosition_manual').disabled = false;
+                }
+                
+                editModal.show();
+                return;
+            }
+            
+            const currentValue = document.getElementById(field).value;
+            const fieldLabel = this.closest('.info-row').querySelector('.info-label p').textContent;
+            
+            document.getElementById('editModalTitle').textContent = `Edit ${fieldLabel.toLowerCase()}`;
+            
+            let inputHtml = '';
+            if (field === 'bio') {
+                inputHtml = `
+                    <div class="mb-3">
+                        <label for="edit_${field}" class="form-label">${fieldLabel}</label>
+                        <textarea class="form-control" id="edit_${field}" name="${field}" rows="4" maxlength="500">${currentValue}</textarea>
+                        <small class="text-muted">Maximum 500 characters</small>
+                    </div>
+                `;
+            } else {
+                const inputType = field === 'email' ? 'email' : field === 'phone' ? 'tel' : field.includes('website') || field.includes('linkedin') ? 'url' : 'text';
+                inputHtml = `
+                    <div class="mb-3">
+                        <label for="edit_${field}" class="form-label">${fieldLabel}</label>
+                        <input type="${inputType}" class="form-control" id="edit_${field}" name="${field}" value="${currentValue}">
+                    </div>
+                `;
+            }
+            
+            document.getElementById('editFieldContainer').innerHTML = inputHtml;
+            editModal.show();
+        });
+    });
+    
+    // Handle modal form submission
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const activeField = document.querySelector('#editFieldContainer').firstElementChild;
+        
+        if (activeField && activeField.querySelector('#edit_country')) {
+            // Handle location field
+            const country = document.getElementById('edit_country').value;
+            const city = document.getElementById('edit_city').value;
+            
+            if (country && city) {
+                updateMainField('countrySelect', country, true);
+                updateMainField('citySelect', city, true);
+            
+                // Populate country select with selected value
+                const countrySelect = document.getElementById('countrySelect');
+                countrySelect.innerHTML = `<option value="${country}">${country}</option>`;
+            
+                // Populate city select with selected value
+                const citySelect = document.getElementById('citySelect');
+                citySelect.innerHTML = `<option value="${city}">${city}</option>`;
+            
+                showUpdateSection();
+                editModal.hide();
+            }
+        } else if (activeField && activeField.querySelector('#edit_jobPosition_select')) {
+        // Handle job position field
+        const selectValue = document.getElementById('edit_jobPosition_select').value;
+        const manualValue = document.getElementById('edit_jobPosition_manual').value;
+        
+        // Use select value if it's not "Other" and not empty, otherwise use manual input
+        const finalValue = (selectValue && selectValue !== 'Other') ? selectValue : manualValue;
+        
+        if (finalValue) {
+            updateMainField('jobPosition', finalValue);
+            showUpdateSection();
+            editModal.hide();
+        } else {
+            alert('Please select a job title or enter one manually.');
+        }
+    } else {
+        // Handle other fields
+        const input = activeField.querySelector('input, textarea');
+        if (input) {
+            const fieldName = input.name;
+            const newValue = input.value;
+            
+            updateMainField(fieldName, newValue);
+            showUpdateSection();
+            editModal.hide();
+        }
+    }
+});
+    
+    // Handle password form submission
+    document.getElementById('passwordForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (newPassword !== confirmPassword) {
+            alert('New passwords do not match');
+            return;
+        }
+        
+        // Add hidden password fields to main form
+        addHiddenField('currentPassword', currentPassword);
+        addHiddenField('newPassword', newPassword);
+        
+        showUpdateSection();
+        passwordModal.hide();
+        
+        // Clear password form
+        this.reset();
+    });
+    
+    // Handle profile picture change
+    document.getElementById('profilePictureInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('profilePreview');
+                if (preview.tagName === 'IMG') {
+                    preview.src = e.target.result;
+                } else {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = 'Profile Picture';
+                    img.className = 'rounded-circle';
+                    img.style.width = '100px';
+                    img.style.height = '100px';
+                    img.style.objectFit = 'cover';
+                    img.id = 'profilePreview';
+                    preview.parentNode.replaceChild(img, preview);
+                }
+            };
+            reader.readAsDataURL(file);
+            showUpdateSection();
+        }
+    });
+    
+    // Handle password confirmation
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = this.value;
+        
+        if (newPassword !== confirmPassword) {
+            this.setCustomValidity('Passwords do not match');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+    
+    // Function to update main form field
+    function updateMainField(fieldName, value, isSelect = false) {
+        const field = document.getElementById(fieldName);
+        if (field) {
+            field.value = value;
+            field.disabled = false;
+            field.readOnly = false;
+            field.classList.add('field-changed');
+            hasChanges = true;
+        }
+    }
+    
+    // Function to add hidden field to main form
+    function addHiddenField(name, value) {
+        // Remove existing hidden field if it exists
+        const existing = document.querySelector(`input[name="${name}"][type="hidden"]`);
+        if (existing) {
+            existing.remove();
+        }
+        
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = name;
+        hiddenInput.value = value;
+        document.getElementById('mainProfileForm').appendChild(hiddenInput);
+        hasChanges = true;
+    }
+    
+    // Function to show update section
+    function showUpdateSection() {
+        document.getElementById('updateSection').style.display = 'block';
+    }
+    
+    // Function to reset form
+    window.resetForm = function() {
+        // Reload the page to reset all changes
+        if (confirm('Are you sure you want to cancel all changes? This will reload the page.')) {
+            window.location.reload();
+        }
+    }
+});
+
+// Function to load countries from API
+async function loadCountries(selectedCountry = '', selectedCity = '') {
+    try {
+        const response = await fetch('https://countriesnow.space/api/v0.1/countries');
+        const data = await response.json();
+        
+        const countrySelect = document.getElementById('edit_country');
+        const citySelect = document.getElementById('edit_city');
+        
+        // Clear existing options
+        countrySelect.innerHTML = '<option value="">Select a country</option>';
+        
+        // Populate countries
+        data.data.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country.country;
+            option.textContent = country.country;
+            if (country.country === selectedCountry) {
+                option.selected = true;
+            }
+            countrySelect.appendChild(option);
+        });
+        
+        // Handle country change
+        countrySelect.addEventListener('change', function() {
+            const selectedCountryName = this.value;
+            citySelect.innerHTML = '<option value="">Select a city</option>';
+            citySelect.disabled = !selectedCountryName;
+            
+            if (selectedCountryName) {
+                const countryData = data.data.find(c => c.country === selectedCountryName);
+                if (countryData && countryData.cities) {
+                    countryData.cities.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city;
+                        option.textContent = city;
+                        citySelect.appendChild(option);
+                    });
+                    citySelect.disabled = false;
+                }
+            }
+        });
+        
+        // If there's a selected country, load its cities
+        if (selectedCountry) {
+            const countryData = data.data.find(c => c.country === selectedCountry);
+            if (countryData && countryData.cities) {
+                countryData.cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    if (city === selectedCity) {
+                        option.selected = true;
+                    }
+                    citySelect.appendChild(option);
+                });
+                citySelect.disabled = false;
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error loading countries:', error);
+        // Fallback to text inputs if API fails
+        document.getElementById('editFieldContainer').innerHTML = `
+            <div class="mb-3">
+                <label for="edit_country" class="form-label">Country</label>
+                <input type="text" class="form-control" id="edit_country" name="country" value="${selectedCountry}" placeholder="Enter country">
+            </div>
+            <div class="mb-3">
+                <label for="edit_city" class="form-label">City</label>
+                <input type="text" class="form-control" id="edit_city" name="city" value="${selectedCity}" placeholder="Enter city">
+            </div>
+        `;
+    }
+}
+
+// Auto-hide success alert after 5 seconds
+setTimeout(function() {
+    const successAlert = document.getElementById('successAlert');
+    if (successAlert) {
+        const alert = new bootstrap.Alert(successAlert);
+        alert.close();
+    }
+}, 5000);
+</script>

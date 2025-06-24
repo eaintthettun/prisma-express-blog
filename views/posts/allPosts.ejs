@@ -13,7 +13,7 @@
                 <div class="post-item d-flex flex-column flex-md-row justify-content-between py-4 border-bottom">
                     <div class="post-content-column order-2 order-md-1 mb-3 mb-md-0 me-md-4 flex-grow-1">
                         <small class="post-category mb-2 d-block">
-                            <a href="/category/<%= post.categoryId %>" class="category-pill-link">
+                            <a href="/topics/<%= post.category.slug %>" class="category-pill-link">
                                 <%= post.category.name %>
                             </a>
                         </small>
@@ -27,7 +27,7 @@
                         <% } %>
 
                         <div class="mt-2">
-                            <%- include('../partials/authorInfoBar',{post,currentUser})%>
+                            <%- include('../partials/authorInfoBar',{post,currentUser,getReadTime})%>
                             <%- include('../partials/likeCommentBookmarkShare', { post: post, currentUser }) %>
                         </div>
                     </div>

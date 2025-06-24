@@ -12,6 +12,8 @@ const commentRoutes=require('./routes/commentRoutes');
 const topicRoutes=require('./routes/topicRoutes');
 const auth=require('./middleware/authMiddleware');
 const { fi } = require('@faker-js/faker');
+const multer = require('multer'); //for file upload,use this package
+const flash = require('connect-flash');
 
 dotenv.config();
 app.set('view engine','ejs');
@@ -27,7 +29,25 @@ app.use(session({
     saveUninitialized:false,
     cookie: { maxAge: 60 * 60 * 1000 } // 1 hour
 }));
+
+//flash middleware
+app.use(flash());
+
+//declare getReadTime in app.js and store it in middleware(res.locals)
+function getReadTime(text) {
+    const wordsPerMinute = 200; // average reading speed
+    const words = text.trim().split(/\s+/).length;
+    const minutes = Math.ceil(words / wordsPerMinute);
+    return `${minutes} min read`;
+}
+
+
 app.use(async(req,res,next)=>{
+    // Make flash messages available in all EJS templates
+    res.locals.successMessage = req.flash('success');
+    res.locals.errorMessage = req.flash('error');
+    
+    res.locals.getReadTime=getReadTime; //to use getReadTime globally across EJS templates
     if (!req.session.likedPosts) {
         req.session.likedPosts = []; // store post IDs liked but not saved yet
     }
@@ -72,7 +92,6 @@ app.use('/posts',postRoutes); //only write posts when only login
 app.use('/comments',commentRoutes);
 app.use('/topics',topicRoutes);
 
-
 app.get('/',async(req,res)=>{
     const currentUser=res.locals.currentUser;
     const featuredPost = await prisma.post.findUnique(
@@ -108,7 +127,8 @@ app.get('/',async(req,res)=>{
                 // You might also need categories if displayed on the card
                 category: {
                      select: {
-                        name: true
+                        name: true,
+                        slug:true,
                     }
                 }
             },
@@ -149,12 +169,13 @@ app.get('/',async(req,res)=>{
             // You might also need categories if displayed on the card
             category: {
                  select: {
-                    name: true
+                    name: true,
+                    slug:true,
                 }
             }
         },
     });
-    res.render('index',{currentUser,featuredPost,recentPosts
+    res.render('index',{currentUser,featuredPost,recentPosts,getReadTime:res.locals.getReadTime
     });
 });
 

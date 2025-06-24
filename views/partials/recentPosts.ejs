@@ -21,7 +21,7 @@
                     </div> 
                     <div class="post-card-content-row">
                         <small class="post-category">
-                            <a href="/category/<%= post.categoryId %>" class="category-pill-link">
+                            <a href="/topics/<%= post.category.slug %>" class="category-pill-link">
                                 <%= post.category.name %>
                             </a>
                         </small>
@@ -29,7 +29,7 @@
 
                         <% if (post.subtitle) { %> <p><%= post.subtitle %></p> <% } %>
                         
-                        <%- include('../partials/authorInfoBar',{ post, currentUser }) %>
+                        <%- include('../partials/authorInfoBar',{ post, currentUser,getReadTime }) %>
 
                     </div> <!--end post card content row-->
                 </div> <!--end post card-->

@@ -20,7 +20,7 @@
                     
                     <!-- Author Info & Actions -->
                     <div class="border-top border-bottom py-3 mb-4">
-                        <%- include('../partials/authorInfoBar',{post,currentUser})%>
+                        <%- include('../partials/authorInfoBar',{post,currentUser,getReadTime})%>
                         <div class="mt-3">
                             <%- include('../partials/likeCommentBookmarkShare', { post, currentUser }) %>
                         </div>
@@ -157,7 +157,7 @@
                                     <small class="text-muted">
                                         <%= popularPost.author.name %> • 
                                         <%=formatViewCount(popularPost.viewCount)%> views • 
-                                        <%= popularPost.readTime || '5 min' %> read
+                                        <%= getReadTime(popularPost.content) %>
                                     </small>
                                 </div>
                             </div>
@@ -257,7 +257,7 @@
                                         <div class="mt-auto">
                                             <small class="text-muted">
                                                 By <%= relatedPost.author.name %> • 
-                                                <%= relatedPost.readTime || '5 min' %> read
+                                                <%= getReadTime(relatedPost.content) %> 
                                             </small>
                                         </div>
                                     </div>

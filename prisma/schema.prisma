@@ -15,11 +15,16 @@ datasource db {
 
 model User {
   id                Int     @id @default(autoincrement())
+  firstName         String?
+  lastName          String?
   name              String
+  profilePictureUrl String? // Optional profile picture URL
   email             String  @unique
   password          String
-  profilePictureUrl String? // Optional profile picture URL
-  title             String? // New: Senior Tech Writer & Developer
+  city              String?
+  country           String?
+  jobPosition       String?
+  company           String?
   bio               String? // New: About Alex Chen
   githubUrl         String? // New: Social links
   twitterUrl        String? // New: Social links
@@ -101,6 +106,7 @@ model CommentLike {
   @@unique([authorId, commentId]) // Prevent double-likes
 }
 
+//m-m rs between author and post
 model Like {
   id       Int  @id @default(autoincrement())
   author   User @relation(fields: [authorId], references: [id]) //who like this

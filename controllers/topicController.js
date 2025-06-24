@@ -134,7 +134,6 @@ exports.showTopic=async(req,res)=>{
     const currentUser=res.locals.currentUser;
     //this id will either category id or topic id
     const slug=req.params.slug;
-     
     //to know category or topic ==> need to check slug name
     const categories=res.locals.categories;  //get categories from local storage
     const isCategory = categories.find(c => c.slug === slug);
@@ -144,10 +143,13 @@ exports.showTopic=async(req,res)=>{
         let category=await getCategory({where:{slug:slug}});
         console.log('category length:',category.posts.length);
         return res.render('category/categoryOrTopicDetails',
-            {isCategory,category,currentUser});
+            {isCategory,category,
+              currentUser,
+              getReadTime:res.locals.getReadTime});
     }else{ //is not category so this is topic
         let topic=await getTopic({where:{slug:slug}});
-        return res.render('category/categoryOrTopicDetails',{isCategory,topic,currentUser});
+        return res.render('category/categoryOrTopicDetails',{isCategory,topic
+          ,currentUser,getReadTime:res.locals.getReadTime});
     }
 }  
 
@@ -213,6 +215,8 @@ exports.showMoreRelatedStories=async(req,res)=>{
           {isCategory,category,currentUser});
   }else{ //is not category so this is topic
       let topic=await getTopic({where:{slug:slug}});
-      return res.render('category/relatedPosts',{isCategory,topic,currentUser});
+      return res.render('category/relatedPosts',{isCategory,topic,currentUser,
+        getReadTime:res.locals.getReadTime
+      });
   }
 }

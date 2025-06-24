@@ -11,6 +11,7 @@ function formatViewCount(count) {
     }
     return (count / 1_000_000).toFixed(count % 1_000_000 === 0 ? 0 : 1) + 'M';
 }  
+
 exports.showPostDetails=async(req,res)=>{
     const categories=res.locals.categories; //get categories from session
     const currentUser=res.locals.currentUser;
@@ -119,7 +120,8 @@ exports.showPostDetails=async(req,res)=>{
     res.render('posts/postDetails',
         {post,currentUser,recentPosts,mostReadPosts,
             formatViewCount,
-            categories
+            categories,
+            getReadTime:res.locals.getReadTime
         });
 }
 
@@ -278,6 +280,7 @@ exports.searchPosts=async(req,res)=>{
         hasPreviousPage:page>1,
         nextPage:page+1,
         previousPage:page-1,
+        getReadTime:res.locals.getReadTime
     });
 }
   // Show all posts including current user and others
@@ -300,6 +303,7 @@ exports.listAllPosts = async (req, res) => {
         hasPreviousPage:page>1,
         nextPage:page+1,
         previousPage:page-1,
+        getReadTime:res.locals.getReadTime
     });
 };
   
@@ -331,7 +335,8 @@ exports.listMyPosts=async (req,res)=>{
         hasPreviousPage:page>1,
         nextPage:page+1,
         previousPage:page-1,
-        currentUser:res.locals.currentUser });   
+        currentUser:res.locals.currentUser,
+        getReadTime:res.locals.getReadTime });   
 };
 
 exports.showCreateForm=async(req,res)=>{
