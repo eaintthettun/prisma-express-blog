@@ -87,10 +87,11 @@ p {
   font-size: 1mrem;
   text-decoration: none;
   padding: 15px 25px;
+  transition: 0.3s;
 }
 
 .base-btn:hover {
-  background-color: #6de7cb;
+  background-color: #3e8676;
 }
 
 /*topic follow btn*/

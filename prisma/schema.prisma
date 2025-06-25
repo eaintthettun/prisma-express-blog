@@ -30,21 +30,18 @@ model User {
   twitterUrl        String? // New: Social links
   linkedinUrl       String? // New: Social links
 
-  posts          Post[] //user can write many posts
-  comments       Comment[]
-  likes          Like[] //Likes given by this user
-  commentLikes   CommentLike[]
-  followedTopics TopicFollow[]
+  posts              Post[] //user can write many posts
+  comments           Comment[]
+  likes              Like[] //Likes given by this user //join table
+  commentLikes       CommentLike[]
+  followedTopics     TopicFollow[] //join table
+  followedCategories CategoryFollow[] //join table
 
   //follows relation(many-many relationship join table)
   followers UserFollow[] @relation("FollowerFollowing")
   following UserFollow[] @relation("FollowingFollower")
 
-  bookmarks  BookMark[] //user can save many posts
-  Category   Category?  @relation(fields: [categoryId], references: [id])
-  categoryId Int?
-  Topic      Topic?     @relation(fields: [topicId], references: [id])
-  topicId    Int?
+  bookmarks BookMark[] //user can save many posts
 }
 
 //m-m relationship between user and post
@@ -106,7 +103,9 @@ model CommentLike {
   @@unique([authorId, commentId]) // Prevent double-likes
 }
 
+//post like table
 //m-m rs between author and post
+//join table
 model Like {
   id       Int  @id @default(autoincrement())
   author   User @relation(fields: [authorId], references: [id]) //who like this
@@ -118,15 +117,26 @@ model Like {
 }
 
 model Category {
-  id         Int           @id @default(autoincrement())
-  name       String        @unique
+  id         Int              @id @default(autoincrement())
+  name       String           @unique
   slug       String? //to prevent confict with old records that does not have slug
   posts      Post[]
   topics     Topic[] //one category has many topics
-  followedBy TopicFollow[]
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime?     @updatedAt
-  User       User[]
+  followedBy CategoryFollow[] //join table
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime?        @updatedAt
+}
+
+model CategoryFollow {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  categoryId Int
+  followedAt DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, categoryId]) // Prevent duplicate follows
 }
 
 //a topic can have only one category
@@ -137,24 +147,21 @@ model Topic {
   category   Category      @relation(fields: [categoryId], references: [id])
   categoryId Int
   posts      Post[]
-  followedBy TopicFollow[]
+  followedBy TopicFollow[] //join table
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
-  User       User[]
 
   @@unique([name, categoryId]) // Prevents duplicate topic names within same category
 }
 
 //join table between Topic and User(m-m rs)
 model TopicFollow {
-  id         Int       @id @default(autoincrement())
-  user       User      @relation(fields: [userId], references: [id])
-  userId     Int
-  topic      Topic     @relation(fields: [topicId], references: [id])
-  topicId    Int
-  createdAt  DateTime  @default(now())
-  Category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId Int?
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  topicId   Int
+  createdAt DateTime @default(now())
 
   @@unique([userId, topicId]) // prevent duplicate follows
 }

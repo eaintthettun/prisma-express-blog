@@ -12,6 +12,93 @@ function formatViewCount(count) {
     return (count / 1_000_000).toFixed(count % 1_000_000 === 0 ? 0 : 1) + 'M';
 }  
 
+exports.getFollowingFeed=async(req,res)=>{
+    const userId = req.session.userId;
+    const page = parseInt(req.query.page) || 1;
+    let ITEMS_PER_PAGE=5;
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+        
+    // Step 1: Get followed user IDs
+    const followedUsers = await prisma.userFollow.findMany({
+        where: { followerId: userId },
+        select: { followingId: true }
+    });
+    const followedUserIds = followedUsers.map(followedUser => followedUser.followingId);
+
+    // Step 2: Get followed topic IDs
+    const followedTopics = await prisma.topicFollow.findMany({
+        where: { userId },
+        include:{
+            topic:{
+                select:{
+                    name:true,
+                    slug:true,
+                }
+            }
+        }
+    });
+    const followedTopicIds = followedTopics.map(followedTopic => followedTopic.topicId);
+
+    // Step 3: Get followed category IDs
+    const followedCategories = await prisma.categoryFollow.findMany({
+        where: { userId },
+        include:{
+            category:{
+                select:{
+                    name:true,
+                    slug:true,
+                }
+            }
+        }
+    });
+    const followedCategoryIds = followedCategories.map(followedCategory => followedCategory.categoryId);
+
+
+    // Step 4: Fetch posts that match any of those
+    //getPostsQuery method takes skip,Items_per_page and where{} as params and returns post array
+    const posts = await getPostsQuery({
+        skip,
+        ITEMS_PER_PAGE,
+        where: {
+        OR: [
+            { authorId: { in: followedUserIds } },
+            { topicId: { in: followedTopicIds } },
+            { categoryId: { in: followedCategoryIds } }
+        ]
+        },
+    });
+ 
+    const totalItems=await prisma.post.count({
+        where: {
+            OR: [
+                { authorId: { in: followedUserIds } },
+                { topicId: { in: followedTopicIds } },
+                { categoryId: { in: followedCategoryIds } }
+            ]
+        },
+    });
+    
+    const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
+
+    res.render('posts/followingFeed', {
+        posts,
+        currentPage:page,
+        totalPages,
+        hasNextPage:page<totalPages,
+        hasPreviousPage:page>1,
+        nextPage:page+1,
+        previousPage:page-1,
+        getReadTime: res.locals.getReadTime,
+        currentUser: res.locals.currentUser,
+        followedTopics, //for scroll bar
+        followedCategories, //for scroll bar
+        feedTitle:"Your following feed",
+        feedDescription:"Read articles from authors and topics that you follow...",
+        activeTab: "following" // ✅ This activates the button
+    });
+}
+
+
 exports.showPostDetails=async(req,res)=>{
     const categories=res.locals.categories; //get categories from session
     const currentUser=res.locals.currentUser;
@@ -290,20 +377,62 @@ exports.listAllPosts = async (req, res) => {
     const skip = (page - 1) * ITEMS_PER_PAGE;
     //getPostsQuery method takes skip,take and where{} as params and returns post array
     const posts = await getPostsQuery(
-        { skip, ITEMS_PER_PAGE }); //return posts from prisma
+        { skip, ITEMS_PER_PAGE }); //return posts from prisma Post model
+
+
+    // Fetch followed topics by current user
+    //note that topics are fetched from join table
+    const followedTopics = await prisma.topicFollow.findMany({
+        where: {
+            userId: req.session.userId, //userId means followerId
+        },
+        include: {
+            topic: {
+                select:{
+                    name:true, //to get topic name on horizontal scrollable bar
+                    slug:true,
+                }
+            } 
+        }
+    });
+
+    // Fetch followed categories by current user
+    const followedCategories = await prisma.categoryFollow.findMany({
+        where: {
+            userId: req.session.userId, //userId means followerId
+        },
+        include: {
+            category: {
+                select:{
+                    name:true, //to get category name on horizontal scrollable bar
+                    slug:true,
+                }
+            }
+        }
+    });
+    //console.log(`followed topics by ${res.locals.currentUser.name} is:`,followedTopics);
+    //console.log(`followed categories by ${res.locals.currentUser.name} is:`,followedCategories);
 
     const totalItems=await prisma.post.count();
     
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
 
-    res.render('posts/allPosts', { posts,
-        currentPage:page,
-        totalPages,
-        hasNextPage:page<totalPages,
-        hasPreviousPage:page>1,
-        nextPage:page+1,
-        previousPage:page-1,
-        getReadTime:res.locals.getReadTime
+    res.render('posts/allPosts', 
+        {
+            posts,
+            currentPage:page,
+            totalPages,
+            hasNextPage:page<totalPages,
+            hasPreviousPage:page>1,
+            nextPage:page+1,
+            previousPage:page-1,
+            getReadTime:res.locals.getReadTime,
+            followedTopics,
+            followedCategories,
+            currentUser:res.locals.currentUser,
+            feedTitle:"All Blog Posts",
+            feedDescription:"Explore articles based on your interests...",
+            activeTab:'all posts'
     });
 };
   
