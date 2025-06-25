@@ -1,11 +1,65 @@
 <section class="all-posts-page-header text-center py-5 bg-light">
         <div class="container">
-            <h1 class="display-4 fw-bold mb-3">All Blog Posts</h1>
-            <p class="lead text-muted">Explore our latest articles and dive into diverse topics.</p>
+            <h1 class="display-4 fw-bold mb-3"><%= feedTitle %></h1>
+            <p class="lead text-muted"><%= feedDescription %></p>
         </div>
 </section>
 
-    <div class="container my-5">
+<!-- Horizontal scrollable nav that shows for you button and followedTopics button -->
+<!--if currentUser exists,show scroll bar-->
+<% if (currentUser) { %>
+  <div class="topic-scrollbar bg-white py-3 border-bottom sticky-top">
+    <div class="container position-relative">
+
+      <!-- Scroll Arrows -->
+      <button class="scroll-arrow left" onclick="scrollTopics(-200)">‹</button>
+      <button class="scroll-arrow right" onclick="scrollTopics(200)">›</button>
+
+    
+      <!-- Scrollable Container -->
+      <div id="scrollContainer" class="scroll-container d-flex gap-2 overflow-auto">
+        <!-- Follow Topics Button -->
+        <a href="/topics" title="Follow more topics">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 32 32">
+                <path fill="#333" d="M16 32C7.163 32 0 24.837 0 16S7.163 0 16 0s16 7.163 16 16a16 16 0 0 1-16 16m0-30C8.268 2 2 8.268 2 16s6.268 14 14 14s14-6.268 14-14A14 14 0 0 0 16 2"/>
+                <path fill="#333" d="M23 15h-6V9h-2v6H9v2h6v6h2v-6h6z" class="ouiIcon__fillSecondary"/>
+            </svg>
+        </a>
+
+        <!-- For You Button -->
+        <a href="/posts/foryou" 
+           class="custom-feed-btn <%= activeTab === 'foryou' ? 'active' : '' %>">For You</a>
+
+        <!-- Following Button -->
+        <a href="/posts/following" 
+           class="custom-feed-btn <%= activeTab === 'following' ? 'active' : '' %>">Following</a>
+
+        <!-- Followed Categories -->
+        <% if (followedCategories?.length > 0) { %>
+          <% followedCategories.forEach(f => { %>
+            <a href="/categories/<%= f.category.slug %>" class="custom-feed-btn">
+              <%= f.category.name %>
+            </a>
+          <% }) %>
+        <% } %>
+
+        <!-- Followed Topics -->
+        <% if (followedTopics?.length > 0) { %>
+          <% followedTopics.forEach(f => { %>
+            <a href="/topics/<%= f.topic.slug %>" class="custom-feed-btn">
+              <%= f.topic.name %>
+            </a>
+          <% }) %>
+        <% } %>
+
+
+      </div>
+    </div>
+  </div>
+<% } %>
+
+
+<div class="container my-5">
         <% if (posts.length === 0) { %>
             <p class="no-posts-message text-center fs-5 text-muted">No posts to show yet. Check back soon!</p>
         <% } else { %>
@@ -65,3 +119,70 @@
             </nav>
         <% } %>
     </div>
+
+<style>
+  .scroll-container {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-feed-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  border: 1px solid #ccc;
+  padding: 6px 16px;
+  border-radius: 50px;
+  background: white;
+  font-weight: 500;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.custom-feed-btn:hover {
+  background: #f8f9fa;
+}
+
+/* Scroll arrows */
+    .scroll-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        padding: 4px 10px;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .scroll-arrow.left {
+        left: -10px;
+    }
+
+    .scroll-arrow.right {
+        right: -10px;
+    }
+
+    .custom-feed-btn.active {
+        background-color:rgb(59, 131, 115);
+        color: #ffffff;
+    }
+</style>
+
+<script>
+  function scrollTopics(offset) {
+    const container = document.getElementById('scrollContainer');
+    container.scrollBy({ left: offset, behavior: 'smooth' });
+  }
+</script>

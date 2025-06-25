@@ -16,7 +16,7 @@ router.post('/like-temp',postController.likeTemp);
 router.post('/save-likes',auth,postController.saveLikes);
 router.post('/:id/unlike-post',auth,postController.unlikePost); //post id
 router.post('/:id/toggle-bookmark',auth,postController.bookMarkPost);
-router.get('/:id',postController.showPostDetails);
-
+//router.get('/:id',postController.showPostDetails);
+router.get('/following',auth,postController.getFollowingFeed);
 
 module.exports=router;
