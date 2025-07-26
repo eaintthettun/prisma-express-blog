@@ -14,6 +14,7 @@ const auth=require('./middleware/authMiddleware');
 const { fi } = require('@faker-js/faker');
 const multer = require('multer'); //for file upload,use this package
 const flash = require('connect-flash');
+const PrismaSessionStore=require('./utils/PrismaSessionStore.js')
 
 dotenv.config();
 app.set('view engine','ejs');
@@ -23,12 +24,19 @@ app.use(expressLayouts);
 app.set('layout', 'layout'); // Specify your default layout file (e.g., views/layout.ejs)
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('public')); //D:\JavaScript online class workspace\prisma-express-blog\public
-app.use(session({
-    secret:process.env.SECRET,
-    resave:false,
-    saveUninitialized:false,
-    cookie: { maxAge: 60 * 60 * 1000 } // 1 hour
-}));
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: new PrismaSessionStore(prisma, {
+      ttl: 14 * 24 * 60 * 60, // 14 days
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 14,
+    },
+  })
+);
 
 //flash middleware
 app.use(flash());
@@ -93,7 +101,6 @@ app.use('/comments',commentRoutes);
 app.use('/topics',topicRoutes);
 
 app.get('/',async(req,res)=>{
-    const currentUser=res.locals.currentUser;
     const featuredPost = await prisma.post.findUnique(
         { 
             where: { id: 36 },
@@ -140,42 +147,63 @@ app.get('/',async(req,res)=>{
         { createdAt: 'desc' },
         take: 2,
         include: {
-            author: {
-                include:{
-                    followers:{
-                        select:{
-                            followerId:true,  //to check if you are following this user or not
+                author:{
+                    include:{
+                        followers:{
+                            select:{
+                                followerId:true, //to check if you are following this user or not
+                            }
                         }
+                    }
+                },
+                likes: {
+                    // Include likes to check if the current user has liked it
+                    select: {
+                        authorId: true, // Only need the authorId to check for a match
+                    },
+                },
+                bookmarks:{
+                    select:{
+                        userId:true,
+                    }
+                },
+                _count: {
+                    select: {
+                        likes:true,
+                        comments: true, // This will give you the count of comments
+                    },
+                },
+                // You might also need categories if displayed on the card
+                category: {
+                     select: {
+                        name: true,
+                        slug:true,
                     }
                 }
             },
-            likes: {
-                // Include likes to check if the current user has liked it
-                select: {
-                    authorId: true, // Only need the authorId to check for a match
-                },
-            },
-            bookmarks:{
-                select:{
-                    userId:true,
-                }
-            },
-            _count: {
-                select: {
-                    likes:true,
-                    comments: true, // This will give you the count of comments
-                },
-            },
-            // You might also need categories if displayed on the card
-            category: {
-                 select: {
-                    name: true,
-                    slug:true,
-                }
-            }
-        },
     });
-    res.render('index',{currentUser,featuredPost,recentPosts,getReadTime:res.locals.getReadTime
+
+    
+    //if the user like featuredpost,likedByUser=true else likedByUser=false,then send it to UI to check condition
+    const featuredPostWithLikeInfo = {
+        ...featuredPost,
+        likedByUser: res.locals.currentUser 
+            ? featuredPost.likes.some(like => like.authorId === req.session.userId)
+            : false,
+    };
+
+   const recentPostsWithLikeInfo = recentPosts.map(post => ({
+  ...post,
+  likedByUser: res.locals.currentUser
+    ? post.likes.some(like => like.authorId === req.session.userId)
+    : false,
+}));
+
+    res.render('index',{
+        currentUser:res.locals.currentUser,
+        featuredPost:featuredPostWithLikeInfo,
+        recentPosts:recentPostsWithLikeInfo,
+        getReadTime:res.locals.getReadTime
     });
 });
 

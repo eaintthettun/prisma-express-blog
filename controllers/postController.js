@@ -99,11 +99,52 @@ exports.getFollowingFeed=async(req,res)=>{
 }
 
 
+exports.bookMarkPost=async(req,res)=>{
+    const postId = parseInt(req.params.id);
+    const currentUserId = req.session.userId; // Ensure currentUserId is correctly set in your session
+    const redirectTo = req.header('Referer') || `/posts`; // Fallback to the all posts page
+
+    try {
+        const existingBookmark = await prisma.bookMark.findUnique({
+            where: {
+                userId_postId: {
+                    userId: currentUserId,
+                    postId: postId,
+                },
+            },
+        });
+
+        if (existingBookmark) {
+            // If exists, delete (unbookmark)
+            await prisma.bookMark.delete({
+                where: {
+                    userId_postId: {
+                        userId: currentUserId,
+                        postId: postId,
+                    },
+                },
+            });
+            res.redirect(redirectTo);
+        } else {
+            // If not exists, create (bookmark)
+            await prisma.bookMark.create({
+                data: {
+                    userId: currentUserId,
+                    postId: postId,
+                },
+            });
+            res.redirect(redirectTo);
+        }
+    } catch (error) {
+        console.error('Error toggling bookmark:', error);
+    }
+}
+
 exports.showPostDetails=async(req,res)=>{
     const categories=res.locals.categories; //get categories from session
     const currentUser=res.locals.currentUser;
     const postId=parseInt(req.params.id);
-
+    
     const post=await prisma.post.findUnique({
         where:{id:postId},
         include:{
@@ -212,123 +253,43 @@ exports.showPostDetails=async(req,res)=>{
         });
 }
 
-exports.bookMarkPost=async(req,res)=>{
-    const postId = parseInt(req.params.id);
-    const currentUserId = req.session.userId; // Ensure currentUserId is correctly set in your session
-    const redirectTo = req.header('Referer') || `/posts`; // Fallback to the all posts page
-
-    try {
-        const existingBookmark = await prisma.bookMark.findUnique({
-            where: {
-                userId_postId: {
-                    userId: currentUserId,
-                    postId: postId,
-                },
-            },
-        });
-
-        if (existingBookmark) {
-            // If exists, delete (unbookmark)
-            await prisma.bookMark.delete({
-                where: {
-                    userId_postId: {
-                        userId: currentUserId,
-                        postId: postId,
-                    },
-                },
-            });
-            res.redirect(redirectTo);
-        } else {
-            // If not exists, create (bookmark)
-            await prisma.bookMark.create({
-                data: {
-                    userId: currentUserId,
-                    postId: postId,
-                },
-            });
-            res.redirect(redirectTo);
-        }
-    } catch (error) {
-        console.error('Error toggling bookmark:', error);
-    }
-}
-
-// Route to store like in session (not DB yet)
-//for one user
-exports.likeTemp = (req, res) => {
-    console.log('req body:',req.body);
-    const { postId } = req.body;
-    // to prevent liking the post again if already liked it.
-    if (req.session.likedPosts.includes(postId)) {
-      return res.json({ success: false, message: 'Already liked this post' });
-    }
-  
-    req.session.likedPosts.push(postId);
-    console.log('after push,req session post ids:',req.session.likedPosts);
-    return res.json({ success: true });
-  };
-  
-  exports.saveLikes=async(req,res)=>{
-    console.log('Saving likes triggered!');
-    const userId = req.session.userId;
-    const likedPosts = req.session.likedPosts || [];
-  
-      //   const existingLike = await prisma.like.findMany({
-      //     where: {
-      //       authorId_postId: {
-      //         authorId,
-      //         postId: parseInt(postId),
-      //       },
-      //     },
-      //   });
-      const response=await prisma.like.createMany({
-              data: likedPosts.map(postId => ({
-                authorId: userId,
-                postId: parseInt(postId)
-              })),
-              skipDuplicates: true // built-in protection!
-      });          
-      console.log('response data:',response.data);
-      req.session.likedPosts = []; // clear session likes
-      res.json({ success: true });         
+// Like/Unlike routes
+exports.likePost=async(req,res)=>{
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not authenticated' });
   }
 
-exports.unlikePost=async(req,res)=>{
-    const { postId } = req.body;
-    const userId = req.session.userId;
-    try {
-      //check Like record exist or not
-      const existingLike = await prisma.like.findFirst({
-        where: {
-            postId: parseInt(postId),
-            authorId: userId,
+  try {
+    const existingLike = await prisma.like.findFirst({
+      where: {
+        postId: parseInt(req.params.id),
+        authorId: req.session.userId,
+      },
+    });
+
+    //if like exists, the code assumes that user unlike the post
+    if (existingLike) {
+      // Unlike the post
+      await prisma.like.delete({
+        where: { id: existingLike.id },
+      });
+      return res.json({ liked: false });
+    } else {
+      // Like the post
+      await prisma.like.create({
+        data: {
+          postId: parseInt(req.params.id),
+          authorId: req.session.userId,
         },
       });
-      if (!existingLike) {
-        // if no like record,send a message to client
-        //update like status in session
-        if (req.session.likedPosts) {
-            req.session.likedPosts = req.session.likedPosts.filter(id => id !== postId);
-        }
-        console.log('after deleting session post id:',req.session.likedPosts);
-        return res.json({success:false, message: 'Like does not exist' });
-      }else{
-        // if record exist,delete
-        await prisma.like.delete({
-            where: {
-                authorId_postId:{
-                    authorId:userId,
-                    postId:parseInt(postId)
-                }
-            },
-        });
-      }
-      res.json({success:true,message:'Unlike success'});
-    } catch (error) {
-      console.error('Unlike error:', error);
-      return res.json({success:false,message:'Server error'});
+      return res.json({ liked: true });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error processing like' });
+  }
 }
+
 
 //getPostsQuery(...)=used for searchPosts,listAllPosts,listMyPosts
 exports.searchPosts=async(req,res)=>{
