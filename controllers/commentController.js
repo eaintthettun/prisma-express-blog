@@ -2,7 +2,6 @@ const {PrismaClient}=require('@prisma/client');
 const prisma=new PrismaClient();
 
 exports.likeComment=async (req,res)=>{
-  const redirectTo = req.header('Referer') || `/posts`; // Fallback to the all posts page
   const commentId = parseInt(req.params.id);
   const authorId = req.session.userId;
 
@@ -22,6 +21,7 @@ exports.likeComment=async (req,res)=>{
         id: existingCommentLike.id
       }
     });
+    return res.json({ liked: false });
   } else {
     // Like
     const commentLike=await prisma.commentLike.create({
@@ -31,9 +31,8 @@ exports.likeComment=async (req,res)=>{
       }
     });
     //console.log('comment like:',commentLike);
+     return res.json({ liked: true });
   }
-
-  res.redirect(redirectTo); // return to the same page
 }
 
 //sql query (select * from posts where authorId=req.session.userId)

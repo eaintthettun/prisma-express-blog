@@ -45,16 +45,14 @@ class PrismaSessionStore extends session.Store {
 
   // ❌ Delete a session from the database
   async destroy(sid, callback) {
-    try {
-      await this.prisma.session.delete({
-        where: { sid },
-      });
-      callback(null);
-    } catch (err) {
-      // It's OK if the session doesn't exist
-      callback(null);
-    }
-  }
+  this.prisma.session.delete({
+    where: { sid },
+  }).then(() => {
+    if (typeof callback === 'function') callback(null);
+  }).catch((err) => {
+    if (typeof callback === 'function') callback(err);
+  });
+}
 }
 
 module.exports = PrismaSessionStore;

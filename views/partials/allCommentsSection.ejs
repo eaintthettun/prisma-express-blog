@@ -1,5 +1,5 @@
 <!--carried post and currentUser from postDetails-->
-<div class="comments-section py-5 rounded-4">
+<div id="comments" class="comments-section py-5 rounded-4">
     <div class="container">
         <div class="row justify-content-center">
             <div>
@@ -114,14 +114,17 @@
                                                             <i class="bi bi-heart me-1"></i>
                                                             <span class="like-count"><%= commentLikeCount %></span>
                                                         </button>
-                                                    <% } else { %>
-                                                        <button type="submit" class="btn btn-sm action-btn <%= commentLiked ? 'btn-danger' : 'btn-outline-light text-muted' %>"
-                                                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                        <% } else { %>
+                                                        <button type="button"
+                                                                class="btn btn-sm action-btn comment-like-btn <%= commentLiked ? 'btn-danger' : 'btn-outline-light text-muted' %>"
+                                                                data-comment-id="<%= comment.id %>"
+                                                                data-liked="<%= commentLiked %>"
+                                                                data-bs-toggle="tooltip" data-bs-placement="top"
                                                                 title="<%= commentLiked ? 'Unlike comment' : 'Like comment' %>">
                                                             <i class="bi <%= commentLiked ? 'bi-heart-fill' : 'bi-heart' %> me-1"></i>
                                                             <span class="like-count"><%= commentLikeCount %></span>
                                                         </button>
-                                                    <% } %>
+                                                        <% } %>
                                                 </form>
                                                 
                                                 <% if (currentUser) { %>
@@ -217,13 +220,17 @@
                                                                                 data-bs-toggle="tooltip" data-bs-placement="top" title="Sign in to like">
                                                                             <i class="bi bi-heart me-1"></i><%= replyLikeCount %>
                                                                         </button>
-                                                                    <% } else { %>
-                                                                        <button type="submit" class="btn btn-sm btn-link p-0 <%= replyLiked ? 'text-danger' : 'text-muted' %>"
-                                                                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                                        <% } else { %>
+                                                                        <button type="button"
+                                                                                class="btn btn-sm btn-link p-0 reply-like-btn <%= replyLiked ? 'text-danger' : 'text-muted' %>"
+                                                                                data-reply-id="<%= reply.id %>"
+                                                                                data-liked="<%= replyLiked %>"
+                                                                                data-bs-toggle="tooltip" data-bs-placement="top"
                                                                                 title="<%= replyLiked ? 'Unlike reply' : 'Like reply' %>">
-                                                                            <i class="bi <%= replyLiked ? 'bi-heart-fill' : 'bi-heart' %> me-1"></i><%= replyLikeCount %>
+                                                                            <i class="bi <%= replyLiked ? 'bi-heart-fill' : 'bi-heart' %> me-1"></i>
+                                                                            <span class="like-count"><%= replyLikeCount %></span>
                                                                         </button>
-                                                                    <% } %>
+                                                                        <% } %>
                                                                 </form>
                                                             </div>
                                                         </div>
@@ -466,3 +473,90 @@
     }
 </style>
 
+<script>
+  document.querySelectorAll('.comment-like-btn').forEach(button => {
+    button.addEventListener('click', async function () {
+      const commentId = this.dataset.commentId;
+
+      try {
+        const response = await fetch(`/comments/${commentId}/toggle-like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          const icon = this.querySelector('i');
+          const likeCountSpan = this.querySelector('.like-count');
+          const currentCount = parseInt(likeCountSpan.textContent);
+
+          if (result.liked) {
+            this.classList.remove('btn-outline-light', 'text-muted');
+            this.classList.add('btn-danger');
+            icon.classList.remove('bi-heart');
+            icon.classList.add('bi-heart-fill');
+            likeCountSpan.textContent = currentCount + 1;
+            this.title = 'Unlike comment';
+          } else {
+            this.classList.add('btn-outline-light', 'text-muted');
+            this.classList.remove('btn-danger');
+            icon.classList.remove('bi-heart-fill');
+            icon.classList.add('bi-heart');
+            likeCountSpan.textContent = currentCount - 1;
+            this.title = 'Like comment';
+          }
+        } else {
+          console.error('Error toggling like:', result.message);
+        }
+      } catch (err) {
+        console.error('Network or server error:', err);
+      }
+    });
+  });
+
+  document.querySelectorAll('.reply-like-btn').forEach(button => {
+    button.addEventListener('click', async function () {
+      const replyId = this.dataset.replyId;
+
+      try {
+        const response = await fetch(`/comments/${replyId}/toggle-like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          const icon = this.querySelector('i');
+          const likeCountSpan = this.querySelector('.like-count');
+          let currentCount = parseInt(likeCountSpan.textContent);
+
+          if (result.liked) {
+            this.classList.remove('text-muted');
+            this.classList.add('text-danger');
+            icon.classList.remove('bi-heart');
+            icon.classList.add('bi-heart-fill');
+            likeCountSpan.textContent = currentCount + 1;
+            this.title = 'Unlike reply';
+          } else {
+            this.classList.add('text-muted');
+            this.classList.remove('text-danger');
+            icon.classList.remove('bi-heart-fill');
+            icon.classList.add('bi-heart');
+            likeCountSpan.textContent = currentCount - 1;
+            this.title = 'Like reply';
+          }
+        } else {
+          console.error('Error toggling like:', result.message);
+        }
+      } catch (err) {
+        console.error('Network or server error:', err);
+      }
+    });
+  });
+</script>
