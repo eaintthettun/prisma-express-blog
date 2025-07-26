@@ -378,9 +378,15 @@ exports.listAllPosts = async (req, res) => {
     
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
 
+    const postsWithLikeInfo = posts.map(post => ({
+        ...post,
+        likedByUser: res.locals.currentUser
+            ? post.likes.some(like => like.authorId === req.session.userId)
+            : false,
+    }));
     res.render('posts/allPosts', 
         {
-            posts,
+            posts:postsWithLikeInfo,
             currentPage:page,
             totalPages,
             hasNextPage:page<totalPages,
