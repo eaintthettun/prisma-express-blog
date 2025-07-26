@@ -84,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(topicFollowBtn){
                     topicFollowBtn.addEventListener('click', async function() {
                         const topicId = this.dataset.topicId; //this topicId is from topicFollowBtn dataset in categoryOrTopicDetails.js
-                        console.log('topicId:',topicId);
                         try {
                             const response = await fetch(`/topics/${topicId}/toggle-follow`, { 
                             method: 'POST',
@@ -128,57 +127,41 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
 
+    //AJAX handler for like unlike btn
+document.querySelectorAll('.like-btn').forEach(button => {
+    button.addEventListener('click', async function () {
+      const postId = this.dataset.postId;
+      const likeCountElement = this.querySelector('.like-count');
+      let currentCount = parseInt(likeCountElement.textContent);
 
-document.body.addEventListener('click', async function(event) {
-                // Like button clicked
-                if (event.target.classList.contains('like-btn')) {
-                  console.log('like btn clicked');
-                  const button = event.target;
-                  const postId = button.dataset.postId;
-              
-                  const response = await fetch('/posts/like-temp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ postId })
-                  });
-              
-                  const data = await response.json();
-                  if (data.success) {
-                    const countEl = document.getElementById(`like-count-${postId}`);
-                    const currentCount = parseInt(countEl.textContent);
-                    countEl.textContent = currentCount + 1;
-              
-                    button.textContent = '❤️ Liked';
-                    button.classList.remove('like-btn');
-                    button.classList.add('unlike-btn');
-                  }
-                }
-              
-                // Unlike button clicked
-                else if (event.target.classList.contains('unlike-btn')) {
-                  console.log('unlike btn clicked');
-                  const button = event.target;
-                  const postId = button.dataset.postId;
-              
-                  const response = await fetch(`/posts/${postId}/unlike-post`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ postId })
-                  });
-              
-                  const data = await response.json();
-                  console.log('response in front end:',data);
-                  if (data.success) {
-                    const countEl = document.getElementById(`like-count-${postId}`);
-                    const currentCount = parseInt(countEl.textContent);
-                    countEl.textContent = currentCount - 1;
-              
-                    button.textContent = '♡ Like';
-                    button.classList.remove('unlike-btn');
-                    button.classList.add('like-btn');
-                  }
-                }
-});
+      if (isNaN(currentCount)) currentCount = 0; // Fallback
+
+      try {
+        const response = await fetch(`/posts/post/${postId}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          if (result.liked) {
+            this.classList.add('liked');
+            likeCountElement.textContent = currentCount + 1;
+          } else {
+            this.classList.remove('liked');
+            likeCountElement.textContent = currentCount - 1;
+          }
+        } else {
+          console.error('Like error:', result.message || 'Unknown error');
+        }
+      } catch (err) {
+        console.error('AJAX error:', err);
+      }
+    });
+  });
+
 
         
              

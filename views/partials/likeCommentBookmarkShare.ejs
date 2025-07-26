@@ -1,5 +1,4 @@
 <%
-    const postLiked = currentUser && post.likes.some(like => like.authorId === currentUser.id);
     const likeCount = post._count.likes;
     const commentCount = post._count.comments;
     const authorProfilePic = post.author && post.author.profilePictureUrl ? post.author.profilePictureUrl : '/images/default-avatar.png';
@@ -20,28 +19,28 @@
                 <!-- Like Button -->
                     <% if (!currentUser) { %>
                         <button type="submit" 
-                                class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 rounded-pill px-3 py-1">
-                            <i class="bi bi-heart" style="font-size: 0.9em;"></i>
-                            <span style="font-size: 0.85em; font-weight: 500;"><%= likeCount %></span>
+                                class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 rounded-pill px-3 py-1" disabled>
+                            <i class="bi bi-heart" style="font-size: 0.7em;"></i>
+                            <span class="like-count" style="font-size: 0.7em; font-weight: 500;"><%= post.likeCount %></span>
                         </button>
-                    <% } else { %>
-                        <p>Likes: <span id="like-count-<%= post.id %>"><%= post._count.likes %></span></p>
-                        <% if (postLiked) { %>
-                            <button class="unlike-btn" data-post-id="<%= post.id %>">❤️ Liked</button>
-                            <% } else { %>
-                            <button class="like-btn" data-post-id="<%= post.id %>">♡ Like</button>
-                        <% } %>
+                        <% } else { %>
+                        <button class="like-btn <%= post.likedByUser ? 'liked' : '' %>" data-post-id="<%= post.id %>">
+                            <i class="bi bi-heart-fill"></i>
+                            <span class="like-count"><%= likeCount %></span>
+                        </button>
                     <% } %>
 
+
                 <!-- Comment Button -->
-                <form action="/posts/<%= post.id %>/comments" method="GET" class="d-inline-block">
-                    <button type="submit"
-                            class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 rounded-pill px-3 py-1"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="View comments">
-                        <i class="bi bi-chat" style="font-size: 0.9em;"></i>
-                        <span style="font-size: 0.85em; font-weight: 500;"><%= commentCount %></span>
-                    </button>
-                </form>
+                <form action="/posts/<%= post.id %>#comments" method="GET" class="d-inline-block">
+            <button type="submit"
+                    class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 rounded-pill px-3 py-1"
+                    data-bs-toggle="tooltip" data-bs-placement="top" title="View comments"
+            >
+                <i class="bi bi-chat" style="font-size: 0.9em;"></i>
+                <span style="font-size: 0.85em; font-weight: 500;"><%= commentCount %></span>
+            </button>
+        </form>
             </div>
         </div>
 
