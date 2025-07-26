@@ -15,15 +15,16 @@
     <div class="row align-items-center">
         <!-- First Column: Like and Comment Buttons -->
         <div class="col-auto">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-4">
                 <!-- Like Button -->
                     <% if (!currentUser) { %>
                         <button type="submit" 
                                 class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 rounded-pill px-3 py-1" disabled>
-                            <i class="bi bi-heart" style="font-size: 0.7em;"></i>
-                            <span class="like-count" style="font-size: 0.7em; font-weight: 500;"><%= post.likeCount %></span>
+                            <i class="bi bi-heart" style="font-size: 1rem;"></i>
+                            <span class="like-count" style="font-size: 1rem; font-weight: 500;"><%= post.likeCount %></span>
                         </button>
                         <% } else { %>
+                        
                         <button class="like-btn <%= post.likedByUser ? 'liked' : '' %>" data-post-id="<%= post.id %>">
                             <i class="bi bi-heart-fill"></i>
                             <span class="like-count"><%= likeCount %></span>
@@ -34,11 +35,12 @@
                 <!-- Comment Button -->
                 <form action="/posts/<%= post.id %>#comments" method="GET" class="d-inline-block">
             <button type="submit"
-                    class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 rounded-pill px-3 py-1"
+                    class="btn btn-sm d-flex align-items-center gap-2 rounded-pill px-2 py-1"
                     data-bs-toggle="tooltip" data-bs-placement="top" title="View comments"
+                    style="color: #999;"
             >
-                <i class="bi bi-chat" style="font-size: 0.9em;"></i>
-                <span style="font-size: 0.85em; font-weight: 500;"><%= commentCount %></span>
+                <i class="bi bi-chat" style="font-size: 1rem;font-weight:600;"></i>
+                <span style="font-size: 1rem; font-weight: 600;"><%= commentCount %></span>
             </button>
         </form>
             </div>

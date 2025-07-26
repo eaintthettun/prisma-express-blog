@@ -114,23 +114,6 @@ app.get('/',async(req,res)=>{
                         }
                     }
                 },
-                likes: {
-                    // Include likes to check if the current user has liked it
-                    select: {
-                        authorId: true, // Only need the authorId to check for a match
-                    },
-                },
-                bookmarks:{
-                    select:{
-                        userId:true,
-                    }
-                },
-                _count: {
-                    select: {
-                        likes:true,
-                        comments: true, // This will give you the count of comments
-                    },
-                },
                 // You might also need categories if displayed on the card
                 category: {
                      select: {
@@ -155,23 +138,6 @@ app.get('/',async(req,res)=>{
                             }
                         }
                     }
-                },
-                likes: {
-                    // Include likes to check if the current user has liked it
-                    select: {
-                        authorId: true, // Only need the authorId to check for a match
-                    },
-                },
-                bookmarks:{
-                    select:{
-                        userId:true,
-                    }
-                },
-                _count: {
-                    select: {
-                        likes:true,
-                        comments: true, // This will give you the count of comments
-                    },
                 },
                 // You might also need categories if displayed on the card
                 category: {

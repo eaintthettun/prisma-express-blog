@@ -136,7 +136,7 @@ p {
 
 .like-btn.liked {
   color: #e0245e;
-  transform: scale(1.2);
+  transform: scale(1);
 }
 
 .like-btn.liked i {
