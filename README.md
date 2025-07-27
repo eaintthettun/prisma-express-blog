@@ -223,9 +223,7 @@ Pull requests are welcome! If you’d like to contribute, please fork the reposi
 
 ## 📸 Screenshots
 
-_Add screenshots of your blog here if available._
-
----
+---![alt text](image.png)
 
 ## 📜 License
 
