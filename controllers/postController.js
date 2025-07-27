@@ -216,6 +216,13 @@ exports.showPostDetails=async(req,res)=>{
         }
         });
 
+    const postWithLikeInfo = {
+        ...post,
+        likedByUser: res.locals.currentUser 
+            ? post.likes.some(like => like.authorId === req.session.userId)
+            : false,
+    };
+
     const recentPosts = await prisma.post.findMany({
             orderBy: {
               createdAt: 'desc' // sort by newest first
@@ -246,7 +253,7 @@ exports.showPostDetails=async(req,res)=>{
     });
     //console.log('post details',post);
     res.render('posts/postDetails',
-        {post,currentUser,recentPosts,mostReadPosts,
+        {post:postWithLikeInfo,currentUser,recentPosts,mostReadPosts,
             formatViewCount,
             categories,
             getReadTime:res.locals.getReadTime
