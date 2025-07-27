@@ -72,30 +72,7 @@ This is a full-featured blogging platform built with **Express.js**, **Prisma**,
 
 ## 📦 Project Structure
 
-├── controllers/
-├── routes/
-├── views/
-├── public/
-│ ├── css/
-│ ├── images/
-│ ├── js/
-│ ├── uploads/
-├── middleware/
-├── utils/
-├── views/
-│ ├── auth/
-│ ├── category/
-│ ├── partials/
-│ ├── posts/
-│ ├── users/
-│ ├── index.ejs
-│ ├── layout.ejs
-├── prisma/
-│ ├── schema.prisma
-├── .env
-├── app.js
-├── seed.js
-└── package.json
+![alt text](image-1.png)
 
 ---
 
@@ -160,8 +137,8 @@ Here are the core dependencies used in this project:
 
 1. **Clone the repository**
 
-   git clone https://github.com/your-username/prisma-express-blog-clone.git
-   cd prisma-express-blog-clone
+   -git clone https://github.com/your-username/prisma-express-blog-clone.git
+   -cd prisma-express-blog-clone
 
 ---
 
@@ -187,11 +164,11 @@ Here are the core dependencies used in this project:
 
 4.  **Initialize Prisma Step by Step**
 
-    npx prisma init(create prisma folder)
-    npx prisma generate(read database url in .env file)
-    npx prisma db push(this adds your database into cluster)
-    npx prisma studio(prisma UI)
-    npx prisma migrate dev --name init
+    -npx prisma init(create prisma folder)
+    -npx prisma generate(read database url in .env file)
+    -npx prisma db push(this adds your database into cluster)
+    -npx prisma studio(prisma UI)
+    -npx prisma migrate dev --name init
 
 ---
 
