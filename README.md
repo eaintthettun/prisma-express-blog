@@ -137,8 +137,8 @@ Here are the core dependencies used in this project:
 
 1. **Clone the repository**
 
-   -git clone https://github.com/your-username/prisma-express-blog-clone.git
-   -cd prisma-express-blog-clone
+   - git clone https://github.com/your-username/prisma-express-blog-clone.git
+   - cd prisma-express-blog-clone
 
 ---
 
@@ -164,11 +164,11 @@ Here are the core dependencies used in this project:
 
 4.  **Initialize Prisma Step by Step**
 
-    -npx prisma init(create prisma folder)
-    -npx prisma generate(read database url in .env file)
-    -npx prisma db push(this adds your database into cluster)
-    -npx prisma studio(prisma UI)
-    -npx prisma migrate dev --name init
+    - npx prisma init(create prisma folder)
+    - npx prisma generate(read database url in .env file)
+    - npx prisma db push(this adds your database into cluster)
+    - npx prisma studio(prisma UI)
+    - npx prisma migrate dev --name init
 
 ---
 
