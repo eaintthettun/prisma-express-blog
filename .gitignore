@@ -1,2 +1,4 @@
-node_modules
+node_modules/
+.env
+prisma-express-blog.sql
 # Keep environment variables out of version control

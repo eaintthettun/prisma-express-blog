@@ -1,79 +1,215 @@
 # 📝 Blog Website using Prisma and Express
 
-This is a full-stack blog application built with **Express.js** and **Prisma ORM**, featuring user authentication, post creation, comments, and post search functionality.
+This is a full-featured blogging platform built with **Express.js**, **Prisma**, and **EJS** — inspired by Medium.com. Users can register, login, write posts, follow topics, and view personalized feeds.
 
 ---
 
-## 🚀 Technologies Used
+## 🚀 Features
 
-### 🔤 Languages & Templates
+- ✅ **User Authentication**
 
-- **EJS** – for server-side rendering
-- **JavaScript**
-- **CSS**
+  - Session-based login & logout
+  - Password hashing with **bcrypt**
+  - Flash messages for feedback
 
-### 🛢️ Database & ORM
+- ✅ **User Profiles**
 
-- **Prisma ORM**
-- **PostgreSQL**
+  - View, edit, and follow/unfollow users
+  - Profile-specific post listings
 
----
+- ✅ **Post Management**
 
-## ✨ Features
+  - Create, read, update, delete (CRUD)
+  - Post likes/unlikes
+  - Bookmarks for later reading
+  - SEO-friendly **slug URLs**
+  - "My Posts" section for authors
 
-- 🔐 Login to the website to write blog posts
-- 📝 Create, read, and manage blog content
-- 💬 Comment on posts from other users
-- 🔎 Search for posts by interest or keyword
+- ✅ **Comment System**
 
----
+  - Add comments to posts
+  - Like/unlike comments
+  - Reply to comments
+  - Like/unlike reply
 
-## 📦 Getting Started
+- ✅ **Topic/Category Management**
 
-Follow these steps after downloading or cloning the project:
+  - Browse topics and categories
+  - Follow/unfollow topics
+  - View related stories by topic and category
 
-### 1. Install dependencies
+- ✅ **Feeds**
 
-```bash
-npm install
-```
+  - Personalized **"Following" feed** (from followed users)
+  - **"For You" feed** (recommended content)
+  - Full post search functionality
 
-### 2. Generate Prisma client
+- ✅ **File Upload**
 
-```bash
-npx prisma generate
-```
+  - Upload images using **Multer**
 
-### 3. Set up the database
+- ✅ **UI/UX Enhancements**
 
-Make sure PostgreSQL is installed and running.
-
-If needed, create the database manually:
-
-```sql
-CREATE DATABASE blog_db;
-```
-
-### 4. Import demo data
-
-Import the sample blog data using the `.sql` file provided:
-
-```bash
-psql -U postgres -d blog_db -f blog-demo.sql
-```
-
-> Replace `postgres` with your PostgreSQL username if it's different.
+  - EJS templating with layout support
+  - Styled **scrollable topic navbar** with active state
+  - Flash message support for actions
 
 ---
 
-## ⚙️ Environment Variables
+## 🧰 Tech Stack
 
-I have already provided a `.env` file in the root directory with the following content:
+- **Backend**: Express.js (v5)
+- **ORM**: Prisma with PostgreSQL
+- **Templating**: EJS with express-ejs-layouts
+- **Styling**: Custom CSS + Bootstrap
+- **Auth**: express-session + bcryptjs
+- **File Uploads**: Multer
+- **Slug Handling**: slugify
+- **Data Generation**: faker
+- **Environment**: dotenv
 
-```
-DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/blog_db?schema=public"
-SECRET=yourSessionSecretHere
-```
+---
+
+## 📦 Project Structure
+
+├── controllers/
+├── routes/
+├── views/
+├── public/
+│ ├── css/
+│ ├── images/
+│ ├── js/
+│ ├── uploads/
+├── middleware/
+├── utils/
+├── views/
+│ ├── auth/
+│ ├── category/
+│ ├── partials/
+│ ├── posts/
+│ ├── users/
+│ ├── index.ejs
+│ ├── layout.ejs
+├── prisma/
+│ ├── schema.prisma
+├── .env
+├── app.js
+├── seed.js
+└── package.json
+
+---
+
+## 🛠 Development Tools & Dependencies
+
+Here are the core dependencies used in this project:
+
+    "dependencies": {
+        "@faker-js/faker": "^9.7.0",
+        "bcryptjs": "^3.0.2",
+        "connect-flash": "^0.1.1",
+        "dotenv": "^16.5.0",
+        "ejs": "^3.1.10",
+        "express": "^5.1.0",
+        "express-ejs-layouts": "^2.5.1",
+        "express-session": "^1.18.1",
+        "multer": "^2.0.1",
+        "slugify": "^1.6.6"
+    },
+    "devDependencies": {
+        "@prisma/client": "^6.8.2",
+        "prisma": "^6.7.0"
+    }
+
+---
+
+## 🌐 Routes Overview
+
+| Method | Route                            | Description                                  |
+| ------ | -------------------------------- | -------------------------------------------- |
+| GET    | `/`                              | Home page                                    |
+| GET    | `/posts`                         | View all posts (public)                      |
+| GET    | `/posts/myPosts`                 | View posts by the logged-in user             |
+| GET    | `/posts/new`                     | Show create post form                        |
+| POST   | `/posts`                         | Create a new post                            |
+| GET    | `/posts/edit/:id`                | Show edit form for a post                    |
+| POST   | `/posts/edit/:id`                | Update a post                                |
+| POST   | `/posts/delete/:id`              | Delete a post                                |
+| GET    | `/posts/:id`                     | View post details                            |
+| POST   | `/posts/post/:id/like`           | Like or unlike a post                        |
+| POST   | `/posts/:id/toggle-bookmark`     | Bookmark or unbookmark a post                |
+| GET    | `/posts/following`               | Posts from followed users                    |
+| GET    | `/posts/search`                  | Search posts                                 |
+| GET    | `/topics`                        | List all categories and topics               |
+| GET    | `/topics/:slug`                  | View posts by topic                          |
+| GET    | `/topics/:slug/stories`          | View more related stories in a topic         |
+| POST   | `/topics/:topicId/toggle-follow` | Follow or unfollow a topic                   |
+| POST   | `/comments`                      | Add a comment to a post                      |
+| POST   | `/comments/:id/toggle-like`      | Like or unlike a comment                     |
+| GET    | `/auth/login`                    | Show login form                              |
+| POST   | `/auth/login`                    | Handle login                                 |
+| GET    | `/auth/register`                 | Show register form                           |
+| POST   | `/auth/register`                 | Handle registration                          |
+| GET    | `/auth/logout`                   | Logout user                                  |
+| GET    | `auth/profile/:id`               | View user profile                            |
+| GET    | `auth/profile/edit/:id`          | Edit user profile                            |
+| POST   | `auth/toggle-follow`             | Follow or unfollow a user (via profile page) |
+
+---
+
+## 📥 Installation
+
+1. **Clone the repository**
+
+   git clone https://github.com/your-username/prisma-express-blog-clone.git
+   cd prisma-express-blog-clone
+
+---
+
+2.  **Install dependencies**
+
+    npm install
+
+---
+
+3.  **Set up environment variables**
+
+    Create a .env file or use a .env.local template I have provided and fill necessary fields :
+
+    DATABASE_URL="your_db_connection_string"
+    SESSION_SECRET="your_secret_key"
+
+    ## 📁 Example .env
+
+        DATABASE_URL="postgresql://user:password@localhost:5432/your_db_name"
+        SESSION_SECRET="your_secret_key"
+
+---
+
+4.  **Initialize Prisma Step by Step**
+
+    npx prisma init(create prisma folder)
+    npx prisma generate(read database url in .env file)
+    npx prisma db push(this adds your database into cluster)
+    npx prisma studio(prisma UI)
+    npx prisma migrate dev --name init
+
+---
+
+5.  **(Optional) Seed the database**
+
+    nodemon seed.js
+
+---
+
+6.  **Run the project**
+
+    npm run dev
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome! If you’d like to contribute, please fork the repository and use a feature branch.
 
 ---
 
@@ -93,4 +229,4 @@ _Add screenshots of your blog here if available._
 
 ## 📜 License
 
-This project is for educational purposes only.
+This project is open-source and free to use for educational and personal purposes.

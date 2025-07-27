@@ -114,6 +114,11 @@ app.get('/',async(req,res)=>{
                         }
                     }
                 },
+                likes:{
+                    select:{
+                        authorId:true,
+                    }
+                },
                 // You might also need categories if displayed on the card
                 category: {
                      select: {
@@ -137,6 +142,11 @@ app.get('/',async(req,res)=>{
                                 followerId:true, //to check if you are following this user or not
                             }
                         }
+                    }
+                },
+                likes:{
+                    select:{
+                        authorId:true,
                     }
                 },
                 // You might also need categories if displayed on the card
