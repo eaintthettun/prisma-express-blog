@@ -128,6 +128,14 @@ exports.showProfile=async (req,res)=>{
                             comments:true,  //to show comment count of that post
                         }
                     },
+                    author:{
+                        select:{
+                            id:true,
+                            profilePictureUrl:true,
+                            followers:true,
+                            name:true,
+                        }
+                    },
                     category:{
                         select:{
                             name:true, //to show category of that post
@@ -147,7 +155,8 @@ exports.showProfile=async (req,res)=>{
             }
         }
     });
-    res.render('user/profile',{profileUser,currentUser,getReadTime:res.locals.getReadTime});
+    res.render('user/profile',{profileUser,currentUser,getReadTime:res.locals.getReadTime,
+    });
 }
 
 exports.showRegister=async(_,res)=>{

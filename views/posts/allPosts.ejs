@@ -1,14 +1,7 @@
-<section class="all-posts-page-header text-center py-5 bg-light">
-        <div class="container">
-            <h1 class="display-4 fw-bold mb-3"><%= feedTitle %></h1>
-            <p class="lead text-muted"><%= feedDescription %></p>
-        </div>
-</section>
-
 <!-- Horizontal scrollable nav that shows for you button and followedTopics button -->
 <!--if currentUser exists,show scroll bar-->
 <% if (currentUser) { %>
-  <div class="topic-scrollbar bg-white py-3 border-bottom sticky-top">
+  <div class="topic-scrollbar bg-white py-3 border-bottom sticky-top" style="z-index: 0;">
     <div class="container position-relative">
 
       <!-- Scroll Arrows -->
@@ -25,10 +18,6 @@
                 <path fill="#333" d="M23 15h-6V9h-2v6H9v2h6v6h2v-6h6z" class="ouiIcon__fillSecondary"/>
             </svg>
         </a>
-
-        <!-- For You Button -->
-        <a href="/posts/foryou" 
-           class="custom-feed-btn <%= activeTab === 'foryou' ? 'active' : '' %>">For You</a>
 
         <!-- Following Button -->
         <a href="/posts/following" 
@@ -61,10 +50,14 @@
 
 <div class="container my-5">
         <% if (posts.length === 0) { %>
-            <p class="no-posts-message text-center fs-5 text-muted">No posts to show yet. Check back soon!</p>
+            <% if(isFollowingFeed){ %>
+             <p class="no-posts-message text-center fs-5 text-muted">You haven't followed any authors or topics yet.</p>
+            <%} else{ %>
+              <p class="no-posts-message text-center fs-5 text-muted">No posts to show yet. Check back soon!</p>
+            <% } %>
         <% } else { %>
             <% posts.forEach(post => { %>
-                <div class="post-item d-flex flex-column flex-md-row justify-content-between py-4 border-bottom">
+                <div class="post-container post-item d-flex flex-column flex-md-row justify-content-between py-4 border-bottom">
                     <div class="post-content-column order-2 order-md-1 mb-3 mb-md-0 me-md-4 flex-grow-1">
                         <small class="post-category mb-2 d-block">
                             <a href="/topics/<%= post.category.slug %>" class="category-pill-link">
