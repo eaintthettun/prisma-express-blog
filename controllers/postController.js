@@ -12,6 +12,14 @@ function formatViewCount(count) {
     return (count / 1_000_000).toFixed(count % 1_000_000 === 0 ? 0 : 1) + 'M';
 }  
 
+exports.deletePost=async(req,res)=>{
+    const postId = parseInt(req.params.id);
+
+    await prisma.post.delete({ where: { id: postId } });
+
+    return res.status(200).json({ message: 'Post deleted successfully' });
+}
+
 exports.getFollowingFeed=async(req,res)=>{
     const userId = req.session.userId;
     const page = parseInt(req.query.page) || 1;
@@ -55,6 +63,7 @@ exports.getFollowingFeed=async(req,res)=>{
 
 
     // Step 4: Fetch posts that match any of those
+    //followed authors or followed categories or followed topics
     //getPostsQuery method takes skip,Items_per_page and where{} as params and returns post array
     const posts = await getPostsQuery({
         skip,
@@ -80,6 +89,7 @@ exports.getFollowingFeed=async(req,res)=>{
     
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
 
+    const isFollowingFeed=true;
     res.render('posts/followingFeed', {
         posts,
         currentPage:page,
@@ -94,7 +104,8 @@ exports.getFollowingFeed=async(req,res)=>{
         followedCategories, //for scroll bar
         feedTitle:"Your following feed",
         feedDescription:"Read articles from authors and topics that you follow...",
-        activeTab: "following" // ✅ This activates the button
+        activeTab: "following", // ✅ This activates the button
+        isFollowingFeed
     });
 }
 
@@ -327,7 +338,7 @@ exports.searchPosts=async(req,res)=>{
     });
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
 
-    res.render('posts/allPosts', { 
+    res.render('posts/searchPosts', { 
         posts,
         currentPage:page,
         totalPages,
@@ -335,7 +346,7 @@ exports.searchPosts=async(req,res)=>{
         hasPreviousPage:page>1,
         nextPage:page+1,
         previousPage:page-1,
-        getReadTime:res.locals.getReadTime
+        getReadTime:res.locals.getReadTime,
     });
 }
   // Show all posts including current user and others
@@ -406,7 +417,7 @@ exports.listAllPosts = async (req, res) => {
             currentUser:res.locals.currentUser,
             feedTitle:"All Blog Posts",
             feedDescription:"Explore articles based on your interests...",
-            activeTab:'all posts'
+            activeTab:'all posts',
     });
 };
   
@@ -430,7 +441,7 @@ exports.listMyPosts=async (req,res)=>{
     });
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
 
-    res.render('posts/allPosts', { 
+    res.render('posts/myPosts', { 
         posts,
         currentPage:page,
         totalPages,
@@ -486,15 +497,10 @@ exports.updatePost=async(req,res)=>{
 }
 
 exports.deletePost=async(req,res)=>{
-    const post=await prisma.post.findUnique({
-        where:{id:parseInt(req.params.id)}
-    });
-    if(post.authorId !== req.session.userId){
-        return res.status(403).send("Forbidden");
-    }
+    
     await prisma.post.delete({
         where:{id:parseInt(req.params.id)}
     });
-    res.redirect('/posts');
+    return res.status(200).json({ message: 'Post deleted successfully' });
 }
 

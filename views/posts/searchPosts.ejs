@@ -1,12 +1,12 @@
 <section class="all-posts-page-header text-center py-5 bg-light">
         <div class="container">
-            <h1 class="display-4 fw-bold mb-3">Posts by you</h1>
+            <h1 class="display-4 fw-bold mb-3">Searched posts</h1>
         </div>
 </section>
 
     <div class="container my-5">
         <% if (posts.length === 0) { %>
-            <p class="no-posts-message text-center fs-5 text-muted">No posts to show yet.</p>
+            <p class="no-posts-message text-center fs-5 text-muted">No posts found.</p>
         <% } else { %>
             <% posts.forEach(post => { %>
                 <div class="post-item d-flex flex-column flex-md-row justify-content-between py-4 border-bottom">
@@ -34,7 +34,8 @@
                                 <span class="read-more-ellipsis">...</span>
                             <% } %>
                         </p>
-            
+                        
+
                         <div class="mt-2">
                              <%- include('../partials/authorInfoBar', {post, currentUser }) %>
                             <%- include('../partials/likeCommentBookmarkShare', {post, currentUser }) %>

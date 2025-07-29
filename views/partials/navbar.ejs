@@ -1,104 +1,129 @@
-<!-- FIXED: Navbar structure with improved accessibility, consistency, and performance -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top border-bottom" style="height: 70px;">
+<!-- Clean Responsive Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top border-bottom">
   <div class="container-fluid px-4">
     <!-- Logo -->
-    <a href="/" class="logo-link">
+    <a href="/" class="navbar-brand d-flex align-items-center">
       <span class="logo-icon me-2">📝</span>
-      <span class="fw-bold">MY<span class="blog-bgcolor-fill">BLOG<span></span>
+      <span class="fw-bold">MY<span class="blog-bgcolor-fill">BLOG</span></span>
     </a>
 
-    <!-- Search Form (Desktop) -->
-    <form class="search-form d-none d-lg-flex ms-4 flex-grow-1" action="/posts/search" method="GET" style="max-width: 400px;">
-      <div class="search-container position-relative w-100" style="max-width: 400px;">
-        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-        <input class="form-control ps-5 py-2 custom-search-input" type="search" placeholder="Search posts..." name="search" aria-label="Search">
-      </div>
-    </form>
+    <!-- Mobile Toggle Button -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <!-- Navigation Items -->
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <!-- Mobile Search -->
-      <form class="d-lg-none mb-3 mt-2" action="/posts/search" method="GET">
-        <div class="search-container position-relative">
-          <svg class="search-icon position-absolute" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-          <input class="form-control search-input" type="search" placeholder="Search posts..." name="search" aria-label="Search">
+    <!-- Desktop Search (Hidden on mobile) -->
+    <div class="d-none d-lg-flex flex-grow-1 justify-content-center mx-4 g-2">
+      <form class="search-form" action="/posts/search" method="GET" style="max-width: 400px; width: 100%;">
+        <div class="position-relative">
+          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+          <input class="form-control ps-5 py-2 rounded-pill border-0 bg-light" 
+                 type="search" placeholder="Search posts..." name="search" aria-label="Search">
         </div>
       </form>
+    </div>
 
-      <ul class="navbar-nav align-items-lg-center">
-        <li class="nav-item me-3">
-          <a href="/posts/new" class="write-something-btn">
-            <i class="bi bi-pencil me-1"></i> Write Something
+    <!-- Collapsible Content -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <!-- Mobile Search (Visible only on mobile) -->
+      <div class="d-lg-none py-3">
+        <form action="/posts/search" method="GET">
+          <div class="position-relative">
+            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            <input class="form-control ps-5 py-2 rounded-pill border-0 bg-light" 
+                   type="search" placeholder="Search posts..." name="search" aria-label="Search">
+          </div>
+        </form>
+      </div>
+
+      <!-- Navigation Menu -->
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <!-- Write Something Button -->
+        <li class="nav-item me-lg-3 mb-2 mb-lg-0">
+          <a href="/posts/new" class="base-btn p-2">
+            <i class="bi bi-pencil me-1"></i>
+            <span>Write Something</span>
           </a>
         </li>
 
-        <li class="nav-item me-3">
-          <a class="nav-link" href="/posts">Read Posts</a>
+        <!-- Read Posts -->
+        <li class="nav-item me-lg-3 mb-2 mb-lg-0">
+          <a class="nav-link px-3 py-2" href="/posts">Read Posts</a>
         </li>
 
-        <li class="nav-item dropdown me-3">
-          <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <!-- Categories Dropdown -->
+        <li class="nav-item dropdown me-lg-3 mb-2 mb-lg-0">
+          <a class="nav-link dropdown-toggle px-3 py-2" href="#" id="categoriesDropdown" 
+             role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Categories
           </a>
-          <ul class="dropdown-menu categories-dropdown" aria-labelledby="categoriesDropdown">
-            <li><a class="dropdown-item" href="/topics/business">Business</a></li>
-            <li><a class="dropdown-item" href="/topics/technology">Technology</a></li>
-            <li><a class="dropdown-item" href="/topics/self-improvement">Self Improvement</a></li>
-            <li><a class="dropdown-item" href="/topics/writing">Writing</a></li>
-            <li><a class="dropdown-item" href="/topics/finance">Finance</a></li>
-            <li><a class="dropdown-item" href="/topics/design">Design</a></li>
-            <li><a class="dropdown-item" href="/topics/education">Education</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item fw-semibold" href="/topics">View All Topics</a></li>
+          <ul class="dropdown-menu shadow-sm" aria-labelledby="categoriesDropdown">
+            <li><a class="dropdown-item py-2" href="/topics/business">Business</a></li>
+            <li><a class="dropdown-item py-2" href="/topics/technology">Technology</a></li>
+            <li><a class="dropdown-item py-2" href="/topics/self-improvement">Self Improvement</a></li>
+            <li><a class="dropdown-item py-2" href="/topics/writing">Writing</a></li>
+            <li><a class="dropdown-item py-2" href="/topics/finance">Finance</a></li>
+            <li><a class="dropdown-item py-2" href="/topics/design">Design</a></li>
+            <li><a class="dropdown-item py-2" href="/topics/education">Education</a></li>
+            <li><hr class="dropdown-divider my-2"></li>
+            <li><a class="dropdown-item py-2 fw-semibold text-primary" href="/topics">View All Topics</a></li>
           </ul>
         </li>
 
+        <!-- Authentication -->
         <% if (!currentUser) { %>
-        <li class="nav-item">
-          <a class="btn btn-dark rounded-pill px-4" href="/auth/login">Get started</a>
-        </li>
+          <li class="nav-item">
+            <a class="btn btn-dark rounded-pill px-3 py-1" href="/auth/login">Get Started</a>
+          </li>
         <% } else { %>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle user-dropdown d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="user-avatar me-2">
-              <% if (currentUser.profilePictureUrl) { %>
-                <img src="<%= currentUser.profilePictureUrl %>" alt="Profile" class="rounded-circle">
-              <% } else { %>
-                <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
-                  <%= currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U' %>
-                </div>
-              <% } %>
-            </div>
-            <span class="d-none d-lg-inline">Me</span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userDropdown">
-            <li class="dropdown-header">
-              <div class="d-flex align-items-center">
-                <div class="user-avatar me-2">
-                  <% if (currentUser.profilePictureUrl) { %>
-                    <img src="<%= currentUser.profilePictureUrl %>" alt="Profile" class="rounded-circle">
-                  <% } else { %>
-                    <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
-                      <%= currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U' %>
-                    </div>
-                  <% } %>
-                </div>
-                <div>
-                  <div class="fw-semibold"><%= currentUser.name || 'User' %></div>
-                  <small class="text-muted"><%= currentUser.email %></small>
-                </div>
+          <!-- User Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center px-2 py-2" href="#" 
+               id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="user-avatar me-2">
+                <% if (currentUser.profilePictureUrl) { %>
+                  <img src="<%= currentUser.profilePictureUrl %>" alt="Profile" class="rounded-circle">
+                <% } else { %>
+                  <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
+                    <%= currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U' %>
+                  </div>
+                <% } %>
               </div>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/auth/profile/<%= currentUser.id %>">Profile</a></li>
-            <li><a class="dropdown-item" href="/settings">Settings</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="/auth/logout">Sign out</a></li>
-          </ul>
-        </li>
+              <span class="d-none d-lg-inline">Me</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+              <!-- User Info Header -->
+              <li class="dropdown-header bg-light">
+                <div class="d-flex align-items-center">
+                  <div class="user-avatar me-3">
+                    <% if (currentUser.profilePictureUrl) { %>
+                      <img src="<%= currentUser.profilePictureUrl %>" alt="Profile" class="rounded-circle">
+                    <% } else { %>
+                      <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
+                        <%= currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U' %>
+                      </div>
+                    <% } %>
+                  </div>
+                  <div>
+                    <div class="fw-semibold text-dark"><%= currentUser.name || 'User' %></div>
+                    <small class="text-muted"><%= currentUser.email %></small>
+                  </div>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider my-2"></li>
+              <li><a class="dropdown-item py-2" href="/auth/profile/<%= currentUser.id %>">
+                <i class="bi bi-person me-2"></i>Profile
+              </a></li>
+              <li><a class="dropdown-item py-2" href="/settings">
+                <i class="bi bi-gear me-2"></i>Settings
+              </a></li>
+              <li><hr class="dropdown-divider my-2"></li>
+              <li><a class="dropdown-item py-2 text-danger" href="/auth/logout">
+                <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+              </a></li>
+            </ul>
+          </li>
         <% } %>
       </ul>
     </div>
@@ -106,71 +131,74 @@
 </nav>
 
 <style>
-/* Logo */
+  /* Clean Navbar Styles */
+.navbar {
+  height: 70px;
+  transition: all 0.3s ease;
+}
+
+/* Logo Styles */
 .navbar-brand {
   font-family: 'Georgia', serif;
-  color: #212529 !important;
   font-size: 1.25rem;
+  color: #212529 !important;
   text-decoration: none;
   transition: opacity 0.2s ease;
 }
 
 .navbar-brand:hover {
-  color: #212529 !important;
   opacity: 0.8;
+  color: #212529 !important;
 }
 
 .logo-icon {
   font-size: 1.2em;
 }
 
-
-
 /* Navigation Links */
 .nav-link {
-  color: #495057 !important;
-  font-weight: 400;
+  color: #6c757d !important;
+  font-weight: 500;
   font-size: 15px;
-  padding: 8px 12px !important;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: all 0.2s ease;
   text-decoration: none;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link:focus {
   color: #212529 !important;
   background-color: #f8f9fa;
 }
 
-/* Dropdowns */
+/* Dropdown Styles */
 .dropdown-menu {
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  padding: 8px 0;
-  margin-top: 8px;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  min-width: 200px;
 }
 
 .dropdown-item {
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   font-size: 14px;
   color: #495057;
   transition: all 0.2s ease;
+  border-radius: 0;
 }
 
-.dropdown-item:hover {
+.dropdown-item:hover,
+.dropdown-item:focus {
   background-color: #f8f9fa;
   color: #212529;
 }
 
-.dropdown-item:active {
-  background-color: #e9ecef;
-  color: #212529;
-}
-
-/* Categories Dropdown */
-.categories-dropdown {
-  min-width: 200px;
+.dropdown-header {
+  padding: 1rem;
+  margin-bottom: 0;
+  border-radius: 12px 12px 0 0;
 }
 
 /* User Avatar */
@@ -188,88 +216,113 @@
 .avatar-placeholder {
   width: 32px;
   height: 32px;
-  background: #6c757d;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-size: 14px;
   font-weight: 600;
 }
 
-/* User Dropdown */
-.user-dropdown {
-  border: none;
-  background: none;
-  padding: 4px 8px !important;
+/* Buttons */
+.btn-outline-primary {
+  border-width: 1.5px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.user-dropdown:hover {
-  background-color: #f8f9fa !important;
-  color: #212529 !important;
-}
-
-.user-dropdown-menu {
-  min-width: 250px;
-}
-
-.dropdown-header {
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-}
-
-/* Get Started Button */
 .btn-dark {
   background-color: #212529;
   border-color: #212529;
   font-weight: 500;
-  font-size: 14px;
-  padding: 8px 20px;
   transition: all 0.2s ease;
 }
 
 .btn-dark:hover {
   background-color: #495057;
   border-color: #495057;
+  transform: translateY(-1px);
+}
+
+/* Search Input */
+.form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
 
 /* Mobile Styles */
 @media (max-width: 991.98px) {
   .navbar-collapse {
     margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #dee2e6;
+    padding: 1rem 0;
+    border-top: 1px solid #e9ecef;
+    background-color: #fff;
   }
   
-  
-  .user-dropdown {
-    padding: 12px 0 !important;
-  }
-  
-  .btn-dark {
-    margin-top: 1rem;
+  .nav-item {
     width: 100%;
+  }
+  
+  .nav-link {
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px;
+    margin-bottom: 0.25rem;
+  }
+  
+  .btn-outline-primary,
+  .btn-dark {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    justify-content: center;
+  }
+  
+  .dropdown-menu {
+    border: none;
+    box-shadow: none;
+    background-color: #f8f9fa;
+    margin-top: 0;
+    border-radius: 8px;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
   }
 }
 
 /* Navbar Toggler */
 .navbar-toggler {
-  color: #495057;
+  border: none;
+  padding: 0.25rem 0.5rem;
 }
 
 .navbar-toggler:focus {
   box-shadow: none;
 }
 
+/* Smooth Animations */
+.navbar-collapse {
+  transition: all 0.3s ease;
+}
+
 /* Active States */
 .nav-link.active {
-  color: #212529 !important;
-  font-weight: 500;
-  background-color: #f8f9fa;
+  color: #0d6efd !important;
+  background-color: rgba(13, 110, 253, 0.1);
+  font-weight: 600;
 }
 
 /* Focus States for Accessibility */
 .nav-link:focus,
-.dropdown-item:focus {
-  outline: 2px solid #495057;
+.dropdown-item:focus,
+.btn:focus {
+  outline: 2px solid #0d6efd;
   outline-offset: 2px;
 }
+
+
 </style>

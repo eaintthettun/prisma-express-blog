@@ -81,7 +81,7 @@ p {
 }
 /* base style of button */
 .base-btn {
-  background-color: #58bea6;
+  background-color: #489986;
   color: white;
   border-radius: 25px;
   font-size: 1mrem;
@@ -346,7 +346,7 @@ p {
   /* Center the container */
   display: flex;
   /* Enable Flexbox for two columns */
-  gap: 40px;
+  gap: 20px;
   /* Space between the image and content columns */
   align-items: center;
   /* Vertically align items in the middle */
@@ -360,6 +360,7 @@ p {
   /* Take exactly 30% of the container width */
   max-width: 30%;
   /* Ensure it doesn't grow beyond 30% */
+  padding: 10px;
 }
 
 .featured-post-image {
@@ -370,7 +371,6 @@ p {
   border-radius: 8px;
   /* Slightly rounded corners for the image */
   /* Soft shadow */
-  transform: translateX(7%);
 }
 
 .featured-post-content-col {

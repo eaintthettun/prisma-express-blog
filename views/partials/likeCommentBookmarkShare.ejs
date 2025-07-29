@@ -64,12 +64,14 @@
                     <% if (isOwnPost) { %>
                         <a href="/posts/edit/<%= post.id %>" class="btn btn-sm btn-outline-secondary">
                             <i class="bi bi-pencil" style="font-size: 0.9em;"></i>
+                            <span>Edit Post</span>
                         </a>
                     <% } else { %>
                         <form action="/posts/<%= post.id %>/toggle-bookmark" method="POST" class="d-inline">
                             <button type="submit"
-                                    class="btn btn-sm d-flex align-items-center <%= isBookmarked ? 'btn-primary' : 'btn-outline-secondary' %>">
+                                    class="btn btn-sm <%= isBookmarked ? 'btn-primary' : 'btn-outline-secondary' %>">
                                 <i class="bi <%= isBookmarked ? 'bi-bookmark-fill' : 'bi-bookmark' %>" style="font-size: 0.9em;"></i>
+                                <span><%= isBookmarked ? 'Bookmarked' : 'Bookmark' %></span>
                             </button>
                         </form>
                     <% } %>
@@ -83,6 +85,7 @@
                             data-bs-toggle="dropdown" 
                             aria-expanded="false">
                         <i class="bi bi-share" style="font-size: 0.9em;"></i>
+                        <span>Share</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="shareDropdown<%= post.id %>">
                         <li>
@@ -128,7 +131,10 @@
                         <li><a class="dropdown-item" href="#"><i class="bi bi-eye-slash me-2"></i>Hide Post</a></li>
                         <% if (currentUser && isOwnPost) { %>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Delete Post</a></li>
+                            <li><a href="#" class="dropdown-item text-danger delete-post-btn" data-post-id="<%= post.id %>">
+                                <i class="bi bi-trash me-2"></i>Delete Post
+                                </a>
+                            </li>
                         <% } %>
                     </ul>
                 </div>
@@ -186,4 +192,7 @@ function shareOnInstagram(postId) {
     copyPostLink(postId);
     alert('Link copied! You can paste it in your Instagram story or bio.');
 }
+
+
+
 </script>

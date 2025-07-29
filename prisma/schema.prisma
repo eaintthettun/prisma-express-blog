@@ -50,9 +50,9 @@ model BookMark {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
-  post   Post @relation(fields: [postId], references: [id])
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId Int
 
   @@unique([userId, postId])
@@ -64,9 +64,9 @@ model UserFollow {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   // Relations: Connecting back to the User model
-  follower    User     @relation("FollowingFollower", fields: [followerId], references: [id])
+  follower    User     @relation("FollowingFollower", fields: [followerId], references: [id], onDelete: Cascade)
   followerId  Int
-  following   User     @relation("FollowerFollowing", fields: [followingId], references: [id])
+  following   User     @relation("FollowerFollowing", fields: [followingId], references: [id], onDelete: Cascade)
   followingId Int
 
   @@unique([followerId, followingId])
@@ -81,12 +81,12 @@ model Post {
   readTime   String?
   featured   Boolean    @default(false)
   viewCount  Int        @default(0)
-  author     User       @relation(fields: [authorId], references: [id])
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId   Int
   createdAt  DateTime   @default(now())
-  category   Category?  @relation(fields: [categoryId], references: [id])
+  category   Category?  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int?
-  topic      Topic?     @relation(fields: [topicId], references: [id])
+  topic      Topic?     @relation(fields: [topicId], references: [id], onDelete: Cascade)
   topicId    Int? //to prevent conflicts with old records that don't have topics
   comments   Comment[]
   likes      Like[] // Likes received by this post
@@ -95,9 +95,9 @@ model Post {
 
 model CommentLike {
   id        Int     @id @default(autoincrement())
-  author    User    @relation(fields: [authorId], references: [id]) //which user like this comment
+  author    User    @relation(fields: [authorId], references: [id], onDelete: Cascade) //which user like this comment
   authorId  Int
-  comment   Comment @relation(fields: [commentId], references: [id]) //which comment is liked
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade) //which comment is liked
   commentId Int
 
   @@unique([authorId, commentId]) // Prevent double-likes
@@ -108,9 +108,9 @@ model CommentLike {
 //join table
 model Like {
   id       Int  @id @default(autoincrement())
-  author   User @relation(fields: [authorId], references: [id]) //who like this
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade) //who like this
   authorId Int
-  post     Post @relation(fields: [postId], references: [id]) //under which post
+  post     Post @relation(fields: [postId], references: [id], onDelete: Cascade) //under which post
   postId   Int
 
   @@unique([authorId, postId]) // Prevent duplicate likes
@@ -133,8 +133,8 @@ model CategoryFollow {
   categoryId Int
   followedAt DateTime @default(now())
 
-  user     User     @relation(fields: [userId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([userId, categoryId]) // Prevent duplicate follows
 }
@@ -144,7 +144,7 @@ model Topic {
   id         Int           @id @default(autoincrement())
   name       String        @unique
   slug       String
-  category   Category      @relation(fields: [categoryId], references: [id])
+  category   Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
   posts      Post[]
   followedBy TopicFollow[] //join table
@@ -157,9 +157,9 @@ model Topic {
 //join table between Topic and User(m-m rs)
 model TopicFollow {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  topic     Topic    @relation(fields: [topicId], references: [id])
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
   topicId   Int
   createdAt DateTime @default(now())
 
@@ -169,9 +169,9 @@ model TopicFollow {
 model Comment {
   id           Int           @id @default(autoincrement())
   content      String
-  post         Post          @relation(fields: [postId], references: [id])
+  post         Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId       Int
-  author       User          @relation(fields: [authorId], references: [id])
+  author       User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId     Int
   createdAt    DateTime      @default(now())
   commentLikes CommentLike[]
