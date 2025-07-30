@@ -24,7 +24,7 @@
            class="custom-feed-btn <%= activeTab === 'following' ? 'active' : '' %>">Following</a>
 
         <!-- Followed Categories -->
-        <% if (followedCategories?.length > 0) { %>
+        <% if (followedCategories && followedCategories.length > 0) { %>
           <% followedCategories.forEach(f => { %>
             <a href="/categories/<%= f.category.slug %>" class="custom-feed-btn">
               <%= f.category.name %>
@@ -33,7 +33,7 @@
         <% } %>
 
         <!-- Followed Topics -->
-        <% if (followedTopics?.length > 0) { %>
+        <% if (followedTopics && followedTopics.length > 0) { %>
           <% followedTopics.forEach(f => { %>
             <a href="/topics/<%= f.topic.slug %>" class="custom-feed-btn">
               <%= f.topic.name %>
@@ -49,20 +49,19 @@
 
 
 <div class="container my-5">
-        <% if (posts.length === 0) { %>
-            <% if(isFollowingFeed){ %>
-             <p class="no-posts-message text-center fs-5 text-muted">You haven't followed any authors or topics yet.</p>
-            <%} else{ %>
-              <p class="no-posts-message text-center fs-5 text-muted">No posts to show yet. Check back soon!</p>
-            <% } %>
-        <% } else { %>
+        <% if (posts && posts.length > 0) { %>
             <% posts.forEach(post => { %>
                 <div class="post-container post-item d-flex flex-column flex-md-row justify-content-between py-4 border-bottom">
                     <div class="post-content-column order-2 order-md-1 mb-3 mb-md-0 me-md-4 flex-grow-1">
                         <small class="post-category mb-2 d-block">
-                            <a href="/topics/<%= post.category.slug %>" class="category-pill-link">
-                                <%= post.category.name %>
+                            <!--if category exists,go to route.If not, go to #-->
+                            <a 
+                              href="<%= post.category && post.category.slug ? '/topics/' + post.category.slug : '#' %>" 
+                              class="category-pill-link"
+                            >
+                              <%= post.category && post.category.name ? post.category.name : 'Uncategorized' %>
                             </a>
+
                         </small>
                         <h2 class="post-title fs-4 fw-bold mb-2">
                             <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark">
@@ -110,6 +109,13 @@
                     <% } %>
                 </ul>
             </nav>
+        <% } else { %>
+              <!--if it clicks following button, isFollowingFeed will be true-->
+              <% if(isFollowingFeed){ %>
+                  <p class="no-posts-message text-center fs-5 text-muted">You haven't followed any authors or topics yet.</p>
+              <%} else{ %> <!--simple all posts-->
+                    <p class="no-posts-message text-center fs-5 text-muted">No posts to show yet. Check back soon!</p>
+              <% } %>
         <% } %>
     </div>
 

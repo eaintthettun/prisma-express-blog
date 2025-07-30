@@ -100,86 +100,96 @@ app.use('/posts',postRoutes); //only write posts when only login
 app.use('/comments',commentRoutes);
 app.use('/topics',topicRoutes);
 
-app.get('/',async(req,res)=>{
+app.get('/', async (req, res) => {
     const featuredPost = await prisma.post.findUnique(
-        { 
+        {
             where: { id: 36 },
             include: {
-                author:{
-                    include:{
-                        followers:{
-                            select:{
-                                followerId:true, //to check if you are following this user or not
+                author: {
+                    include: {
+                        followers: {
+                            select: {
+                                followerId: true, //to check if you are following this user or not
                             }
                         }
                     }
                 },
-                likes:{
-                    select:{
-                        authorId:true,
+                likes: {
+                    select: {
+                        authorId: true,
                     }
                 },
                 // You might also need categories if displayed on the card
                 category: {
-                     select: {
+                    select: {
                         name: true,
-                        slug:true,
+                        slug: true,
                     }
                 }
             },
         }
-    ); 
+    );
 
     const recentPosts = await prisma.post.findMany({
-        orderBy: 
-        { createdAt: 'desc' },
+        orderBy:
+            { createdAt: 'desc' },
         take: 2,
         include: {
-                author:{
-                    include:{
-                        followers:{
-                            select:{
-                                followerId:true, //to check if you are following this user or not
-                            }
+            author: {
+                include: {
+                    followers: {
+                        select: {
+                            followerId: true, //to check if you are following this user or not
                         }
-                    }
-                },
-                likes:{
-                    select:{
-                        authorId:true,
-                    }
-                },
-                // You might also need categories if displayed on the card
-                category: {
-                     select: {
-                        name: true,
-                        slug:true,
                     }
                 }
             },
+            likes: {
+                select: {
+                    authorId: true,
+                }
+            },
+            // You might also need categories if displayed on the card
+            category: {
+                select: {
+                    name: true,
+                    slug: true,
+                }
+            }
+        },
     });
 
-    
-    //if the user like featuredpost,likedByUser=true else likedByUser=false,then send it to UI to check condition
-    const featuredPostWithLikeInfo = {
-        ...featuredPost,
-        likedByUser: res.locals.currentUser 
-            ? featuredPost.likes.some(like => like.authorId === req.session.userId)
-            : false,
-    };
+    let featuredPostWithLikeInfo = null;
 
-   const recentPostsWithLikeInfo = recentPosts.map(post => ({
-  ...post,
-  likedByUser: res.locals.currentUser
-    ? post.likes.some(like => like.authorId === req.session.userId)
-    : false,
-}));
+    //if the user like featuredpost,likedByUser=true,heart fill
+    // else likedByUser=false, heart no fill then send it to UI to check condition
+    if (featuredPost) {
+        featuredPostWithLikeInfo = {
+            ...featuredPost,
+            likedByUser: res.locals.currentUser
+                ? featuredPost.likes.some(like => like.authorId === req.session.userId)
+                : false,
+        };
+    }
 
-    res.render('index',{
-        currentUser:res.locals.currentUser,
-        featuredPost:featuredPostWithLikeInfo,
-        recentPosts:recentPostsWithLikeInfo,
-        getReadTime:res.locals.getReadTime
+    let recentPostsWithLikeInfo = null;
+
+    //if the user like recentPosts,likedByUser=true,heart fill
+    // else likedByUser=false, heart no fill then send it to UI to check condition
+    if (recentPosts) {
+        recentPostsWithLikeInfo = recentPosts.map(post => ({
+            ...post,
+            likedByUser: res.locals.currentUser
+                ? post.likes.some(like => like.authorId === req.session.userId)
+                : false,
+        }));
+    }
+
+    res.render('index', {
+        currentUser: res.locals.currentUser,
+        featuredPost: featuredPostWithLikeInfo,
+        recentPosts: recentPostsWithLikeInfo,
+        getReadTime: res.locals.getReadTime
     });
 });
 

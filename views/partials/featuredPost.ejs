@@ -2,9 +2,8 @@
     <div class="section-header">
         <h2>Featured Post</h2>
     </div>
-    <div class="featured-post-container">
-        <div class="featured-post-image-col">
-            <% if (featuredPost.imageUrl) { %>
+    <% if (featuredPost) { %>
+        <% if (featuredPost.imageUrl) { %>
                 <img src="<%= featuredPost.imageUrl %>" alt="<%= featuredPost.title %>" class="featured-post-image">
             <% } else { %>
                 <img src="/images/default-featured-image.jpg" alt="Default Featured Image" class="featured-post-image">
@@ -24,5 +23,7 @@
             <%- include('../partials/authorInfoBar',{ post: featuredPost, currentUser})%>
             <br>
         </div> <!--end feature post content col-->
-        
+    <% } else { %>
+        <p class="no-posts-message text-center fs-5 text-muted">No feautured posts to show yet. Check back soon!</p>
+    <%}%>
 </section>
