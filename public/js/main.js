@@ -169,7 +169,7 @@ document.querySelectorAll('.like-btn').forEach(button => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const postId = btn.dataset.postId; //from data-post-id="<%= post.id %>
+        const postId = btn.dataset.postId; //from data-post-id="<%= post.id %> in likeCommentBookmarkShare.ejs
         const confirmed = confirm('Are you sure you want to delete this post?');
 
         if (!confirmed) return;
@@ -188,7 +188,7 @@ document.querySelectorAll('.like-btn').forEach(button => {
             // Remove post from DOM
 
             //from <div class="post-container post-item d-flex ..> in allPosts.ejs (Or) //from  <article class="card border-0 shadow-sm mb-4 post-container"> in profile.ejs
-            const postElement = btn.closest('.post-container'); profile.ejs
+            const postElement = btn.closest('.post-container'); 
             if (postElement) postElement.remove();
             alert('Post deleted successfully');
           } else {

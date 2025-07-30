@@ -349,7 +349,8 @@ exports.searchPosts=async(req,res)=>{
         getReadTime:res.locals.getReadTime,
     });
 }
-  // Show all posts including current user and others
+
+// Show all posts including current user and others
 exports.listAllPosts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     let ITEMS_PER_PAGE=5;
@@ -357,7 +358,6 @@ exports.listAllPosts = async (req, res) => {
     //getPostsQuery method takes skip,take and where{} as params and returns post array
     const posts = await getPostsQuery(
         { skip, ITEMS_PER_PAGE }); //return posts from prisma Post model
-
 
     // Fetch followed topics by current user
     //note that topics are fetched from join table
@@ -396,12 +396,16 @@ exports.listAllPosts = async (req, res) => {
     
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);
 
-    const postsWithLikeInfo = posts.map(post => ({
+    let postsWithLikeInfo=null;
+    if(posts){
+        postsWithLikeInfo = posts.map(post => ({
         ...post,
         likedByUser: res.locals.currentUser
             ? post.likes.some(like => like.authorId === req.session.userId)
             : false,
-    }));
+        }));
+    }
+    const isFollowingFeed=false;
     res.render('posts/allPosts', 
         {
             posts:postsWithLikeInfo,
@@ -418,8 +422,10 @@ exports.listAllPosts = async (req, res) => {
             feedTitle:"All Blog Posts",
             feedDescription:"Explore articles based on your interests...",
             activeTab:'all posts',
+            isFollowingFeed
     });
 };
+  
   
 
 //sql query (select * from posts where authorId=req.session.userId)
