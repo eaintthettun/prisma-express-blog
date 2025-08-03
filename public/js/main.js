@@ -40,44 +40,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 // for author follow btn notification alert
-            const authorFollowBtn = document.getElementById('authorFollowBtn');
-
-            if (authorFollowBtn) {  
-                authorFollowBtn.addEventListener('click', async function () {
-                    const authorId = this.dataset.authorId; //you get authorId from btn dataset defined in authorInfoBar.ejs
-                    const authorName=this.dataset.authorName; 
-                    try {
-                        //you can also write fetch('/auth/${authorId}/toggle-follow')
-                        const response = await fetch('/auth/toggle-follow', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ authorToFollowId: authorId })
-                        });
-                        if (response.status === 401) {
-                            const result = await response.json();
-                            alert(result.error); // ✅ Show "You must be logged in to follow topics."
-                            return;
-                        }
-                        const result = await response.json();
-                        if (result.followed) {
-                            authorFollowBtn.classList.remove('btn-secondary');
-                            authorFollowBtn.classList.add('btn-outline-secondary');
-                            authorFollowBtn.innerHTML = `<i class="bi-person-plus"></i> Following`;
-                            alert(`You followed user ${authorName}`);
-                        } else if(!result.followed) {
-                            authorFollowBtn.classList.remove('btn-outline-secondary');
-                            authorFollowBtn.classList.add('btn-secondary');
-                            authorFollowBtn.innerHTML = `<i class="bi-person-plus"></i> Follow`;
-                            alert(`You unfollowed user ${authorName}`);
-                        }
-                    } catch (error) {
-                        console.error('Follow error:', error);
-                        alert('Something went wrong.');
-                    }
-                });
-            }
+            document.querySelectorAll('.authorFollowBtn').forEach(button => {
+              button.addEventListener('click', async function () {
+                      const authorId = this.dataset.authorId; //you get authorId from btn dataset defined in authorInfoBar.ejs
+                      const authorName=this.dataset.authorName; 
+                      try {
+                          //you can also write fetch('/auth/${authorId}/toggle-follow')
+                          const response = await fetch('/auth/toggle-follow', {
+                              method: 'POST',
+                              headers: {
+                                  'Content-Type': 'application/json'
+                              },
+                              body: JSON.stringify({ authorToFollowId: authorId })
+                          });
+                          if (response.status === 401) {
+                              const result = await response.json();
+                              alert(result.error); // ✅ Show "You must be logged in to follow topics."
+                              return;
+                          }
+                          const result = await response.json();
+                          if (result.followed) {
+                              this.classList.remove('btn-secondary');
+                              this.classList.add('btn-outline-secondary');
+                              this.innerHTML = `<i class="bi-person-plus"></i> Following`;
+                              alert(`You followed user ${authorName}`);
+                          } else if(!result.followed) {
+                              this.classList.remove('btn-outline-secondary');
+                              this.classList.add('btn-secondary');
+                              this.innerHTML = `<i class="bi-person-plus"></i> Follow`;
+                              alert(`You unfollowed user ${authorName}`);
+                          }
+                      } catch (error) {
+                          console.error('Follow error:', error);
+                          alert('Something went wrong.');
+                      }
+              });
+            });  
+            
 
         //for topic follow btn notification alert
                 const topicFollowBtn = document.getElementById('topicFollowBtn');

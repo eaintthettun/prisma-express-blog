@@ -62,14 +62,15 @@
                 </div>
             <% } else { %>
                 <div style="margin: 24px;">
-                        <button id="authorFollowBtn"
-                                class="btn btn-sm <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %> rounded-pill"
-                                data-author-id="<%= post.author.id %>"
-                                data-author-name="<%= post.author.name %>"
-                                style="padding:7px 12px;">
+                        <button
+                            class="authorFollowBtn btn btn-sm <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %> rounded-pill"
+                            data-author-id="<%= post.author.id %>"
+                            data-author-name="<%= post.author.name %>"
+                            style="padding:7px 12px;">
                             <i class="<%= isFollowing ? 'bi-person-dash' : 'bi-person-plus' %>"></i>
                             <%= isFollowing ? 'Following' : 'Follow' %>
                         </button>
+
                 </div>
             <% } %>
         <% } %>

@@ -35,12 +35,13 @@
                                     </div>
                                 <%}else{%>
                                     <div style="margin:24px">
-                                            <button id="followBtn"
-                                                    class="btn btn-sm <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %> rounded-pill"
-                                                    data-author-id="<%= profileUser.id %>"
-                                                    data-author-name="<%= profileUser.name %>">
-                                                    <i class="<%= isFollowing ? 'bi-person-dash' : 'bi-person-plus' %>"></i>
-                                                    <%= isFollowing ? 'Following' : 'Follow' %>
+                                            <button
+                                                class="authorFollowBtn btn btn-sm <%= isFollowing ? 'btn-outline-secondary' : 'btn-secondary' %> rounded-pill"
+                                                data-author-id="<%= profileUser.id %>"
+                                                data-author-name="<%= profileUser.name %>"
+                                                style="padding:7px 12px;">
+                                                <i class="<%= isFollowing ? 'bi-person-dash' : 'bi-person-plus' %>"></i>
+                                                <%= isFollowing ? 'Following' : 'Follow' %>
                                             </button>
                                     </div>
                                 <%}%>
@@ -123,75 +124,46 @@
                 <div class="posts-container">
                     <% profileUser.posts.forEach(post => { %>
                         <article class="card border-0 shadow-sm mb-4 post-container">
-                            <div class="row g-0">
-                                <!-- Post Content -->
-                                <div class="col-md-8">
-                                    <div class="card-body p-4">
-                                        <!-- Category Badge -->
-                                        <% if (post.category) { %>
-                                            <div class="mb-2">
-                                                <a href="/category/<%= post.category.id %>" 
-                                                   class="badge bg-light text-dark text-decoration-none">
-                                                    <%= post.category.name %>
-                                                </a>
-                                            </div>
-                                        <% } %>
-                                        
-                                        <!-- Post Title -->
-                                        <h4 class="fw-bold mb-2">
-                                            <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark">
-                                                <%= post.title %>
-                                            </a>
-                                        </h4>
-                                        
-                                        <!-- Post Subtitle -->
-                                        <% if (post.subtitle) { %>
-                                            <p class="text-muted mb-3">
-                                                <%= post.subtitle %>
-                                            </p>
-                                        <% } %>
-                                        
-                                        <!-- Post Meta -->
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <small class="text-muted">
-                                                <i class="bi bi-calendar me-1"></i>
-                                                <%= new Date(post.createdAt).toLocaleDateString('en-US', { 
-                                                    year: 'numeric', 
-                                                    month: 'long', 
-                                                    day: 'numeric' 
-                                                }) %>
-                                            </small>
-                                            <small class="text-muted">
-                                                <i class="bi bi-clock me-1"></i>
-                                                <%= getReadTime(post.content) %>
-                                            </small>
-                                        </div>
-                                        
-                                        <!-- Post Actions -->
-                                            <%- include('../partials/authorInfoBar', { post: post, currentUser }) %>
-                                            <%- include('../partials/likeCommentBookmarkShare', { post: post, currentUser }) %>
-                                    </div>
-                                </div>
-                                
-                                <!-- Post Image -->
-                                <div class="col-md-4 d-flex justify-content-center align-items-center">
-                                    <div class="position-relative h-100" style="max-height: 250px;width: 80%;">
-                                        <a href="/posts/<%= post.id %>" class="d-block h-100">
-                                            <% if (post.imageUrl) { %>
-                                                <img src="<%= post.imageUrl %>" 
-                                                     alt="<%= post.title %>" 
-                                                     class="img-fluid w-100 h-100 rounded-end"
-                                                     style="object-fit: cover;">
-                                            <% } else { %>
-                                                <img src="/images/defaultPostImage.avif" 
-                                                     alt="Default Post Image" 
-                                                     class="img-fluid w-100 h-100 rounded-end"
-                                                     style="object-fit: cover;">
-                                            <% } %>
+                            <div class="row align-items-center g-3 p-4">
+                               <!-- Post Content -->
+                                <div class="col-12 col-md-8">
+                                    <!-- Category Badge -->
+                                    <% if (post.category) { %>
+                                    <div class="mb-2">
+                                        <a href="/category/<%= post.category.id %>" class="badge bg-light text-dark text-decoration-none">
+                                        <%= post.category.name %>
                                         </a>
                                     </div>
+                                    <% } %>
+
+                                    <!-- Title -->
+                                    <h4 class="fw-bold mb-2">
+                                    <a href="/posts/<%= post.id %>" class="text-decoration-none text-dark">
+                                        <%= post.title %>
+                                    </a>
+                                    </h4>
+
+                                    <!-- Subtitle -->
+                                    <% if (post.subtitle) { %>
+                                    <p class="text-muted mb-3"><%= post.subtitle %></p>
+                                    <% } %>
+
+                                    <!-- Post Actions -->
+                                    <%- include('../partials/authorInfoBar', { post: post, currentUser }) %>
+                                    <%- include('../partials/likeCommentBookmarkShare', { post: post, currentUser }) %>
                                 </div>
-                            </div>
+
+                                <!-- Post Image -->
+                                <div class="col-12 col-md-4 text-center">
+                                    <a href="/posts/<%= post.id %>">
+                                    <% if (post.imageUrl) { %>
+                                        <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="img-fluid rounded post-thumbnail">
+                                    <% } else { %>
+                                        <img src="/images/defaultPostImage.avif" alt="Default Post Image" class="img-fluid rounded post-thumbnail">
+                                    <% } %>
+                                    </a>
+                                </div>
+                                </div>
                         </article>
                     <% }); %>
                 </div>
@@ -206,23 +178,7 @@
                 <% } %>
                 
             <% } else { %>
-                <div class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="bi bi-file-text display-1 text-muted opacity-50"></i>
-                    </div>
-                    <h4 class="text-muted mb-3">No posts yet</h4>
-                    <p class="text-muted">
-                        <% if (isOwnProfile) { %>
-                            Start sharing your thoughts and ideas with the world!
-                            <br>
-                            <a href="/posts/new" class="btn btn-primary mt-3">
-                                <i class="bi bi-plus-lg me-2"></i>Create Your First Post
-                            </a>
-                        <% } else { %>
-                            <%= profileUser.name %> hasn't published any posts yet.
-                        <% } %>
-                    </p>
-                </div>
+                <p class="text-muted">No posts found for this user yet.</p>
             <% } %>
         </div>
     </div>
