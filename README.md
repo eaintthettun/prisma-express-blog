@@ -105,7 +105,6 @@ Here are the core dependencies used in this project:
 | ------ | -------------------------------- | -------------------------------------------- |
 | GET    | `/`                              | Home page                                    |
 | GET    | `/posts`                         | View all posts (public)                      |
-| GET    | `/posts/myPosts`                 | View posts by the logged-in user             |
 | GET    | `/posts/new`                     | Show create post form                        |
 | POST   | `/posts`                         | Create a new post                            |
 | GET    | `/posts/edit/:id`                | Show edit form for a post                    |
@@ -118,6 +117,7 @@ Here are the core dependencies used in this project:
 | GET    | `/posts/search`                  | Search posts                                 |
 | GET    | `/topics`                        | List all categories and topics               |
 | GET    | `/topics/:slug`                  | View posts by topic                          |
+| GET    | `/topics/search`                 | Search topic by name                         |
 | GET    | `/topics/:slug/stories`          | View more related stories in a topic         |
 | POST   | `/topics/:topicId/toggle-follow` | Follow or unfollow a topic                   |
 | POST   | `/comments`                      | Add a comment to a post                      |
@@ -172,7 +172,7 @@ Here are the core dependencies used in this project:
 
 ---
 
-5.  **(Optional) Seed the database**
+5.  ** Seed the database**
 
     nodemon seed.js
 

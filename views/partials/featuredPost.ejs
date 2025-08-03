@@ -1,29 +1,30 @@
 <section class="featured-post-section">
-    <div class="section-header">
         <h2>Featured Post</h2>
-    </div>
-    <% if (featuredPost) { %>
-        <% if (featuredPost.imageUrl) { %>
-                <img src="<%= featuredPost.imageUrl %>" alt="<%= featuredPost.title %>" class="featured-post-image">
-            <% } else { %>
-                <img src="/images/default-featured-image.jpg" alt="Default Featured Image" class="featured-post-image">
-            <% } %>
+        <% if (featuredPost) { %>
+        <div class="featured-post-container">
+            <div class="featured-post-image-col">
+            <% if (featuredPost.imageUrl) { %>
+                    <img src="<%= featuredPost.imageUrl %>" alt="<%= featuredPost.title %>" class="featured-post-image">
+                <% } else { %>
+                    <img src="/images/default-featured-image.jpg" alt="Default Featured Image" class="featured-post-image">
+                <% } %>
+            </div>
+            <div class="featured-post-content-col">
+                <br>
+                <small class="post-category">
+                                <a href="/topics/<%= featuredPost.category.slug %>" class="category-pill-link">
+                                    <%= featuredPost.category.name %>
+                                </a>
+                </small>
+                <h3><a href="/posts/<%= featuredPost.id %>"><%= featuredPost.title %></a></h3>
+                <% if (featuredPost.subtitle) { %>
+                        <p><%= featuredPost.subtitle %></p>
+                <% } %>
+                <%- include('../partials/authorInfoBar',{ post: featuredPost, currentUser})%>
+                <br>
+            </div> <!--end feature post content col-->
+        <% } else { %>
+            <p class="no-posts-message text-center fs-5 text-muted">No feautured posts to show yet. Check back soon!</p>
+        <%}%>
         </div>
-        <div class="featured-post-content-col">
-            <br>
-            <small class="post-category">
-                            <a href="/topics/<%= featuredPost.category.slug %>" class="category-pill-link">
-                                <%= featuredPost.category.name %>
-                            </a>
-            </small>
-            <h3><a href="/posts/<%= featuredPost.id %>"><%= featuredPost.title %></a></h3>
-            <% if (featuredPost.subtitle) { %>
-                    <p><%= featuredPost.subtitle %></p>
-            <% } %>
-            <%- include('../partials/authorInfoBar',{ post: featuredPost, currentUser})%>
-            <br>
-        </div> <!--end feature post content col-->
-    <% } else { %>
-        <p class="no-posts-message text-center fs-5 text-muted">No feautured posts to show yet. Check back soon!</p>
-    <%}%>
 </section>

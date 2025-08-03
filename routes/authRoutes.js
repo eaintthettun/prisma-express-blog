@@ -15,6 +15,6 @@ router.post('/toggle-follow',auth,authController.toggleFollow); //do not show id
 router.get('/profile/edit/:id',authController.showEditProfile);
 
 //upload.single('file input name) will populate req.file if a file is uploaded.
-router.post('/profile/edit/:id',upload.single('profilePictureUrl'),authController.editProfile);
+router.post('/profile/edit/:id',upload.single('profilePicture'),authController.editProfile);
 
 module.exports=router;

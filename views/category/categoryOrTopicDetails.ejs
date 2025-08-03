@@ -1,5 +1,6 @@
-<!--this page accepts either category object or post object-->
+<!--this page handles either category object or topic object-->
 <!--the business is same,so only use one ejs file for both category and topic-->
+
 
 <%
 // Determine if it's a category or topic page
@@ -117,78 +118,85 @@
 <div class="topic-header-section">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-lg-8 text-center">
-        <h1 class="topic-title-custom"><%= typeObj.name %></h1>
-        <p class="lead text-muted mb-4">Discover amazing stories and insights</p>
-        
-        <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-4">
-          <button class="base-follow-btn" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
-            <i class="bi bi-plus-lg me-2"></i>Follow
-          </button>
+      <% if(typeObj){ %>
+        <div class="col-lg-8 text-center">
+          <h1 class="topic-title-custom"><%= typeObj.name %></h1>
+          <p class="lead text-muted mb-4">Discover amazing stories and insights</p>
+          
+          <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-4">
+            <button class="base-follow-btn" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
+              <i class="bi bi-plus-lg me-2"></i>Follow
+            </button>
+          </div>
+          
+          <div class="d-flex justify-content-center gap-4 custom-stats">
+            <span class="followers-count">
+              <i class="bi bi-people-fill me-2 text-primary"></i>
+              <strong><%= typeObj._count.followers || 0 %></strong> followers
+            </span>
+            <span>
+              <i class="bi bi-file-text-fill me-2 text-success"></i>
+              <strong><%= typeObj._count.posts || 0 %></strong> stories
+            </span>
+          </div>
         </div>
-        
-        <div class="d-flex justify-content-center gap-4 custom-stats">
-          <span class="followers-count">
-            <i class="bi bi-people-fill me-2 text-primary"></i>
-            <strong><%= typeObj._count.followers || 0 %></strong> followers
-          </span>
-          <span>
-            <i class="bi bi-file-text-fill me-2 text-success"></i>
-            <strong><%= typeObj._count.posts || 0 %></strong> stories
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-11">
-      
-      <div class="text-center mb-5">
-        <h2 class="custom-section-title">Related Articles</h2>
-        <p class="text-muted">Explore the best stories from this topic</p>
-      </div>
-
-      <!-- 2 Cards per row with compact design -->
-      <div class="row custom-grid-2 g-4 mb-5">
-      <!--to show only two Posts-->
-        <% typeObj.posts.slice(0,2).forEach(post => { %>
-            <div class="col">
-            <div class="card custom-post-card">
-              <div class="position-relative overflow-hidden">
-                <a href="/posts/<%= post.id %>">
-                  <% if (post.imageUrl) { %>
-                    <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="custom-post-image">
-                  <% } else { %>
-                    <img src="/images/defaultPostImage.avif" alt="Default Post Image" class="custom-post-image">
-                  <% } %>
-                </a>
-              </div>
+        <!--show more stories-->
+        <div class="container py-5 mt-5">
+          <div class="row justify-content-center">
+            <div class="col-lg-11">
               
-              <div class="custom-card-body">
-                <a href="/posts/<%= post.id %>" class="text-decoration-none">
-                  <h3 class="custom-post-title"><%= post.title %></h3>
-                </a>
-                <p class="custom-post-subtitle"><%= post.subtitle %></p>
-                
-                <div class="mt-auto">
-                  <%- include('../partials/authorInfoBar',{post,currentUser})%>
-                </div>
+              <div class="text-center mb-5">
+                <h2 class="custom-section-title">Related Articles</h2>
+                <p class="text-muted">Explore the best stories from this topic</p>
               </div>
+
+              <!-- 2 Cards per row with compact design -->
+              <div class="row custom-grid-2 g-4 mb-5">
+              <!--to show only two Posts-->
+                <% typeObj.posts.slice(0,2).forEach(post => { %>
+                    <div class="col">
+                    <div class="card custom-post-card">
+                      <div class="position-relative overflow-hidden">
+                        <a href="/posts/<%= post.id %>">
+                          <% if (post.imageUrl) { %>
+                            <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="custom-post-image">
+                          <% } else { %>
+                            <img src="/images/defaultPostImage.avif" alt="Default Post Image" class="custom-post-image">
+                          <% } %>
+                        </a>
+                      </div>
+                      
+                      <div class="custom-card-body">
+                        <a href="/posts/<%= post.id %>" class="text-decoration-none">
+                          <h3 class="custom-post-title"><%= post.title %></h3>
+                        </a>
+                        <p class="custom-post-subtitle"><%= post.subtitle %></p>
+                        
+                        <div class="mt-auto">
+                          <%- include('../partials/authorInfoBar',{post,currentUser})%>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% }) %> <!--end for loop-->
+              </div>
+
+              <div class="text-center">
+                <a href="/topics/<%= typeObj.slug %>/stories" class="base-showmore-btn">
+                  <i class="bi bi-arrow-right me-2"></i>
+                  Show More Related Stories
+                </a>
+              </div>
+
             </div>
           </div>
-        <% }) %> <!--end for loop-->
-      </div>
-
-      <div class="text-center">
-        <a href="/topics/<%= typeObj.slug %>/stories" class="base-showmore-btn">
-          <i class="bi bi-arrow-right me-2"></i>
-          Show More Related Stories
-        </a>
-      </div>
-
+        </div>
+      <% }else{ %>
+        <p class="no-posts-message text-center fs-5 text-muted">No topic found.</p>
+      <% } %>
     </div>
   </div>
 </div>
+
+

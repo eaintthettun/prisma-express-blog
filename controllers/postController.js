@@ -321,19 +321,16 @@ exports.searchPosts=async(req,res)=>{
         //getPostsQuery method takes skip,take and where{} as params and returns post array
         posts=await getPostsQuery({ skip, take:ITEMS_PER_PAGE,  
             where: {
-                OR: [
-                    { title: { contains: searchWord, mode: 'insensitive' } },
-                    { content: { contains: searchWord, mode: 'insensitive' } }
-                  ]
-                } 
-        });
+                         title:
+                          { contains: searchWord, mode: 'insensitive' } 
+                    },
+            }
+        );
     }
     const totalItems=await prisma.post.count({
         where:{
-            OR: [
-                { title: { contains: searchWord, mode: 'insensitive' } },
-                { content: { contains: searchWord, mode: 'insensitive' } }
-              ]
+                title:
+                    { contains: searchWord, mode: 'insensitive' }  
         }
     });
     const totalPages=Math.ceil(totalItems/ITEMS_PER_PAGE);

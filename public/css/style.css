@@ -337,6 +337,7 @@ p {
   color: #333;
   margin: 0;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .featured-post-container {
@@ -356,11 +357,11 @@ p {
 }
 
 .featured-post-image-col {
-  flex: 0 0 30%;
+  flex: 0 0 40%;
   /* Take exactly 30% of the container width */
-  max-width: 30%;
+  max-width: 40%;
   /* Ensure it doesn't grow beyond 30% */
-  padding: 10px;
+  padding: 20px;
 }
 
 .featured-post-image {

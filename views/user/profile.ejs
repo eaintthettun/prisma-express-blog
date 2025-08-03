@@ -69,6 +69,14 @@
                         </span>
                         <span class="stat-label">Followers</span>
                     </div>
+                    <div class="stat-item me-4">
+                        <span class="stat-number">
+                            <%= profileUser._count.following >= 1000000 ? (profileUser._count.following / 1000000).toFixed(1) + 'M' :
+                                profileUser._count.following >= 1000 ? (profileUser._count.following / 1000).toFixed(1) + 'K' :
+                                profileUser._count.following %>
+                        </span>
+                        <span class="stat-label">Following</span>
+                    </div>
                     <div class="stat-item">
                         <span class="stat-number">
                             <%= profileUser.totalViews >= 1000000 ? (profileUser.totalViews / 1000000).toFixed(1) + 'M' :
@@ -166,8 +174,8 @@
                                 </div>
                                 
                                 <!-- Post Image -->
-                                <div class="col-md-4">
-                                    <div class="position-relative h-100" style="min-height: 200px;">
+                                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                                    <div class="position-relative h-100" style="max-height: 250px;width: 80%;">
                                         <a href="/posts/<%= post.id %>" class="d-block h-100">
                                             <% if (post.imageUrl) { %>
                                                 <img src="<%= post.imageUrl %>" 
@@ -207,7 +215,7 @@
                         <% if (isOwnProfile) { %>
                             Start sharing your thoughts and ideas with the world!
                             <br>
-                            <a href="/posts/create" class="btn btn-primary mt-3">
+                            <a href="/posts/new" class="btn btn-primary mt-3">
                                 <i class="bi bi-plus-lg me-2"></i>Create Your First Post
                             </a>
                         <% } else { %>

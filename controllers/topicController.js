@@ -115,6 +115,40 @@ const getTopic=async(options = {}) => {
 });
 }
 
+//this method search either topic or category
+exports.searchTopic=async(req,res)=>{
+  const searchWord =req.query.searchWord.trim();
+  const currentUser=res.locals.currentUser;
+
+    if (searchWord !== "") {
+      //check if it's category
+      const isCategory = res.locals.categories.find(c => c.name.toLowerCase() === searchWord);
+      
+      //if it is category, get category obj and send it to UI
+      if(isCategory){
+        const category=await getCategory({
+          where:{
+            name:
+            { contains: searchWord, mode: 'insensitive' } 
+          }
+        });
+        return res.render('category/categoryOrTopicDetails',
+            {isCategory,category,
+              currentUser,
+              getReadTime:res.locals.getReadTime});
+      }else{ 
+        const topic=await getTopic({
+          where:{
+            name:
+            { contains: searchWord, mode: 'insensitive' } 
+          }
+        });
+        return res.render('category/categoryOrTopicDetails',{isCategory,topic
+          ,currentUser,getReadTime:res.locals.getReadTime});
+      }
+    }
+}
+
 exports.listTopics=async(req,res)=>{
     const categories=await prisma.category.findMany({ //get both categories and topics
         include:{
