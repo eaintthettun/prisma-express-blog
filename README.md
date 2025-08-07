@@ -41,7 +41,6 @@ This is a full-featured blogging platform built with **Express.js**, **Prisma**,
 - ✅ **Feeds**
 
   - Personalized **"Following" feed** (from followed users)
-  - **"For You" feed** (recommended content)
   - Full post search functionality
 
 - ✅ **File Upload**

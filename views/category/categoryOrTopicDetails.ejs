@@ -124,15 +124,23 @@
           <p class="lead text-muted mb-4">Discover amazing stories and insights</p>
           
           <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-4">
-            <button class="base-follow-btn" id="topicFollowBtn" data-topic-id="<%= typeObj.id %>">
-              <i class="bi bi-plus-lg me-2"></i>Follow
+            <button 
+              class="base-follow-btn <%= isFollowed ? 'btn-dark' : 'btn-outline-dark' %>" 
+              id="topicFollowBtn" 
+              data-topic-id="<%= typeObj.id %>"
+            >
+              <% if (isFollowed) { %>
+                <i class="bi bi-check-lg me-2"></i>Following
+              <% } else { %>
+                <i class="bi bi-plus-lg me-2"></i>Follow
+              <% } %>
             </button>
           </div>
           
           <div class="d-flex justify-content-center gap-4 custom-stats">
             <span class="followers-count">
               <i class="bi bi-people-fill me-2 text-primary"></i>
-              <strong><%= typeObj._count.followers || 0 %></strong> followers
+              <strong><%= followerCount || 0 %></strong> followers
             </span>
             <span>
               <i class="bi bi-file-text-fill me-2 text-success"></i>

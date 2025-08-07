@@ -166,24 +166,63 @@ exports.listTopics=async(req,res)=>{
 
 exports.showTopic=async(req,res)=>{
     const currentUser=res.locals.currentUser;
+    let isFollowed=false;
+    let followerCount;
     //this id will either category id or topic id
     const slug=req.params.slug;
     //to know category or topic ==> need to check slug name
     const categories=res.locals.categories;  //get categories from local storage
     const isCategory = categories.find(c => c.slug === slug);
-    //console.log('isCategory?:',isCategory);
     if(isCategory){
       //get category first ,then you can call category.posts to get posts
         let category=await getCategory({where:{slug:slug}});
-        console.log('category length:',category.posts.length);
+
+        if(currentUser){
+          const followed = await prisma.categoryFollow.findFirst({
+            where: {
+              userId: currentUser.id,
+              categoryId: category.id,
+            },
+          });
+
+          if(followed){
+            isFollowed=true;
+          }
+
+          followerCount = await prisma.categoryFollow.count({
+            where: {
+              categoryId: category.id,
+            },
+          });
+        }
         return res.render('category/categoryOrTopicDetails',
             {isCategory,category,
               currentUser,
-              getReadTime:res.locals.getReadTime});
+              getReadTime:res.locals.getReadTime,
+              isFollowed,
+              followerCount});
     }else{ //is not category so this is topic
         let topic=await getTopic({where:{slug:slug}});
+        if(currentUser){
+          const followed = await prisma.topicFollow.findFirst({
+              where: {
+                userId: currentUser.id,
+                topicId: topic.id,
+              },
+            });
+
+            if(followed){
+              isFollowed=true;
+            }
+          
+          followerCount = await prisma.topicFollow.count({
+            where: {
+              topicId: topic.id,
+            },
+          });
+        }
         return res.render('category/categoryOrTopicDetails',{isCategory,topic
-          ,currentUser,getReadTime:res.locals.getReadTime});
+          ,currentUser,getReadTime:res.locals.getReadTime,isFollowed,followerCount});
     }
 }  
 
@@ -191,21 +230,53 @@ exports.toggleFollow=async(req,res)=>{
         const topicToFollowId = parseInt(req.params.topicId); //this id is from ajax api ${topicId}
         const currentUserId = req.session.userId;
       
-        console.log("currentUserId:", currentUserId, ", topicToFollowId:", topicToFollowId);
+        //console.log("currentUserId:", currentUserId, ", topicToFollowId:", topicToFollowId);
       
         try {
-          const existingFollow = await prisma.topicFollow.findUnique({
-            where: {
-              userId_topicId: {
-                userId: currentUserId,
-                topicId: topicToFollowId,
-              },
-            },
+          const category=await prisma.category.findUnique({
+            where:{
+              id:topicToFollowId
+            }
           });
-      
-          if (existingFollow) {
-            // Unfollow
-            await prisma.topicFollow.delete({
+          if(category){
+            const existingFollow = await prisma.categoryFollow.findUnique({
+              where: {
+                userId_categoryId: {
+                  userId: currentUserId,
+                  categoryId: topicToFollowId,
+                },
+              },
+            });
+            
+            if (existingFollow) {
+              // Unfollow
+              await prisma.categoryFollow.delete({
+                where: {
+                  userId_categoryId: {
+                    userId: currentUserId,
+                    topicId: topicToFollowId,
+                  },
+                },
+              });
+              const count = await prisma.category.count({
+                where: { categoryId: topicToFollowId }
+              });
+              res.json({ followed: false, followersCount: count });
+            } else {
+              // Follow
+              await prisma.categoryFollow.create({
+                data: {
+                  userId: currentUserId,
+                  categoryId: topicToFollowId,
+                },
+              });
+              const count = await prisma.categoryFollow.count({
+                where: { categoryId: topicToFollowId }
+              });
+              res.json({ followed: true, followersCount: count });
+            }
+          }else{
+            const existingFollow = await prisma.topicFollow.findUnique({
               where: {
                 userId_topicId: {
                   userId: currentUserId,
@@ -213,22 +284,34 @@ exports.toggleFollow=async(req,res)=>{
                 },
               },
             });
-            const count = await prisma.topicFollow.count({
-              where: { topicId: topicToFollowId }
-            });
-            res.json({ followed: false, followersCount: count });
-          } else {
-            // Follow
-            await prisma.topicFollow.create({
-              data: {
-                userId: currentUserId,
-                topicId: topicToFollowId,
-              },
-            });
-            const count = await prisma.topicFollow.count({
-              where: { topicId: topicToFollowId }
-            });
-            res.json({ followed: true, followersCount: count });
+            
+            if (existingFollow) {
+              // Unfollow
+              await prisma.topicFollow.delete({
+                where: {
+                  userId_topicId: {
+                    userId: currentUserId,
+                    topicId: topicToFollowId,
+                  },
+                },
+              });
+              const count = await prisma.topicFollow.count({
+                where: { topicId: topicToFollowId }
+              });
+              res.json({ followed: false, followersCount: count });
+            } else {
+              // Follow
+              await prisma.topicFollow.create({
+                data: {
+                  userId: currentUserId,
+                  topicId: topicToFollowId,
+                },
+              });
+              const count = await prisma.topicFollow.count({
+                where: { topicId: topicToFollowId }
+              });
+              res.json({ followed: true, followersCount: count });
+            }
           }
         } catch (error) {
           console.error("Toggle follow error:", error);

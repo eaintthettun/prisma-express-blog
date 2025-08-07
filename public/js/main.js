@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 return; // Don't proceed further
                             }
                             const data = await response.json();
+                           
                             if (data.followed) {
                                 topicFollowBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Following';
                                 topicFollowBtn.classList.remove('btn-outline-dark');

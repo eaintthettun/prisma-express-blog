@@ -26,7 +26,7 @@
         <!-- Followed Categories -->
         <% if (followedCategories && followedCategories.length > 0) { %>
           <% followedCategories.forEach(f => { %>
-            <a href="/categories/<%= f.category.slug %>" class="custom-feed-btn">
+            <a href="/topics/<%= f.category.slug %>" class="custom-feed-btn">
               <%= f.category.name %>
             </a>
           <% }) %>
